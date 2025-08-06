@@ -1,0 +1,39 @@
+This file is explain files in this base
+
+I. RepositoryAspect
+    Đây là một Spring AOP Aspect, dùng để log thời gian thực thi các phương thức trong repository, cụ thể:
+    - @Aspect: Đánh dấu là một Aspect - tức là một lớp chứa logic chạy trước/sau hoặc bao quanh một hành vi khác.
+    - @Value("${application.repository.query-limit-warning-ms:60}"): Lấy giá trị từ file application, nếu không
+    có thì giá trị mặc định là 60ms. Nếu truy vấn mất hơn executionLimitMs -> cảnh báo truy vấn chậm.
+    - @Around("execution(* com.example.corevo.repository.*.*(..))"): Áp dụng cho tất cả phương thức trong package
+    chỉ định. @Around là advice bao quanh method - tức là chạy trước và sau method.
+    => Sau đó log ra message nếu thời gian truy vấn bị chậm.
+
+II. Folder base
+    1. RestApiV1
+    Tạo ra một annotation có tên @RestApiV1
+    - @Target(ElementType.TYPE): Chỉ rằng annotation này có thể áp dụng cho class, interface hoặc enum.
+    - @Retention(RetentionPolicy.RUNTIME): Annotation này sẽ tồn tại khi chạy chương trình.
+    - @RestController: Không cần viết nữa mà @RestApiV1 đã tự động gắn sẵn.
+    2. RestData
+    Là một Generic Response Wrapper dùng để chuẩn hóa response của REST API.
+    - @JsonInclude(JsonInclude.Include.NON_NULL): Chỉ hiện thị nếu khác null.
+    3. VsResponseUtil
+    - success(Object data): Trả về thành công với status 200 OK.
+        return VsResponseUtil.success(users);
+    - success(HttpStatus status, Object data): Trả về thành công với status tùy chọn.
+        return VsResponseUtil.success(HttpStatus.CREATED, user);
+    - success(MultiValueMap<String, String> header, Object data): Trả về thành công 200 OK kèm theo header tuỳ chỉnh.
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=\"file.txt\"");
+        headers.add("Custom-Header", "Value123");
+
+        return VsResponseUtil.success(headers, fileData);
+    - success(HttpStatus status, MultiValueMap<String, String> header, Object data): Trả về thành công với status +
+    header tuỳ chỉnh.
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Generated-By", "System");
+
+        return VsResponseUtil.success(HttpStatus.CREATED, headers, report);
+    - error(HttpStatus status, Object message): Trả về lỗi với status tùy chọn và message.
+        return VsResponseUtil.error(HttpStatus.NOT_FOUND, "User not found");
