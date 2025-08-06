@@ -1,4 +1,4 @@
-package org.example.haus.exception;
+package com.example.haus.exception;
 
 import lombok.Getter;
 import lombok.Setter;

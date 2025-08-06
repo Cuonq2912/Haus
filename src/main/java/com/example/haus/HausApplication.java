@@ -1,4 +1,4 @@
-package org.example.haus;
+package com.example.haus;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

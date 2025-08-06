@@ -1,4 +1,4 @@
-package org.example.haus.exception;
+package com.example.haus.exception;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @Setter
-public class ForbiddenException extends RuntimeException {
+public class UploadFileException extends RuntimeException {
 
     private String message;
 
@@ -14,26 +14,26 @@ public class ForbiddenException extends RuntimeException {
 
     private String[] params;
 
-    public ForbiddenException(String message) {
+    public UploadFileException(String message) {
         super(message);
-        this.status = HttpStatus.FORBIDDEN;
+        this.status = HttpStatus.BAD_GATEWAY;
         this.message = message;
     }
 
-    public ForbiddenException(HttpStatus status, String message) {
+    public UploadFileException(HttpStatus status, String message) {
         super(message);
         this.status = status;
         this.message = message;
     }
 
-    public ForbiddenException(String message, String[] params) {
+    public UploadFileException(String message, String[] params) {
         super(message);
-        this.status = HttpStatus.FORBIDDEN;
+        this.status = HttpStatus.BAD_GATEWAY;
         this.message = message;
         this.params = params;
     }
 
-    public ForbiddenException(HttpStatus status, String message, String[] params) {
+    public UploadFileException(HttpStatus status, String message, String[] params) {
         super(message);
         this.status = status;
         this.message = message;

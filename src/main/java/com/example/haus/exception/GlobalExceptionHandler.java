@@ -1,12 +1,12 @@
-package org.example.haus.exception;
+package com.example.haus.exception;
 
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.haus.base.RestData;
-import org.example.haus.base.VsResponseUtil;
-import org.example.haus.constant.ErrorMessage;
+import com.example.haus.base.RestData;
+import com.example.haus.base.VsResponseUtil;
+import com.example.haus.constant.ErrorMessage;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;

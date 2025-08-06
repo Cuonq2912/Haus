@@ -1,4 +1,4 @@
-package org.example.haus.exception;
+package com.example.haus.exception;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @Setter
-public class InternalServerException extends RuntimeException {
+public class NotFoundException extends RuntimeException {
 
     private String message;
 
@@ -14,26 +14,26 @@ public class InternalServerException extends RuntimeException {
 
     private String[] params;
 
-    public InternalServerException(String message) {
+    public NotFoundException(String message) {
         super(message);
-        this.status = HttpStatus.INTERNAL_SERVER_ERROR;
+        this.status = HttpStatus.NOT_FOUND;
         this.message = message;
     }
 
-    public InternalServerException(HttpStatus status, String message) {
+    public NotFoundException(HttpStatus status, String message) {
         super(message);
         this.status = status;
         this.message = message;
     }
 
-    public InternalServerException(String message, String[] params) {
+    public NotFoundException(String message, String[] params) {
         super(message);
-        this.status = HttpStatus.INTERNAL_SERVER_ERROR;
+        this.status = HttpStatus.NOT_FOUND;
         this.message = message;
         this.params = params;
     }
 
-    public InternalServerException(HttpStatus status, String message, String[] params) {
+    public NotFoundException(HttpStatus status, String message, String[] params) {
         super(message);
         this.status = status;
         this.message = message;

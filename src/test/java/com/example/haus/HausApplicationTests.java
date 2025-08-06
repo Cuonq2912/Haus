@@ -1,4 +1,4 @@
-package org.example.haus;
+package com.example.haus;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,4 +1,4 @@
-package org.example.haus.exception;
+package com.example.haus.exception;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @Setter
-public class NotFoundException extends RuntimeException {
+public class UnauthorizedException extends RuntimeException {
 
     private String message;
 
@@ -14,26 +14,26 @@ public class NotFoundException extends RuntimeException {
 
     private String[] params;
 
-    public NotFoundException(String message) {
+    public UnauthorizedException(String message) {
         super(message);
-        this.status = HttpStatus.NOT_FOUND;
+        this.status = HttpStatus.UNAUTHORIZED;
         this.message = message;
     }
 
-    public NotFoundException(HttpStatus status, String message) {
+    public UnauthorizedException(HttpStatus status, String message) {
         super(message);
         this.status = status;
         this.message = message;
     }
 
-    public NotFoundException(String message, String[] params) {
+    public UnauthorizedException(String message, String[] params) {
         super(message);
-        this.status = HttpStatus.NOT_FOUND;
+        this.status = HttpStatus.UNAUTHORIZED;
         this.message = message;
         this.params = params;
     }
 
-    public NotFoundException(HttpStatus status, String message, String[] params) {
+    public UnauthorizedException(HttpStatus status, String message, String[] params) {
         super(message);
         this.status = status;
         this.message = message;

@@ -1,4 +1,4 @@
-package org.example.haus.constant;
+package com.example.haus.constant;
 
 public class RoleConstant {
 

@@ -1,4 +1,4 @@
-package org.example.haus.base;
+package com.example.haus.base;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
