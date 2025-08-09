@@ -2,6 +2,9 @@ package com.example.haus.constant;
 
 public class CommonConstant {
 
+    public static final Boolean TRUE = true;
+    public static final Boolean FALSE = false;
+
     public static final String SORT_TYPE_ASC = "ASC";
     public static final String SORT_TYPE_DESC = "DESC";
     public static final Integer PAGE_SIZE_DEFAULT = 10;
