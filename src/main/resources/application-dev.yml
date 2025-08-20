@@ -1,0 +1,56 @@
+application:
+  repository:
+    query-limit-warning-ms: 300
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+#DATABASE
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/haus?createDatabaseIfNotExist=true}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+  jpa:
+    show-sql: true
+    hibernate:
+      format_sql: true
+      ddl-auto: update
+      dialect: org.hibernate.dialect.MySQLDialect
+      use_sql_comments: true
+  kafka:
+    bootstrap   -servers: localhost:29092
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+openapi:
+  service:
+    api-docs: Haus
+    server: http://localhost:${server.port}
+    title: ${API_TITLE:DUMMY API TITLE}
+    version: v1.0.0
+
+#endpoint:
+#  confirmUser: http://localhost:${server.port}/user/confirm
+#
+#jwt:
+#  expiryHour: 1
+#  expiryDay: 14
+#  accessKey: REMOVED_JWT_ACCESS_KEY
+#  refreshKey: REMOVED_JWT_REFRESH_KEY
+#  resetKey: 2OeEeG48CvIcH1K0UAXbSo/7gPj3QLJ7MnQZuscRirQFC=
