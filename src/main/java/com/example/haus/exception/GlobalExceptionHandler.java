@@ -81,8 +81,8 @@ public class GlobalExceptionHandler {
         return VsResponseUtil.error(ex.getStatus(), message);
     }
 
-    @ExceptionHandler(InvalidException.class)
-    public ResponseEntity<RestData<?>> handlerInvalidException(InvalidException ex) {
+    @ExceptionHandler(InvalidDataException.class)
+    public ResponseEntity<RestData<?>> handlerInvalidException(InvalidDataException ex) {
         log.error(ex.getMessage(), ex);
         String message = messageSource.getMessage(ex.getMessage(), ex.getParams(), LocaleContextHolder.getLocale());
         return VsResponseUtil.error(ex.getStatus(), message);
