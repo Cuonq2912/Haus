@@ -32,7 +32,7 @@ spring:
 #    host: ${REDIS_HOST:localhost}
 #    port: ${REDIS_PORT:6379}
   sendGrid:
-    apiKey: ${SENDGRID_API_KEY:REMOVED_SENDGRID_KEYgzA95PCKSgiorYlHRzSx_A.uu0nfV8aPxwxiIu5n3KvXQyfh6GSfAPUlBk1Wd7wHBU}
+    apiKey: ${SENDGRID_API_KEY}
     fromEmail: quanducbui2017@gmail.com
     templateRegistrationId: d-3bda4951dfac403f8d1ec196d9c1c800
     templateForgotId: d-ef1fae82216744d193b7c7657a5912a3
