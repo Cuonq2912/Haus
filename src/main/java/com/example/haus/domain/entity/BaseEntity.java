@@ -3,12 +3,15 @@ package com.example.haus.domain.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 @MappedSuperclass
 @AllArgsConstructor
@@ -19,14 +22,18 @@ import java.time.LocalDate;
 public abstract class BaseEntity {
 
     @Column(nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
-    LocalDate createdAt;
+    Date createdAt;
 
     @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     @UpdateTimestamp
-    LocalDate updatedAt;
+    Date updatedAt;
 
     @Column()
-    LocalDate deletedAt;
+    @UpdateTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    Date deletedAt;
 
 }
