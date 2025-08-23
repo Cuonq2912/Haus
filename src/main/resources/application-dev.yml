@@ -67,8 +67,8 @@ security:
 jwt:
   expiryHour: 1
   expiryDay: 1
-  accessKey: REMOVED_JWT_ACCESS_KEY
-  refreshKey: REMOVED_JWT_REFRESH_KEY
+  accessKey: ${ACCESS_KEY:c2VjcmV0QGtleS5hcGlfaGFzX2JlZW5fZGVzaWduZWRfYnlfVGF5TFE}
+  refreshKey: ${REFRESH_KEY:9k1jJAWAKQCnCEz1pwcPNegbHoLugf9hgEnn6sz5pFc}
 
 #Cloudinary
 cloudinary:
