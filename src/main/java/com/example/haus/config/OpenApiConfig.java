@@ -37,13 +37,16 @@ public class OpenApiConfig {
                 .info(new Info().title(title)
                         .description("API Documents")
                         .version(version)
-                        .license(new License().name("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0.html")))
+                        .license(new License().name("Apache 2.0")
+                                .url("https://www.apache.org/licenses/LICENSE-2.0.html")))
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth")) // 🔑 áp dụng global
                 .components(new Components()
                         .addSecuritySchemes("bearerAuth",
-                        new SecurityScheme()
-                                .type(SecurityScheme.Type.HTTP)
-                                .scheme("bearer")
-                                .bearerFormat("JWT")
-                                )).security(List.of(new SecurityRequirement().addList("bearerAuth")));
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")
+                                        .in(SecurityScheme.In.HEADER) // đảm bảo nó đi vào header
+                                        .name("Authorization")));
     }
 }

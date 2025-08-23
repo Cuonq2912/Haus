@@ -53,7 +53,7 @@ public class JwtServiceImpl implements JwtService {
         claims.put("userId", userId);
         claims.put("role", authorities);
 
-        return generateAccessToken(claims, username);
+        return generateRefreshToken(claims, username);
     };
 
     @Override

@@ -122,7 +122,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             JwtId = signedJwt.getJWTClaimsSet().getJWTID();
             expirationTime = signedJwt.getJWTClaimsSet().getExpirationTime();
 
-            invalidatedTokenRepository.save(new InvalidatedToken(JwtId, expirationTime));
+            InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                    .jwtId(JwtId)               // set id rõ ràng
+                    .expiryTime(expirationTime)  // set expiry
+                    .build();
+
+            invalidatedTokenRepository.save(invalidatedToken);
 
         } catch (ParseException ex) {
             log.error("Signed Jwt parsed fail, message = {}", ex.getMessage());
@@ -133,13 +138,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public RefreshTokenResponseDto refresh(RefreshTokenResponseDto request) {
         String refreshToken = request.getRefreshToken();
 
+        log.info("Refresh token: {}", refreshToken);
+
         String username = jwtService.extractUserName(refreshToken, TokenType.REFRESH_TOKEN);
 
         if (jwtService.isExpired(refreshToken, TokenType.REFRESH_TOKEN)) {
             throw new InvalidDataException("Refresh Token đã hết hạn");
         }
 
-        if (!jwtService.isValid(refreshToken, TokenType.ACCESS_TOKEN, username)) {
+        if (!jwtService.isValid(refreshToken, TokenType.REFRESH_TOKEN, username)) {
             throw new InvalidDataException("Refresh Token không hợp lệ");
         }
 

@@ -14,7 +14,7 @@ spring:
     activate:
       on-profile: dev
 
-#DATABASE
+  #DATABASE
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/haus?createDatabaseIfNotExist=true}
     username: ${SPRING_DATASOURCE_USERNAME:root}
@@ -26,11 +26,11 @@ spring:
       ddl-auto: update
       dialect: org.hibernate.dialect.MySQLDialect
       use_sql_comments: true
-#  kafka:
-#    bootstrap   -servers: localhost:29092
-#  redis:
-#    host: ${REDIS_HOST:localhost}
-#    port: ${REDIS_PORT:6379}
+  #  kafka:
+  #    bootstrap   -servers: localhost:29092
+  #  redis:
+  #    host: ${REDIS_HOST:localhost}
+  #    port: ${REDIS_PORT:6379}
   sendGrid:
     apiKey: ${SENDGRID_API_KEY}
     fromEmail: quanducbui2017@gmail.com

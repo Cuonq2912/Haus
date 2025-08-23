@@ -43,6 +43,8 @@ public class CustomizePreFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
 
+        log.info(authHeader);
+
 //        log.info("Auth Header = {}", authHeader);
 
         if (StringUtils.isBlank(authHeader) || !authHeader.startsWith("Bearer ")) {
@@ -64,6 +66,7 @@ public class CustomizePreFilter extends OncePerRequestFilter {
                     SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
                     securityContext.setAuthentication(authenticationToken);
                     SecurityContextHolder.setContext(securityContext);
+                    log.info("1");
                 }
             }
         } catch (Exception e) {
