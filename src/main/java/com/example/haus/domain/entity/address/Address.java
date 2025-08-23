@@ -1,5 +1,6 @@
 package com.example.haus.domain.entity.address;
 
+import com.example.haus.domain.entity.BaseEntity;
 import com.example.haus.domain.entity.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,7 +15,7 @@ import org.hibernate.annotations.GenericGenerator;
 @Getter
 @Setter
 @Table(name = "address")
-public class Address {
+public class Address extends BaseEntity {
 
     @Id
     @GeneratedValue(generator = "uuid2")

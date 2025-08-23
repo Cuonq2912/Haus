@@ -101,7 +101,7 @@ public class JwtServiceImpl implements JwtService {
                 return Keys.hmacShaKeyFor(Decoders.BASE64.decode(accessKey));
             }
             case TokenType.REFRESH_TOKEN -> {
-                return Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(refreshKey));
+                return Keys.hmacShaKeyFor(Decoders.BASE64.decode(refreshKey));
             }
             default -> throw new InvalidDataException("Invalid Token type");
         }
