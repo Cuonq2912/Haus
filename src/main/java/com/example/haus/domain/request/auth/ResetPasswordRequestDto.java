@@ -2,6 +2,7 @@ package com.example.haus.domain.request.auth;
 
 import com.example.haus.constant.ErrorMessage;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
@@ -16,6 +17,7 @@ public class ResetPasswordRequestDto {
 
     @Schema(description = "Email người dùng", example = "user@gmail.com")
     @NotBlank(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
+    @Email
     String email;
 
     @Schema(description = "Mật khẩu mới", example = "User123@")

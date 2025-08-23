@@ -2,7 +2,7 @@ package com.example.haus.domain.entity.user;
 
 import com.example.haus.constant.CommonConstant;
 import com.example.haus.domain.entity.BaseEntity;
-import com.example.haus.domain.entity.address.DeliveryAddress;
+import com.example.haus.domain.entity.address.Address;
 import com.example.haus.domain.entity.news.CommentNews;
 import com.example.haus.domain.entity.news.News;
 import com.example.haus.domain.entity.product.Cart;
@@ -14,11 +14,11 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Nationalized;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Entity(name = "user")
 @NoArgsConstructor
@@ -46,7 +46,7 @@ public class User extends BaseEntity {
 
     String lastName;
 
-    String dateOfBirth;
+    Date dateOfBirth;
 
     String avatarLink;
 
@@ -61,11 +61,16 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     Gender gender;
 
+    String phone;
+
     @Builder.Default
     Boolean isLock = CommonConstant.FALSE;
 
     @Builder.Default
     Boolean isActive = CommonConstant.TRUE;
+
+    @Builder.Default
+    Boolean isDeleted = CommonConstant.FALSE;
 
     @Nationalized
     String nationality;
@@ -79,13 +84,12 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     List<Order> orders;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    List<DeliveryAddress> deliveryAddresses;
-
     @OneToMany(mappedBy = "author")
     List<News> authoredNews;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     List<CommentNews> newsComments;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    Address address;
 }
