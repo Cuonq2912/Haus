@@ -31,7 +31,7 @@ public class UserController {
     @DeleteMapping(UrlConstant.User.DELETE_MY_ACCOUNT)
     public ResponseEntity<?> deleteMyAccount(Authentication authentication) {
         userService.deleteAccount(authentication);
-        return ResponseUtil.success("Xóa tài khoản thành công");
+        return ResponseUtil.success("Xóa tài khoản thành công", null);
     }
 
     @Operation(
@@ -41,7 +41,7 @@ public class UserController {
     )
     @GetMapping(UrlConstant.User.GET_PROFILE)
     public ResponseEntity<?> getMyProfile(Authentication authentication) {
-        return ResponseUtil.success(userService.getDetailProfile(authentication));
+        return ResponseUtil.success("Get my profile successful", userService.getDetailProfile(authentication));
     }
 
     @Operation(
@@ -54,6 +54,6 @@ public class UserController {
             @Valid @RequestBody ConfirmPasswordRequestDto request,
             Authentication authentication
     ) {
-        return ResponseUtil.success(userService.updateDetailProfile(request, authentication));
+        return ResponseUtil.success("Update profile successful", userService.updateDetailProfile(request, authentication));
     }
 }
