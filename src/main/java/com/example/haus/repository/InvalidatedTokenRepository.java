@@ -10,6 +10,4 @@ import java.util.Date;
 public interface InvalidatedTokenRepository extends JpaRepository<InvalidatedToken, String> {
 
     void deleteByExpiryTimeBefore(Date expiryTimeBefore);
-
 }
-
