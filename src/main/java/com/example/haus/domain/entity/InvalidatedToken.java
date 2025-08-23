@@ -21,4 +21,3 @@ public class InvalidatedToken {
 
     Date expiryTime;
 }
-
