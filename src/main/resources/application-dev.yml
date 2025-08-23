@@ -1,0 +1,77 @@
+application:
+  repository:
+    query-limit-warning-ms: 300
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+#DATABASE
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/haus?createDatabaseIfNotExist=true}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+  jpa:
+    show-sql: true
+    hibernate:
+      format_sql: true
+      ddl-auto: update
+      dialect: org.hibernate.dialect.MySQLDialect
+      use_sql_comments: true
+#  kafka:
+#    bootstrap   -servers: localhost:29092
+#  redis:
+#    host: ${REDIS_HOST:localhost}
+#    port: ${REDIS_PORT:6379}
+  sendGrid:
+    apiKey: ${SENDGRID_API_KEY}
+    fromEmail: quanducbui2017@gmail.com
+    templateRegistrationId: d-3bda4951dfac403f8d1ec196d9c1c800
+    templateForgotId: d-ef1fae82216744d193b7c7657a5912a3
+    imagePrev: https://res.cloudinary.com/dgwnoquie/image/upload/v1755789933/image-43_f3kmgh.jpg
+    imageNext: https://res.cloudinary.com/dgwnoquie/image/upload/v1755790009/KHACH-BEP-15_bj8u43.jpg
+    logo: https://res.cloudinary.com/dgwnoquie/image/upload/v1755791051/HAUS-logo_byhum7.jpg
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+openapi:
+  service:
+    api-docs: Haus
+    server: http://localhost:${server.port}
+    title: ${API_TITLE:DUMMY API TITLE}
+    version: v1.0.0
+
+#Security Endpoint
+security:
+  public-endpoints: /oauth2/**, /auth/**
+  user-endpoints: /user/**
+  admin-endpoints: /admin/**
+  swagger-endpoints: /swagger-ui/**,/v3/api-docs/**,/swagger-ui.html
+
+#endpoint:
+#  confirmUser: http://localhost:${server.port}/user/confirm
+
+#JWT
+jwt:
+  expiryHour: 1
+  expiryDay: 1
+  accessKey: ${ACCESS_KEY:c2VjcmV0QGtleS5hcGlfaGFzX2JlZW5fZGVzaWduZWRfYnlfVGF5TFE}
+  refreshKey: ${REFRESH_KEY:9k1jJAWAKQCnCEz1pwcPNegbHoLugf9hgEnn6sz5pFc}
+
+#Cloudinary
+cloudinary:
+  cloud_name: ${CLOUDINARY_NAME:dgwnoquie}
+  api_key: ${CLOUDINARY_API_KEY:671838345639772
+  secret_key: ${CLOUDINARY_SECRET_KEY:-xdwjAMbATWoIvkpbT_-6K5TuIg}

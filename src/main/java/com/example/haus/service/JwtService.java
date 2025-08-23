@@ -1,21 +1,18 @@
 package com.example.haus.service;
 
-import com.example.haus.domain.entity.user.User;
-import com.nimbusds.jose.JOSEException;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.example.haus.constant.TokenType;
+import org.springframework.security.core.GrantedAuthority;
 
-import java.util.Date;
+import java.util.Collection;
 
 public interface JwtService {
+    String generateAccessToken(String userId, String username, Collection<? extends GrantedAuthority> authorities);
 
-    String generateToken(User user, long expirationTime) throws JOSEException;
+    String generateRefreshToken(String userId, String username, Collection<? extends GrantedAuthority> authorities);
 
-    String extractUsername(String token);
+    String extractUserName(String token, TokenType type);
 
-    Date extractExpiration(String token);
+    boolean isValid(String token, TokenType type, String username);
 
-    boolean isTokenValid(String token, UserDetails userDetails);
-
-    boolean isTokenNotExpired(String token);
-
+    boolean isExpired(String token, TokenType type);
 }

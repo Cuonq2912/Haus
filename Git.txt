@@ -1,0 +1,3 @@
+Chỉnh 2 git repo
+git remote add origin https://github.com/Cuonq2912/Haus.git
+git remote set-url --add origin https://github.com/quankane/HAUS.git
