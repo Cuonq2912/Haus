@@ -32,7 +32,7 @@ public class AuthController {
     )
     @PostMapping(UrlConstant.Auth.LOGIN)
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto loginRequestDto) {
-        return ResponseUtil.success(authenticationService.authentication(loginRequestDto));
+        return ResponseUtil.success("Login successful", authenticationService.authentication(loginRequestDto));
     }
 
     @Operation(
@@ -42,7 +42,7 @@ public class AuthController {
     @PostMapping(UrlConstant.Auth.LOGOUT)
     public ResponseEntity<?> logout(@Valid @RequestBody LogoutRequestDto logoutRequestDto) {
         authenticationService.logout(logoutRequestDto);
-        return ResponseUtil.success("Đăng xuất tài khoản thành công");
+        return ResponseUtil.success("Logout successful", "Đăng xuất tài khoản thành công");
     }
 
     @Operation(
@@ -51,7 +51,7 @@ public class AuthController {
     )
     @PostMapping(UrlConstant.Auth.REFRESH_TOKEN)
     public ResponseEntity<?> refresh(@Valid @RequestBody RefreshTokenResponseDto refreshTokenResponseDto) {
-        return ResponseUtil.success(authenticationService.refresh(refreshTokenResponseDto));
+        return ResponseUtil.success("Take refresh token successful", authenticationService.refresh(refreshTokenResponseDto));
     }
 
     @Operation(
@@ -61,7 +61,7 @@ public class AuthController {
     @PostMapping(UrlConstant.Auth.REGISTER)
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequestDto registerRequestDto) {
         authenticationService.register(registerRequestDto);
-        return ResponseUtil.success("Đăng ký tài khoản thành công");
+        return ResponseUtil.success("Register successful","Đăng ký tài khoản thành công");
     }
 
     @Operation(
@@ -70,7 +70,7 @@ public class AuthController {
     )
     @PostMapping(UrlConstant.Auth.VERIFY_OTP)
     public ResponseEntity<?> verify(@Valid @RequestBody VerifyOtpRequestDto verifyOtpRequestDto) {
-        return ResponseUtil.success(authenticationService.verifyOtpToRegister(verifyOtpRequestDto));
+        return ResponseUtil.success("Verify successful",authenticationService.verifyOtpToRegister(verifyOtpRequestDto));
     }
 
     @Operation(
@@ -80,7 +80,7 @@ public class AuthController {
     @PostMapping(UrlConstant.Auth.FORGOT_PASSWORD)
     public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequestDto forgotPasswordRequestDto) {
         authenticationService.forgotPassword(forgotPasswordRequestDto);
-        return ResponseUtil.success(null);
+        return ResponseUtil.success("Forgot password successful", null);
     }
 
     @Operation(
@@ -89,7 +89,7 @@ public class AuthController {
     )
     @PostMapping(UrlConstant.Auth.VERIFY_OTP_TO_RESET_PASSWORD)
     public ResponseEntity<?> verifyToResetPassword(@Valid @RequestBody VerifyOtpRequestDto request) {
-        return ResponseUtil.success(authenticationService.verifyOtpToResetPassword(request));
+        return ResponseUtil.success("Verify to reset password successful" ,authenticationService.verifyOtpToResetPassword(request));
     }
 
     @Operation(
@@ -98,6 +98,6 @@ public class AuthController {
     )
     @PostMapping(UrlConstant.Auth.RESET_PASSWORD)
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequestDto request) {
-        return ResponseUtil.success(authenticationService.resetPassword(request));
+        return ResponseUtil.success("Reset password successful", authenticationService.resetPassword(request));
     }
 }

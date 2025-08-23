@@ -13,12 +13,12 @@ spring:
   config:
     activate:
       on-profile: dev
-
-#DATABASE
+  
+  #DATABASE
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/haus?createDatabaseIfNotExist=true}
     username: ${SPRING_DATASOURCE_USERNAME:root}
-    password: ${SPRING_DATASOURCE_PASSWORD:}
+    password: ${SPRING_DATASOURCE_PASSWORD:Quankane1905@}
   jpa:
     show-sql: true
     hibernate:
@@ -26,11 +26,11 @@ spring:
       ddl-auto: update
       dialect: org.hibernate.dialect.MySQLDialect
       use_sql_comments: true
-#  kafka:
-#    bootstrap   -servers: localhost:29092
-#  redis:
-#    host: ${REDIS_HOST:localhost}
-#    port: ${REDIS_PORT:6379}
+  #  kafka:
+  #    bootstrap   -servers: localhost:29092
+  #  redis:
+  #    host: ${REDIS_HOST:localhost}
+  #    port: ${REDIS_PORT:6379}
   sendGrid:
     apiKey: ${SENDGRID_API_KEY}
     fromEmail: quanducbui2017@gmail.com
@@ -67,8 +67,8 @@ security:
 jwt:
   expiryHour: 1
   expiryDay: 1
-  accessKey: ${ACCESS_KEY:c2VjcmV0QGtleS5hcGlfaGFzX2JlZW5fZGVzaWduZWRfYnlfVGF5TFE}
-  refreshKey: ${REFRESH_KEY:9k1jJAWAKQCnCEz1pwcPNegbHoLugf9hgEnn6sz5pFc}
+  accessKey: c2VjcmV0QGtleS5hcGlfaGFzX2JlZW5fZGVzaWduZWRfYnlfVGF5TFE=
+  refreshKey: 9k1jJAWAKQCnCEz1pwcPNegbHoLugf9hgEnn6sz5pFc=
 
 #Cloudinary
 cloudinary:

@@ -78,6 +78,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         log.info("-----------GetAccessToken-------------");
         try {
             //Verify username password with authentication
+            log.info(authenticationManager.toString());
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(),
                             request.getPassword()));
@@ -205,7 +206,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void forgotPassword(ForgotPasswordRequestDto request) {
-        if (!userRepository.existsUserByUsername(request.getEmail()))
+        log.info(request.getEmail());
+        if (!userRepository.existsUserByEmail(request.getEmail()))
             throw new UsernameNotFoundException("Username not found");
 
         String otp = generateOtp();
