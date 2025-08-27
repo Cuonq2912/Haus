@@ -54,7 +54,7 @@ public class JwtServiceImpl implements JwtService {
         claims.put("role", authorities);
 
         return generateAccessToken(claims, username);
-    };
+    }
 
     @Override
     public String extractUserName(String token, TokenType type) {
@@ -97,10 +97,10 @@ public class JwtServiceImpl implements JwtService {
     private Key getKey(TokenType type) {
         log.info("------------ [ getKey ] -------------------------");
         switch (type) {
-            case TokenType.ACCESS_TOKEN -> {
+            case ACCESS_TOKEN -> {
                 return Keys.hmacShaKeyFor(Decoders.BASE64.decode(accessKey));
             }
-            case TokenType.REFRESH_TOKEN -> {
+            case REFRESH_TOKEN -> {
                 return Keys.hmacShaKeyFor(Decoders.BASE64.decode(refreshKey));
             }
             default -> throw new InvalidDataException("Invalid Token type");
