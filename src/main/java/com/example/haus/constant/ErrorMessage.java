@@ -30,10 +30,6 @@ public class ErrorMessage {
 
     public static class User {
         public static final String ERR_USER_NOT_EXISTED = "exception.user.user.not.existed";
-    }
-
-    public static class User {
-        public static final String ERR_USER_NOT_EXISTED = "exception.user.user.not.existed";
         public static final String ERR_USERNAME_EXISTED = "exception.user.username.existed";
         public static final String ERR_EMAIL_EXISTED = "exception.user.email.existed";
         public static final String ERR_EMAIL_NOT_EXISTED = "exception.user.email.not.existed";

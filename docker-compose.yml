@@ -1,7 +1,6 @@
-version: '3.9'
 
 services:
-
+  # MySQL Database Service
   mysql:
     image: mysql:8.0
     container_name: mysql
@@ -9,15 +8,22 @@ services:
       - SYS_NICE
     restart: always
     environment:
-      - MYSQL_DATABASE=root
-      - MYSQL_ROOT_PASSWORD=
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - '3306:3306'
+      - '3307:3306'
     volumes:
       - mysql_data:/var/lib/mysql
       - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
     networks:
-      - default
+      - backend
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 #  redis:
 #    image: redis:6.2-alpine
@@ -61,8 +67,9 @@ services:
 #      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
 #      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
+  # Spring Boot Application Service
   api-service:
-    container_name: api-container-1
+    container_name: haus_backend
     build:
       context: ./
       dockerfile: Dockerfile
@@ -72,6 +79,19 @@ services:
       - '8080:8080'
     networks:
       - backend
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+    - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/haus
+    - SPRING_DATASOURCE_USERNAME=root
+    - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD} 
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+
+volumes:
+  mysql_data:
 
 #  api-service-test:
 #    container_name: api-container-2
