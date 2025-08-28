@@ -9,6 +9,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 
 public class ResponseUtil {
+    public static ResponseEntity<ResponseData<?>> success(Object data){
+        return success(HttpStatus.OK, data);
+    }
+
+    public static ResponseEntity<ResponseData<?>> success(HttpStatus status, Object data) {
+        ResponseData<?> response = new ResponseData<>(data);
+        return new ResponseEntity<>(response, status);
+    }
+
     public static ResponseEntity<ResponseData<?>> success(String message, Object data) {
         return success(HttpStatus.OK, message, data);
     }

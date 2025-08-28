@@ -1,6 +1,7 @@
 package com.example.haus.service.impl;
 
 import com.example.haus.constant.CommonConstant;
+import com.example.haus.constant.ErrorMessage;
 import com.example.haus.domain.entity.address.Address;
 import com.example.haus.domain.entity.user.User;
 import com.example.haus.domain.mapper.AddressMapper;
@@ -44,7 +45,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(() ->  new UsernameNotFoundException("Username not found"));
+        return userRepository.findByUsername(username).orElseThrow(
+                () ->  new UsernameNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
     }
 
     @Override
@@ -52,10 +54,11 @@ public class UserServiceImpl implements UserService {
     public void deleteAccount(Authentication authentication) {
         String username = authentication.getName();
 
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("Username not found"));
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         if (Boolean.TRUE.equals(user.getIsDeleted())) {
-            throw new InvalidDataException("Usernaem đã bị xóa");
+            throw new InvalidDataException(ErrorMessage.User.ERR_ACCOUNT_ALREADY_DELETED);
         }
 
         user.setIsDeleted(CommonConstant.TRUE);
@@ -68,7 +71,8 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto getDetailProfile(Authentication authentication) {
         String username = authentication.getName();
 
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("Username not found"));
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         UserResponseDto userResponseDto = userMapper.userToUserResponseDto(user);
 
@@ -79,17 +83,20 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto updateDetailProfile(ConfirmPasswordRequestDto requestDto, Authentication authentication) {
         String username = authentication.getName();
 
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("Username not found"));
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
 
         if (requestDto.getProfileData() != null) {
 
-            UpdatePersonalInformationRequestDto personalInfo = personalInformationHelper.handleEmptyStrings(requestDto.getProfileData());
+            UpdatePersonalInformationRequestDto personalInfo = personalInformationHelper
+                    .handleEmptyStrings(requestDto.getProfileData());
 
             userMapper.updateUserFromPersonalInformationDto(personalInfo, user);
 
             if (personalInfo.getUpdateAddressRequestDto() != null) {
-                Address address = addressMapper.updateAddressRequestDtoToAddress(requestDto.getProfileData().getUpdateAddressRequestDto());
+                Address address = addressMapper
+                        .updateAddressRequestDtoToAddress(requestDto.getProfileData().getUpdateAddressRequestDto());
 
                 user.setAddress(address);
             }
