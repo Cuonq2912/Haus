@@ -1,13 +1,16 @@
 package com.example.haus.controller;
 
 import com.example.haus.base.ResponseUtil;
+import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.request.user.profile.ConfirmPasswordRequestDto;
 import com.example.haus.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,11 +20,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Slf4j(topic = "USER-CONTROLLER")
-@RequestMapping("/user")
 @Validated
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
 
-    private final UserService userService;
+    UserService userService;
 
     @Operation(
             summary = "Xóa tài khoản",
@@ -31,22 +34,25 @@ public class UserController {
     @DeleteMapping(UrlConstant.User.DELETE_MY_ACCOUNT)
     public ResponseEntity<?> deleteMyAccount(Authentication authentication) {
         userService.deleteAccount(authentication);
-        return ResponseUtil.success("Xóa tài khoản thành công", null);
+        return ResponseUtil.success(SuccessMessage.User.DELETE_MY_ACCOUNT_SUCCESS);
     }
 
     @Operation(
-            summary = "Lấy thông tin profile (thông tin user và user health)",
-            description = "Dùng để người dùng lấy thông tin profile đầy đủ (thông tin cá nhân + sức khỏe)",
+            summary = "Lấy thông tin profile",
+            description = "Dùng để người dùng lấy thông tin profile",
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping(UrlConstant.User.GET_PROFILE)
     public ResponseEntity<?> getMyProfile(Authentication authentication) {
-        return ResponseUtil.success("Get my profile successful", userService.getDetailProfile(authentication));
+        return ResponseUtil.success(
+                SuccessMessage.User.GET_MY_PROFILE_SUCCESS,
+                userService.getDetailProfile(authentication)
+        );
     }
 
     @Operation(
             summary = "Cập nhật thông tin profile",
-            description = "Dùng để người dùng cập nhật thông tin cá nhân và sức khỏe với xác nhận mật khẩu",
+            description = "Dùng để người dùng cập nhật thông tin cá nhân với xác nhận mật khẩu",
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PutMapping(UrlConstant.User.UPDATE_PROFILE)
@@ -54,6 +60,9 @@ public class UserController {
             @Valid @RequestBody ConfirmPasswordRequestDto request,
             Authentication authentication
     ) {
-        return ResponseUtil.success("Update profile successful", userService.updateDetailProfile(request, authentication));
+        return ResponseUtil.success(
+                SuccessMessage.User.UPDATE_PROFILE_SUCCESS,
+                userService.updateDetailProfile(request, authentication)
+        );
     }
 }
