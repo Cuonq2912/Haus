@@ -1,6 +1,7 @@
 package com.example.haus.service.impl;
 
 import com.example.haus.constant.CommonConstant;
+import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.RoleConstant;
 import com.example.haus.constant.TokenType;
 import com.example.haus.domain.entity.InvalidatedToken;
@@ -90,10 +91,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (DisabledException e) {
             log.error("Tài khoản đã bị vô hiệu hóa");
-            throw new BadCredentialsException("Tài khoản đã bị khóa"); // hoặc custom exception của bạn
+            throw new BadCredentialsException(ErrorMessage.Auth.ERR_ACCOUNT_LOCKED); // hoặc custom exception của bạn
         } catch (AuthenticationException e) {
             log.error("Xác thực thất bại: {}", e.getMessage());
-            throw new InternalAuthenticationServiceException("Sai tài khoản hoặc mật khẩu");
+            throw new InternalAuthenticationServiceException(ErrorMessage.Auth.ERR_INCORRECT_PASSWORD);
         }
         var user = userService.findByUsername(request.getUsername());
 
@@ -126,6 +127,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         } catch (ParseException ex) {
             log.error("Signed Jwt parsed fail, message = {}", ex.getMessage());
+            throw new InvalidDataException(ErrorMessage.Auth.ERR_TOKEN_INVALIDATED);
         }
     }
 
@@ -136,14 +138,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String username = jwtService.extractUserName(refreshToken, TokenType.REFRESH_TOKEN);
 
         if (jwtService.isExpired(refreshToken, TokenType.REFRESH_TOKEN)) {
-            throw new InvalidDataException("Refresh Token đã hết hạn");
+            throw new InvalidDataException(ErrorMessage.Auth.EXPIRED_REFRESH_TOKEN);
         }
 
         if (!jwtService.isValid(refreshToken, TokenType.ACCESS_TOKEN, username)) {
-            throw new InvalidDataException("Refresh Token không hợp lệ");
+            throw new InvalidDataException(ErrorMessage.Auth.INVALID_REFRESH_TOKEN);
         }
 
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         String accessToken = jwtService.generateAccessToken(user.getId(), user.getUsername(),
                 List.of(new SimpleGrantedAuthority(user.getRole().toString())));
@@ -158,10 +161,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void register(RegisterRequestDto request) {
         if (userRepository.existsUserByUsername(request.getUsername()))
-            throw new InvalidDataException("Username đã tồn tại, không thể đăng ký với tài khoản này");
+            throw new InvalidDataException(ErrorMessage.User.ERR_USERNAME_EXISTED);
 
-//        if (userRepository.existsUserByEmail(request.getEmail()))
-//            throw new VsException(HttpStatus.CONFLICT, ErrorMessage.User.ERR_EMAIL_EXISTED);
+        if (userRepository.existsUserByEmail(request.getEmail()))
+            throw new InvalidDataException(ErrorMessage.User.ERR_EMAIL_EXISTED);
 
         String otp = generateOtp();
 
@@ -181,12 +184,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         PendingRegistrationRequestDto pending = pendingRegisterMap.get(request.getEmail());
 
         if (pending == null)
-            throw new InvalidDataException("Registration storage pending request không được null");
+            throw new InvalidDataException(ErrorMessage.Auth.ERR_PENDING_RESET_REQUEST_NULL);
 
         if (pending.isExpired())
-            throw new InternalServerException("Mã otp đã quá hạn");
+            throw new InvalidDataException(ErrorMessage.Auth.ERR_OTP_EXPIRED);
+
         if (!pending.getOtp().equals(request.getOtp()))
-            throw new InvalidDataException("Mã otp không khớp");
+            throw new InvalidDataException(ErrorMessage.Auth.ERR_OTP_NOT_MATCH);
 
         RegisterRequestDto req = pending.getRequest();
 
@@ -207,8 +211,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void forgotPassword(ForgotPasswordRequestDto request) {
         log.info(request.getEmail());
+
         if (!userRepository.existsUserByEmail(request.getEmail()))
-            throw new UsernameNotFoundException("Username not found");
+            throw new UsernameNotFoundException(ErrorMessage.User.ERR_EMAIL_NOT_EXISTED);
 
         String otp = generateOtp();
 
@@ -228,13 +233,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         PendingResetPasswordRequestDto pending = pendingResetPasswordMap.get(request.getEmail());
 
         if (pending == null)
-            throw new InvalidDataException("Pending Reset Password Request không được null");
+            throw new InvalidDataException(ErrorMessage.Auth.ERR_PENDING_RESET_REQUEST_NULL);
 
         if (pending.isExpired())
-            throw new InternalServerException("Mã otp đã hết hạn");
+            throw new InvalidDataException(ErrorMessage.Auth.ERR_OTP_EXPIRED);
 
         if (!pending.getOtp().equals(request.getOtp()))
-            throw new InvalidDataException("Mã otp nhập không trùng khớp");
+            throw new InvalidDataException(ErrorMessage.Auth.ERR_OTP_NOT_MATCH);
 
         return pendingResetPasswordMap.containsKey(request.getEmail())
                 && pendingResetPasswordMap.get(request.getEmail()).getOtp().equals(request.getOtp());
@@ -244,15 +249,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public UserResponseDto resetPassword(ResetPasswordRequestDto request) {
 
         if (!request.getNewPassword().equals(request.getReEnterPassword()))
-            throw new InvalidDataException("Mật khẩu nhập lại không khớp");
+            throw new InvalidDataException(ErrorMessage.User.ERR_RE_ENTER_PASSWORD_NOT_MATCH);
 
         User user = userRepository.findByUsername(request.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+                .orElseThrow(() -> new UsernameNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
         if (passwordEncoder.matches(request.getNewPassword(), user.getPassword()))
-            throw new InvalidDataException("Không được nhập trùng với mật khẩu cũ");
+            throw new InvalidDataException(ErrorMessage.User.ERR_DUPLICATE_OLD_PASSWORD);
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
 

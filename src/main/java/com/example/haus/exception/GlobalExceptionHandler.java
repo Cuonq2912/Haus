@@ -67,7 +67,7 @@ public class GlobalExceptionHandler {
         if(ex instanceof MethodArgumentNotValidException) {
             int start = message.lastIndexOf('[');
             int end = message.lastIndexOf(']');
-            message = message.substring(start, end - 1);
+            message = message.substring(start + 1, end - 1);
             errorResponse.setError("Payload Invalid");
             errorResponse.setMessage(message);
         } else if(ex instanceof ConstraintViolationException) {

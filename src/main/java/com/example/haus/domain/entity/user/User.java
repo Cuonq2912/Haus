@@ -58,7 +58,6 @@ public class User extends BaseEntity {
     Role role;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     Gender gender;
 
     String phone;
