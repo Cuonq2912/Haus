@@ -1,15 +1,10 @@
 package com.example.haus.domain.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
-
-import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Getter
@@ -21,8 +16,6 @@ import org.hibernate.annotations.GenericGenerator;
 public class InvalidatedToken {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     String id;
 
     Date expiryTime;
