@@ -12,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
@@ -34,7 +35,7 @@ public class UserController {
     @DeleteMapping(UrlConstant.User.DELETE_MY_ACCOUNT)
     public ResponseEntity<?> deleteMyAccount(Authentication authentication) {
         userService.deleteAccount(authentication);
-        return ResponseUtil.success(SuccessMessage.User.DELETE_MY_ACCOUNT_SUCCESS);
+        return ResponseUtil.success(HttpStatus.NO_CONTENT, SuccessMessage.User.DELETE_MY_ACCOUNT_SUCCESS, null);
     }
 
     @Operation(

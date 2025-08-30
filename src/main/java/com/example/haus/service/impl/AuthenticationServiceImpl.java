@@ -42,10 +42,7 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -77,11 +74,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public LoginResponseDto authentication(LoginRequestDto request) {
         log.info("-----------GetAccessToken-------------");
+
+        Optional<User> user = Optional.ofNullable(userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException(ErrorMessage.User.ERR_USERNAME_EXISTED)));
+
         try {
             //Verify username password with authentication
             log.info(authenticationManager.toString());
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getUsername(),
+                    new UsernamePasswordAuthenticationToken(user.get().getUsername(),
                             request.getPassword()));
 
             log.info("isAuthenticated = {}", authentication.isAuthenticated());
@@ -96,18 +97,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             log.error("Xác thực thất bại: {}", e.getMessage());
             throw new InternalAuthenticationServiceException(ErrorMessage.Auth.ERR_INCORRECT_PASSWORD);
         }
-        var user = userService.findByUsername(request.getUsername());
-
         //Create accessToken and refreshToken
-        String accessToken = jwtService.generateAccessToken(user.getId(), user.getUsername(),
-                List.of(new SimpleGrantedAuthority(user.getRole().toString())));
+        String accessToken = jwtService.generateAccessToken(user.get().getId(), user.get().getUsername(),
+                List.of(new SimpleGrantedAuthority(user.get().getRole().toString())));
 
-        String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getUsername(),
-                List.of(new SimpleGrantedAuthority(user.getRole().toString())));
+        String refreshToken = jwtService.generateRefreshToken(user.get().getId(), user.get().getUsername(),
+                List.of(new SimpleGrantedAuthority(user.get().getRole().toString())));
 
         //save to redis if use (Best practise) -> Although you can use both redis and db
 
         return LoginResponseDto.builder()
+                .tokenType(CommonConstant.BEARER_TOKEN)
+                .userId(user.get().getId())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
@@ -194,7 +195,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         RegisterRequestDto req = pending.getRequest();
 
-        User user = authMapper.registerRequestDtoToUser(req);
+        User user = User.builder()
+                .username(req.getUsername())
+                .email(req.getEmail())
+                .firstName(req.getFirstName())
+                .lastName(req.getLastName())
+                .build();
 
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
