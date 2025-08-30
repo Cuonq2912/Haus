@@ -17,7 +17,7 @@ public interface AuthenticationService {
 
     void logout(LogoutRequestDto request);
 
-    RefreshTokenResponseDto refresh(RefreshTokenResponseDto request);
+    RefreshTokenResponseDto refresh(RefreshTokenRequestDto request);
 
     void register(RegisterRequestDto request);
 

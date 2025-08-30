@@ -2,12 +2,15 @@ package com.example.haus.service.impl;
 
 import com.example.haus.constant.TokenType;
 import com.example.haus.exception.InvalidDataException;
+import com.example.haus.repository.InvalidatedTokenRepository;
 import com.example.haus.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
@@ -15,10 +18,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
@@ -35,6 +35,8 @@ public class JwtServiceImpl implements JwtService {
 
     @Value("${jwt.refreshKey}")
     public String refreshKey;
+
+    private InvalidatedTokenRepository invalidatedTokenRepository;
 
     @Override
     public String generateAccessToken(String userId, String username, Collection<? extends GrantedAuthority> authorities) {
@@ -53,7 +55,7 @@ public class JwtServiceImpl implements JwtService {
         claims.put("userId", userId);
         claims.put("role", authorities);
 
-        return generateAccessToken(claims, username);
+        return generateRefreshToken(claims, username);
     }
 
     @Override
@@ -64,7 +66,11 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public boolean isValid(String token, TokenType type, String name) {
         final String username = extractUserName(token, type);
-        return username.equals(name) && !isTokenExpired(token, type);
+        String jwtId = extractTokenId(token, type);
+
+        boolean isInvalidated = invalidatedTokenRepository.existsById(jwtId);
+
+        return username.equals(name) && !isTokenExpired(token, type) && !isInvalidated;
     }
 
     @Override
@@ -77,6 +83,7 @@ public class JwtServiceImpl implements JwtService {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
+                .setId(UUID.randomUUID().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * expiryHour))
                 .signWith(getKey(TokenType.ACCESS_TOKEN), SignatureAlgorithm.HS256)
@@ -88,6 +95,7 @@ public class JwtServiceImpl implements JwtService {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
+                .setId(UUID.randomUUID().toString()) // fixed
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * expiryDay))
                 .signWith(getKey(TokenType.REFRESH_TOKEN), SignatureAlgorithm.HS256)
@@ -129,5 +137,9 @@ public class JwtServiceImpl implements JwtService {
 
     private Date extractTokenExpiration(String token, TokenType type) {
         return extractClaim(token, type, Claims::getExpiration);
+    }
+
+    public String extractTokenId(String token, TokenType type) {
+        return extractClaim(token, type, Claims::getId);
     }
 }
