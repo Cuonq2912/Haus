@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,7 +48,7 @@ public class AuthController {
     @PostMapping(UrlConstant.Auth.LOGOUT)
     public ResponseEntity<?> logout(@Valid @RequestBody LogoutRequestDto logoutRequestDto) {
         authenticationService.logout(logoutRequestDto);
-        return ResponseUtil.success(SuccessMessage.Auth.LOGOUT_SUCCESS);
+        return ResponseUtil.success(HttpStatus.NO_CONTENT, SuccessMessage.Auth.LOGOUT_SUCCESS, null);
     }
 
     @Operation(
@@ -69,7 +70,7 @@ public class AuthController {
     @PostMapping(UrlConstant.Auth.REGISTER)
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequestDto registerRequestDto) {
         authenticationService.register(registerRequestDto);
-        return ResponseUtil.success(SuccessMessage.Auth.REGISTER_SEND_OTP_SUCCESS);
+        return ResponseUtil.success(HttpStatus.CREATED, SuccessMessage.Auth.REGISTER_SEND_OTP_SUCCESS, null);
     }
 
     @Operation(
@@ -79,6 +80,7 @@ public class AuthController {
     @PostMapping(UrlConstant.Auth.VERIFY_OTP)
     public ResponseEntity<?> verify(@Valid @RequestBody VerifyOtpRequestDto verifyOtpRequestDto) {
         return ResponseUtil.success(
+                HttpStatus.CREATED,
                 SuccessMessage.Auth.VERIFY_OTP_REGISTER_SUCCESS,
                 authenticationService.verifyOtpToRegister(verifyOtpRequestDto)
         );
@@ -91,7 +93,7 @@ public class AuthController {
     @PostMapping(UrlConstant.Auth.FORGOT_PASSWORD)
     public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequestDto forgotPasswordRequestDto) {
         authenticationService.forgotPassword(forgotPasswordRequestDto);
-        return ResponseUtil.success(SuccessMessage.Auth.FORGOT_PASSWORD_SUCCESS);
+        return ResponseUtil.success(HttpStatus.ACCEPTED, SuccessMessage.Auth.FORGOT_PASSWORD_SUCCESS, null);
     }
 
     @Operation(

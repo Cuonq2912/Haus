@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class LoginResponseDto {
 
-    String tokenType = CommonConstant.BEARER_TOKEN;
+    String tokenType;
 
     String userId;
 
