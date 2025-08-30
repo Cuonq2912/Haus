@@ -9,6 +9,7 @@ import com.example.haus.domain.request.auth.otp.VerifyOtpRequestDto;
 import com.example.haus.domain.response.auth.LoginResponseDto;
 import com.example.haus.domain.response.auth.RefreshTokenResponseDto;
 import com.example.haus.service.AuthenticationService;
+import com.google.api.client.auth.oauth2.RefreshTokenRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -54,10 +55,10 @@ public class AuthController {
             description = "Dùng để cấp lại token"
     )
     @PostMapping(UrlConstant.Auth.REFRESH_TOKEN)
-    public ResponseEntity<?> refresh(@Valid @RequestBody RefreshTokenResponseDto refreshTokenResponseDto) {
+    public ResponseEntity<?> refresh(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
         return ResponseUtil.success(
                 SuccessMessage.Auth.REFRESH_TOKEN_SUCCESS,
-                authenticationService.refresh(refreshTokenResponseDto)
+                authenticationService.refresh(refreshTokenRequestDto)
         );
     }
 

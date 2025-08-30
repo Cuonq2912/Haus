@@ -132,7 +132,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public RefreshTokenResponseDto refresh(RefreshTokenResponseDto request) {
+    public RefreshTokenResponseDto refresh(RefreshTokenRequestDto request) {
         String refreshToken = request.getRefreshToken();
 
         String username = jwtService.extractUserName(refreshToken, TokenType.REFRESH_TOKEN);
@@ -141,7 +141,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new InvalidDataException(ErrorMessage.Auth.EXPIRED_REFRESH_TOKEN);
         }
 
-        if (!jwtService.isValid(refreshToken, TokenType.ACCESS_TOKEN, username)) {
+        if (!jwtService.isValid(refreshToken, TokenType.REFRESH_TOKEN, username)) {
             throw new InvalidDataException(ErrorMessage.Auth.INVALID_REFRESH_TOKEN);
         }
 
