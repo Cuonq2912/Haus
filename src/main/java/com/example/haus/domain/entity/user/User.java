@@ -50,6 +50,8 @@ public class User extends BaseEntity {
 
     String avatarLink;
 
+    String avatarPublicId;
+
     @Column(nullable = false)
     String email;
 

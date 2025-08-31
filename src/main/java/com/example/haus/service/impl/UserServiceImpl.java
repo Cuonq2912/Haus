@@ -1,5 +1,8 @@
 package com.example.haus.service.impl;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
+import com.cloudinary.utils.ObjectUtils;
 import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.domain.entity.user.User;
@@ -10,6 +13,7 @@ import com.example.haus.domain.request.user.profile.UpdateUserRequestDto;
 import com.example.haus.domain.response.user.UserResponseDto;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
+import com.example.haus.exception.UploadFileException;
 import com.example.haus.helper.PersonalInformationHelper;
 import com.example.haus.repository.UserRepository;
 import com.example.haus.service.UserService;
@@ -21,8 +25,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 
 
 @Service
@@ -36,6 +43,8 @@ public class UserServiceImpl implements UserService {
     UserMapper userMapper;
 
     PersonalInformationHelper personalInformationHelper;
+
+    Cloudinary cloudinary;
 
     @Override
     public void deleteAccount(Authentication authentication) {
@@ -109,5 +118,38 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(updatePasswordRequestDto.getNewPassword()));
         userRepository.save(user);
 
+    }
+
+    @Override
+    public UserResponseDto uploadAvatar(MultipartFile file, Authentication authentication) throws IOException {
+
+        User user = userRepository.findByUsername(authentication.getName()).orElseThrow(
+                () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+
+        if(user.getAvatarPublicId() != null){
+            cloudinary.uploader().destroy(user.getAvatarPublicId(), ObjectUtils.emptyMap());
+        }
+        String imageUrl;
+        String publicId;
+        try{
+            Map<String, Object> uploadParams = ObjectUtils.asMap(
+                    "folder", "haus/avatars",
+                    "public_id", "avatar_" + user.getId() + "_" + System.currentTimeMillis(),
+                    "resource_type", "image",
+                    "overwrite", true,
+                    "transformation", "w_400,h_400,c_fill,q_auto"
+            );
+
+            Map<?, ?> result = cloudinary.uploader().upload(file.getBytes(), uploadParams);
+            publicId = (String) result.get("public_id");
+            imageUrl = (String) result.get("secure_url");
+        } catch (IOException e) {
+            throw new UploadFileException(ErrorMessage.User.UPLOAD_AVATAR_FAIL, e);
+        }
+        user.setAvatarLink(imageUrl);
+        user.setAvatarPublicId(publicId);
+
+        userRepository.save(user);
+        return userMapper.userToUserResponseDto(user);
     }
 }
