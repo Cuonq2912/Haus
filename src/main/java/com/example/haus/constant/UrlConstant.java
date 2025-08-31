@@ -32,6 +32,7 @@ public class UrlConstant {
 
         public static final String GET_PROFILE = PRE_FIX + "/profile";
         public static final String UPDATE_PROFILE = PRE_FIX + "/update-profile";
+        public static final String UPDATE_PASSWORD = PRE_FIX + "/update-password";
 
         private User() {
         }
