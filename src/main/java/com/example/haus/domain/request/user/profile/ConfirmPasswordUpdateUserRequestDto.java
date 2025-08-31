@@ -12,13 +12,13 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ConfirmPasswordRequestDto {
+public class ConfirmPasswordUpdateUserRequestDto {
 
     @Schema(description = "Mật khẩu xác nhận", example = "User123@")
-    @NotBlank(message = ErrorMessage.NOT_BLANK_FIELD)
-    String password;
+    @NotBlank(message = ErrorMessage.User.ERR_PASSWORD_NOT_BLANK)
+    String passwordConfirm;
 
     @Schema(description = "Thông tin profile cần cập nhật")
     @Valid
-    UpdatePersonalInformationRequestDto profileData;
+    UpdateUserRequestDto profileData;
 }

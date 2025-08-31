@@ -10,6 +10,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,20 +24,22 @@ import java.util.function.Function;
 
 @Service
 @Slf4j(topic = "JWT-SERVICE")
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class JwtServiceImpl implements JwtService {
     @Value("${jwt.expiryHour}")
-    public long expiryHour;
+    long expiryHour;
 
     @Value("${jwt.expiryDay}")
-    public long expiryDay;
+    long expiryDay;
 
     @Value("${jwt.accessKey}")
-    public String accessKey;
+    String accessKey;
 
     @Value("${jwt.refreshKey}")
-    public String refreshKey;
+    String refreshKey;
 
-    private InvalidatedTokenRepository invalidatedTokenRepository;
+    final InvalidatedTokenRepository invalidatedTokenRepository;
 
     @Override
     public String generateAccessToken(String userId, String username, Collection<? extends GrantedAuthority> authorities) {

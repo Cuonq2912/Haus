@@ -1,9 +1,10 @@
 package com.example.haus.controller;
 
 import com.example.haus.base.ResponseUtil;
+import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
-import com.example.haus.domain.request.user.profile.ConfirmPasswordRequestDto;
+import com.example.haus.domain.request.user.profile.ConfirmPasswordUpdateUserRequestDto;
 import com.example.haus.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -18,7 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+@RestApiV1
 @RequiredArgsConstructor
 @Slf4j(topic = "USER-CONTROLLER")
 @Validated
@@ -35,7 +36,10 @@ public class UserController {
     @DeleteMapping(UrlConstant.User.DELETE_MY_ACCOUNT)
     public ResponseEntity<?> deleteMyAccount(Authentication authentication) {
         userService.deleteAccount(authentication);
-        return ResponseUtil.success(HttpStatus.NO_CONTENT, SuccessMessage.User.DELETE_MY_ACCOUNT_SUCCESS, null);
+          return ResponseUtil.success(
+                  HttpStatus.OK,
+                  SuccessMessage.User.SOFT_DELETE_SUCCESS
+          );
     }
 
     @Operation(
@@ -52,13 +56,13 @@ public class UserController {
     }
 
     @Operation(
-            summary = "Cập nhật thông tin profile",
-            description = "Dùng để người dùng cập nhật thông tin cá nhân với xác nhận mật khẩu",
+            summary = "Cập nhật thông tin cá nhân",
+            description = "Dùng để người dùng cập nhật thông tin cá nhân",
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PutMapping(UrlConstant.User.UPDATE_PROFILE)
     public ResponseEntity<?> updateProfile(
-            @Valid @RequestBody ConfirmPasswordRequestDto request,
+            @Valid @RequestBody ConfirmPasswordUpdateUserRequestDto request,
             Authentication authentication
     ) {
         return ResponseUtil.success(
