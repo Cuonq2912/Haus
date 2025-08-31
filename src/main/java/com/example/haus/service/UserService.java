@@ -1,6 +1,7 @@
 package com.example.haus.service;
 
 import com.example.haus.domain.request.user.profile.ConfirmPasswordUpdateUserRequestDto;
+import com.example.haus.domain.request.user.profile.UpdatePasswordRequestDto;
 import com.example.haus.domain.response.user.UserResponseDto;
 import org.springframework.security.core.Authentication;
 
@@ -12,4 +13,5 @@ public interface UserService {
 
     UserResponseDto updateDetailProfile(ConfirmPasswordUpdateUserRequestDto requestDto, Authentication authentication);
 
+    void updatePassword(UpdatePasswordRequestDto updatePasswordRequestDto, Authentication authentication);
 }
