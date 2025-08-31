@@ -9,7 +9,7 @@ public class SuccessMessage {
         public static final String REFRESH_TOKEN_SUCCESS = "Take refresh token successful";
         public static final String REGISTER_SEND_OTP_SUCCESS = "Register successful. OTP has been sent to your email";
         public static final String VERIFY_OTP_REGISTER_SUCCESS = "Verify successful";
-        public static final String FORGOT_PASSWORD_SUCCESS = "Forgot password successful";
+        public static final String FORGOT_PASSWORD_SUCCESS = "Forgot password request successful";
         public static final String VERIFY_OTP_TO_RESET_PASSWORD_SUCCESS = "Verify to reset password successful";
         public static final String RESET_PASSWORD_SUCCESS = "Reset password successful";
 

@@ -102,10 +102,10 @@ public class AuthController {
     )
     @PostMapping(UrlConstant.Auth.VERIFY_OTP_TO_RESET_PASSWORD)
     public ResponseEntity<?> verifyToResetPassword(@Valid @RequestBody VerifyOtpRequestDto request) {
+        boolean isVerified = authenticationService.verifyOtpToResetPassword(request);
         return ResponseUtil.success(
-                SuccessMessage.Auth.VERIFY_OTP_TO_RESET_PASSWORD_SUCCESS,
-                authenticationService.verifyOtpToResetPassword(request)
-        );
+                HttpStatus.OK,
+                SuccessMessage.Auth.VERIFY_OTP_TO_RESET_PASSWORD_SUCCESS);
     }
 
     @Operation(
