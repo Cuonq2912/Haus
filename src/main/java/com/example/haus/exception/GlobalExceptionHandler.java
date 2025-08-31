@@ -113,7 +113,7 @@ public class GlobalExceptionHandler {
         errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
         errorResponse.setStatus(UNAUTHORIZED.value());
         errorResponse.setError(UNAUTHORIZED.getReasonPhrase());
-        errorResponse.setMessage("Username or password is incorrect");
+        errorResponse.setMessage("Email or password is incorrect");
 
         return errorResponse;
     }
