@@ -48,5 +48,6 @@ public class ErrorMessage {
         public static final String ERR_ACCOUNT_NOT_DELETED = "exception.user.account.is.not.in.deleted.state";
         public static final String ERR_INCORRECT_PASSWORD = "exception.user.incorrect.password";
         public static final String ERR_PERSONAL_INFORMATION_NOT_COMPLETED = "exception.user.personal.information.not.completed";
+        public static final String UPLOAD_AVATAR_FAIL = "exception.user.upload.fail";
     }
 }
