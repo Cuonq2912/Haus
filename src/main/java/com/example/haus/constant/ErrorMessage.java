@@ -39,6 +39,7 @@ public class ErrorMessage {
         public static final String ERR_EMAIL_NOT_EXISTED = "exception.user.email.not.existed";
         public static final String ERR_RE_ENTER_PASSWORD_NOT_MATCH = "exception.user.re-enter.password.not.match";
         public static final String ERR_DUPLICATE_OLD_PASSWORD = "exception.user.duplicate_old_password";
+        public static final String ERR_PASSWORD_NOT_BLANK = "exception.user.password.confirm.not_blank";
         public static final String ERR_PHONE_EXISTED = "exception.user.phone.existed";
         public static final String ERR_USER_IS_LOCKED = "exception.user.is.locked";
         public static final String ERR_USER_IS_NOT_LOCKED = "exception.user.is.not.locked";

@@ -12,6 +12,11 @@ public class ResponseUtil {
         return success(HttpStatus.OK, message, data);
     }
 
+    public static ResponseEntity<ResponseData<?>> success(HttpStatus status, String message) {
+        ResponseData<?> response = new ResponseData<>(status.value(), message);
+        return new ResponseEntity<>(response, status);
+    }
+
     public static ResponseEntity<ResponseData<?>> success(HttpStatus status, String message, Object data) {
         ResponseData<?> response = new ResponseData<>(status.value(), message, data);
         return new ResponseEntity<>(response, status);

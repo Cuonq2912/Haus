@@ -17,6 +17,7 @@ import com.example.haus.domain.response.auth.RefreshTokenResponseDto;
 import com.example.haus.domain.response.user.UserResponseDto;
 import com.example.haus.exception.InternalServerException;
 import com.example.haus.exception.InvalidDataException;
+import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.InvalidatedTokenRepository;
 import com.example.haus.repository.UserRepository;
 import com.example.haus.security.CustomUserDetailsService;
@@ -73,42 +74,32 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public LoginResponseDto authentication(LoginRequestDto request) {
-        log.info("-----------GetAccessToken-------------");
 
-        Optional<User> user = Optional.ofNullable(userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException(ErrorMessage.User.ERR_USERNAME_EXISTED)));
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
+                () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         try {
-            //Verify username password with authentication
-            log.info(authenticationManager.toString());
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(user.get().getUsername(),
+                    new UsernamePasswordAuthenticationToken(user.getUsername(),
                             request.getPassword()));
 
-            log.info("isAuthenticated = {}", authentication.isAuthenticated());
-            log.info("Authorities = {}", authentication.getAuthorities());
-
-            // If verify success, save in security context
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (DisabledException e) {
-            log.error("Tài khoản đã bị vô hiệu hóa");
-            throw new BadCredentialsException(ErrorMessage.Auth.ERR_ACCOUNT_LOCKED); // hoặc custom exception của bạn
+            throw new BadCredentialsException(ErrorMessage.Auth.ERR_ACCOUNT_LOCKED);
         } catch (AuthenticationException e) {
-            log.error("Xác thực thất bại: {}", e.getMessage());
             throw new InternalAuthenticationServiceException(ErrorMessage.Auth.ERR_INCORRECT_PASSWORD);
         }
-        //Create accessToken and refreshToken
-        String accessToken = jwtService.generateAccessToken(user.get().getId(), user.get().getUsername(),
-                List.of(new SimpleGrantedAuthority(user.get().getRole().toString())));
+        String accessToken = jwtService.generateAccessToken(user.getId(), user.getUsername(),
+                List.of(new SimpleGrantedAuthority(user.getRole().toString())));
 
-        String refreshToken = jwtService.generateRefreshToken(user.get().getId(), user.get().getUsername(),
-                List.of(new SimpleGrantedAuthority(user.get().getRole().toString())));
+        String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getUsername(),
+                List.of(new SimpleGrantedAuthority(user.getRole().toString())));
 
         //save to redis if use (Best practise) -> Although you can use both redis and db
 
         return LoginResponseDto.builder()
                 .tokenType(CommonConstant.BEARER_TOKEN)
-                .userId(user.get().getId())
+                .userId(user.getId())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
