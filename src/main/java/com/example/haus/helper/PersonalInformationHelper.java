@@ -1,13 +1,13 @@
 package com.example.haus.helper;
 
-import com.example.haus.domain.request.user.profile.UpdatePersonalInformationRequestDto;
+import com.example.haus.domain.request.user.profile.UpdateUserRequestDto;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PersonalInformationHelper {
 
-    public UpdatePersonalInformationRequestDto handleEmptyStrings(
-            UpdatePersonalInformationRequestDto personalInformation) {
+    public UpdateUserRequestDto handleEmptyStrings(
+            UpdateUserRequestDto personalInformation) {
         if (personalInformation == null) {
             return null;
         }
@@ -28,31 +28,35 @@ public class PersonalInformationHelper {
             personalInformation.setNationality(null);
         }
 
-        if (personalInformation.getUpdateAddressRequestDto() != null) {
-            if (personalInformation.getUpdateAddressRequestDto().getCountry() != null &&
-                    personalInformation.getUpdateAddressRequestDto().getCountry().trim().isEmpty()) {
-                personalInformation.getUpdateAddressRequestDto().setCountry(null);
-            }
-
-            if (personalInformation.getUpdateAddressRequestDto().getCity() != null &&
-                    personalInformation.getUpdateAddressRequestDto().getCity().trim().isEmpty()) {
-                personalInformation.getUpdateAddressRequestDto().setCity(null);
-            }
-
-            if (personalInformation.getUpdateAddressRequestDto().getDistrict() == null &&
-                    personalInformation.getUpdateAddressRequestDto().getDistrict() == null) {
-                personalInformation.getUpdateAddressRequestDto().setDistrict(null);
-            }
-            if (personalInformation.getUpdateAddressRequestDto().getCommune() == null &&
-                    personalInformation.getUpdateAddressRequestDto().getCommune() == null) {
-                personalInformation.getUpdateAddressRequestDto().setCommune(null);
-            }
-            if (personalInformation.getUpdateAddressRequestDto().getDetailAddress() == null &&
-                    personalInformation.getUpdateAddressRequestDto().getDetailAddress() == null) {
-                personalInformation.getUpdateAddressRequestDto().setDetailAddress(null);
-            }
-            personalInformation.setUpdateAddressRequestDto(null);
+        if(personalInformation.getEmail() != null && personalInformation.getEmail().trim().isEmpty()) {
+            personalInformation.setEmail(null);
         }
+
+//        if (personalInformation.getUpdateAddressRequestDto() != null) {
+//            if (personalInformation.getUpdateAddressRequestDto().getCountry() != null &&
+//                    personalInformation.getUpdateAddressRequestDto().getCountry().trim().isEmpty()) {
+//                personalInformation.getUpdateAddressRequestDto().setCountry(null);
+//            }
+//
+//            if (personalInformation.getUpdateAddressRequestDto().getCity() != null &&
+//                    personalInformation.getUpdateAddressRequestDto().getCity().trim().isEmpty()) {
+//                personalInformation.getUpdateAddressRequestDto().setCity(null);
+//            }
+//
+//            if (personalInformation.getUpdateAddressRequestDto().getDistrict() == null &&
+//                    personalInformation.getUpdateAddressRequestDto().getDistrict() == null) {
+//                personalInformation.getUpdateAddressRequestDto().setDistrict(null);
+//            }
+//            if (personalInformation.getUpdateAddressRequestDto().getCommune() == null &&
+//                    personalInformation.getUpdateAddressRequestDto().getCommune() == null) {
+//                personalInformation.getUpdateAddressRequestDto().setCommune(null);
+//            }
+//            if (personalInformation.getUpdateAddressRequestDto().getDetailAddress() == null &&
+//                    personalInformation.getUpdateAddressRequestDto().getDetailAddress() == null) {
+//                personalInformation.getUpdateAddressRequestDto().setDetailAddress(null);
+//            }
+//            personalInformation.setUpdateAddressRequestDto(null);
+//        }
 
         return personalInformation;
     }

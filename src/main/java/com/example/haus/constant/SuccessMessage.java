@@ -17,10 +17,9 @@ public class SuccessMessage {
 
     public static class User {
 
-        public static final String DELETE_MY_ACCOUNT_SUCCESS = "Delete my account successful";
         public static final String GET_MY_PROFILE_SUCCESS = "Get my profile successful";
         public static final String UPDATE_PROFILE_SUCCESS = "Update profile successful";
-
-    }
+        public static final String SOFT_DELETE_SUCCESS = "User account has been deleted successfully.";
+        }
 
 }
