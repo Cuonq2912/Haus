@@ -5,6 +5,7 @@ import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.request.user.profile.ConfirmPasswordUpdateUserRequestDto;
+import com.example.haus.domain.request.user.profile.UpdatePasswordRequestDto;
 import com.example.haus.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -68,6 +69,23 @@ public class UserController {
         return ResponseUtil.success(
                 SuccessMessage.User.UPDATE_PROFILE_SUCCESS,
                 userService.updateDetailProfile(request, authentication)
+        );
+    }
+
+    @Operation(
+            summary = "Cập nhật mật khẩu",
+            description = "Dùng để người dùng cập nhật mật khẩu",
+            security = @SecurityRequirement(name = "Bearer Token")
+    )
+    @PatchMapping(UrlConstant.User.UPDATE_PASSWORD)
+    public ResponseEntity<?> updatePassword(
+            @Valid @RequestBody UpdatePasswordRequestDto request,
+            Authentication authentication
+    ) {
+        userService.updatePassword(request, authentication);
+        return ResponseUtil.success(
+                HttpStatus.OK,
+                SuccessMessage.User.UPDATE_PASSWORD_SUCCESS
         );
     }
 }
