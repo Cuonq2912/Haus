@@ -5,6 +5,7 @@ import com.example.haus.constant.ErrorMessage;
 import com.example.haus.domain.entity.user.User;
 import com.example.haus.domain.mapper.UserMapper;
 import com.example.haus.domain.request.user.profile.ConfirmPasswordUpdateUserRequestDto;
+import com.example.haus.domain.request.user.profile.UpdatePasswordRequestDto;
 import com.example.haus.domain.request.user.profile.UpdateUserRequestDto;
 import com.example.haus.domain.response.user.UserResponseDto;
 import com.example.haus.exception.InvalidDataException;
@@ -17,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -85,5 +88,26 @@ public class UserServiceImpl implements UserService {
         UserResponseDto userResponseDto = userMapper.userToUserResponseDto(updatedUser);
 
         return userResponseDto;
+    }
+
+    @Override
+    public void updatePassword(UpdatePasswordRequestDto updatePasswordRequestDto, Authentication authentication) {
+
+        String username = authentication.getName();
+
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+
+        if(!passwordEncoder.matches(updatePasswordRequestDto.getCurrentPassword(), user.getPassword()))
+            throw new InvalidDataException(ErrorMessage.User.ERR_INCORRECT_PASSWORD);
+
+        if(updatePasswordRequestDto.getNewPassword().equals(updatePasswordRequestDto.getCurrentPassword()))
+            throw new InvalidDataException(ErrorMessage.User.ERR_DUPLICATE_OLD_PASSWORD);
+
+        user.setPassword(passwordEncoder.encode(updatePasswordRequestDto.getNewPassword()));
+        userRepository.save(user);
+
     }
 }

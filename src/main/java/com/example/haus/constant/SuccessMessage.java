@@ -20,6 +20,7 @@ public class SuccessMessage {
         public static final String GET_MY_PROFILE_SUCCESS = "Get my profile successful";
         public static final String UPDATE_PROFILE_SUCCESS = "Update profile successful";
         public static final String SOFT_DELETE_SUCCESS = "User account has been deleted successfully.";
+        public static final String UPDATE_PASSWORD_SUCCESS = "Update password successful";
         }
 
 }
