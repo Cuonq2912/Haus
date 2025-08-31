@@ -22,6 +22,8 @@ public class UserResponseDto {
 
     String dateOfBirth;
 
+    String avatarLink;
+
     String email;
 
     Role role;

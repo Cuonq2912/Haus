@@ -4,6 +4,9 @@ import com.example.haus.domain.request.user.profile.ConfirmPasswordUpdateUserReq
 import com.example.haus.domain.request.user.profile.UpdatePasswordRequestDto;
 import com.example.haus.domain.response.user.UserResponseDto;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 public interface UserService {
 
@@ -14,4 +17,6 @@ public interface UserService {
     UserResponseDto updateDetailProfile(ConfirmPasswordUpdateUserRequestDto requestDto, Authentication authentication);
 
     void updatePassword(UpdatePasswordRequestDto updatePasswordRequestDto, Authentication authentication);
+
+    UserResponseDto uploadAvatar(MultipartFile file, Authentication authentication) throws IOException;
 }
