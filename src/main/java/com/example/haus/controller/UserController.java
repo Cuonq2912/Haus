@@ -15,10 +15,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestApiV1
 @RequiredArgsConstructor
@@ -86,6 +90,21 @@ public class UserController {
         return ResponseUtil.success(
                 HttpStatus.OK,
                 SuccessMessage.User.UPDATE_PASSWORD_SUCCESS
+        );
+    }
+
+    @Operation(
+            summary = "Tải lên ảnh đại diện",
+            description = "Dùng để người dùng tải lên ảnh đại diện",
+            security = @SecurityRequirement(name = "Bearer Token")
+    )
+    @PostMapping(value = UrlConstant.User.UPLOAD_AVATAR, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadAvatar(
+            @RequestParam("file") MultipartFile file,
+            Authentication authentication
+    ) throws IOException {
+        return ResponseUtil.success(SuccessMessage.User.UPDATE_AVATAR_SUCCESS,
+                userService.uploadAvatar(file, authentication)
         );
     }
 }
