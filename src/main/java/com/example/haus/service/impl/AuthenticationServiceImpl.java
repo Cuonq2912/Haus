@@ -186,12 +186,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         RegisterRequestDto req = pending.getRequest();
 
-        User user = User.builder()
-                .username(req.getUsername())
-                .email(req.getEmail())
-                .firstName(req.getFirstName())
-                .lastName(req.getLastName())
-                .build();
+        User user = authMapper.registerRequestDtoToUser(req);
 
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
@@ -210,7 +205,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         log.info(request.getEmail());
 
         if (!userRepository.existsUserByEmail(request.getEmail()))
-            throw new UsernameNotFoundException(ErrorMessage.User.ERR_EMAIL_NOT_EXISTED);
+            throw new ResourceNotFoundException(ErrorMessage.User.ERR_EMAIL_NOT_EXISTED);
 
         String otp = generateOtp();
 
@@ -245,11 +240,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public UserResponseDto resetPassword(ResetPasswordRequestDto request) {
 
-        if (!request.getNewPassword().equals(request.getReEnterPassword()))
-            throw new InvalidDataException(ErrorMessage.User.ERR_RE_ENTER_PASSWORD_NOT_MATCH);
-
-        User user = userRepository.findByUsername(request.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
