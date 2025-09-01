@@ -50,4 +50,12 @@ public class ErrorMessage {
         public static final String ERR_PERSONAL_INFORMATION_NOT_COMPLETED = "exception.user.personal.information.not.completed";
         public static final String UPLOAD_AVATAR_FAIL = "exception.user.upload.fail";
     }
+
+    public static class Product {
+        public static final String ERR_PRICE_INVALID = "exception.product.price.invalid";
+        public static final String ERR_QUANTITY_INVALID = "exception.product.quantity.invalid";
+        public static final String ERR_PRODUCT_NOT_EXISTED = "exception.product.not.existed";
+        public static final String ERR_PRODUCT_NAME_EXISTED = "exception.product.name.existed";
+        public static final String ERR_PRODUCT_ALREADY_DELETED = "exception.product.already.deleted";
+    }
 }

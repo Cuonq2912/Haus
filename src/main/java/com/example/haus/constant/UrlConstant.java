@@ -25,16 +25,27 @@ public class UrlConstant {
 //        public static final String GET_USERS = PRE_FIX;
 //        public static final String GET_USER = PRE_FIX + "/{userId}";
 //        public static final String GET_CURRENT_USER = PRE_FIX + "/current";
-//
 //        public static final String FILL_PERSONAL_INFORMATION = PRE_FIX + "/personal-information";
         public static final String UPLOAD_AVATAR = PRE_FIX + "/upload-avatar";
         public static final String DELETE_MY_ACCOUNT = PRE_FIX + "/delete-my-account";
-
         public static final String GET_PROFILE = PRE_FIX + "/profile";
         public static final String UPDATE_PROFILE = PRE_FIX + "/update-profile";
         public static final String UPDATE_PASSWORD = PRE_FIX + "/update-password";
 
         private User() {
+        }
+    }
+
+    public static class Product {
+        private static final String PRE_FIX = "/product";
+
+        public static final String GET_PRODUCT_BY_ID = PRE_FIX + "/{id}";
+        public static final String CREATE_PRODUCT = PRE_FIX;
+        public static final String UPDATE_PRODUCT = PRE_FIX + "/{id}";
+        public static final String DELETE_PRODUCT = PRE_FIX + "/{id}";
+        public static final String GET_ALL_PRODUCTS = PRE_FIX;
+
+        private Product() {
         }
     }
 

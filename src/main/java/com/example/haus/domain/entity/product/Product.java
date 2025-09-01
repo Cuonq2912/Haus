@@ -34,10 +34,6 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     Integer inventoryQuantity;
 
-    List<String> color;
-
-    List<String> imageUrl;
-
     @ManyToMany
     @JoinTable(
             name = "product_categories",
@@ -54,5 +50,8 @@ public class Product extends BaseEntity {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     List<OrderItem> orderItems;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    List<ProductVariation> productVariations;
 
 }
