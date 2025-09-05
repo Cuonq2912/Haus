@@ -83,7 +83,7 @@ services:
       mysql:
         condition: service_healthy
     environment:
-    - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/haus
+    - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/${MYSQL_DATABASE}?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
     - SPRING_DATASOURCE_USERNAME=root
     - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD} 
     restart: unless-stopped

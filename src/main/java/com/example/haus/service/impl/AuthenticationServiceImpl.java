@@ -2,7 +2,6 @@ package com.example.haus.service.impl;
 
 import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
-import com.example.haus.constant.RoleConstant;
 import com.example.haus.constant.TokenType;
 import com.example.haus.domain.entity.InvalidatedToken;
 import com.example.haus.domain.entity.user.Role;
@@ -15,7 +14,6 @@ import com.example.haus.domain.request.auth.otp.VerifyOtpRequestDto;
 import com.example.haus.domain.response.auth.LoginResponseDto;
 import com.example.haus.domain.response.auth.RefreshTokenResponseDto;
 import com.example.haus.domain.response.user.UserResponseDto;
-import com.example.haus.exception.InternalServerException;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.InvalidatedTokenRepository;
@@ -175,8 +173,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public UserResponseDto verifyOtpToRegister(VerifyOtpRequestDto request) {
         PendingRegistrationRequestDto pending = pendingRegisterMap.get(request.getEmail());
 
-        if (pending == null)
-            throw new InvalidDataException(ErrorMessage.Auth.ERR_PENDING_RESET_REQUEST_NULL);
+        if (pending == null){
+            throw new InvalidDataException(ErrorMessage.Auth.ERR_PENDING_REGISTER_REQUEST_NULL);
+        }
 
         if (pending.isExpired())
             throw new InvalidDataException(ErrorMessage.Auth.ERR_OTP_EXPIRED);
