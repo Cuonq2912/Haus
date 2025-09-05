@@ -79,7 +79,7 @@ public class ProductController {
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseUtil.success(
-                HttpStatus.NO_CONTENT,
+                HttpStatus.OK,
                 SuccessMessage.Product.DELETE_PRODUCT_SUCCESS
         );
     }
