@@ -1,6 +1,6 @@
 package com.example.haus.helper;
 
-import com.example.haus.domain.request.user.profile.UpdateUserRequestDto;
+import com.example.haus.domain.dto.request.user.profile.UpdateUserRequestDto;
 import org.springframework.stereotype.Component;
 
 @Component

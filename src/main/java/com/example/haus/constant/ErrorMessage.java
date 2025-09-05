@@ -50,4 +50,9 @@ public class ErrorMessage {
         public static final String ERR_PERSONAL_INFORMATION_NOT_COMPLETED = "exception.user.personal.information.not.completed";
         public static final String UPLOAD_AVATAR_FAIL = "exception.user.upload.fail";
     }
+
+    public static class Category {
+        public static final String ERR_CATEGORY_EXISTED = "exception.category.existed";
+        public static final String ERR_CATEGORY_NOT_EXISTED = "exception.category.not.existed";
+    }
 }
