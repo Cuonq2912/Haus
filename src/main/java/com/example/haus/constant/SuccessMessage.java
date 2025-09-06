@@ -31,4 +31,12 @@ public class SuccessMessage {
         public static final String GET_ALL_CATEGORY_SUCCESS = "Get all category successful";
         public static final String DELETE_CATEGORY_SUCCESS = "Delete category successful";
     }
+
+    public static class Promotion {
+        public static final String ADD_PROMOTION_SUCCESS = "Add promotion successful";
+        public static final String UPDATE_PROMOTION_SUCCESS = "Update promotion successful";
+        public static final String GET_PROMOTION_SUCCESS = "Get promotion successful";
+        public static final String GET_ALL_PROMOTION_SUCCESS = "Get all promotion successful";
+        public static final String DELETE_PROMOTION_SUCCESS = "Delete promotion successful";
+    }
 }

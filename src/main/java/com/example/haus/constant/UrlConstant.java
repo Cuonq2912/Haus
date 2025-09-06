@@ -50,4 +50,15 @@ public class UrlConstant {
 
     }
 
+    public static class Promotion {
+        private static final String PRE_FIX = "/promotion";
+
+        public static final String ADD_PROMOTION = PRE_FIX;
+        public static final String UPDATE_PROMOTION = PRE_FIX + "/{promotionId}";
+        public static final String DELETE_PROMOTION = PRE_FIX + "/{promotionId}";
+        public static final String GET_PROMOTION_BY_ID = PRE_FIX + "/{promotionId}";
+        public static final String GET_ALL_PROMOTION = PRE_FIX;
+        public static final String GET_PROMOTION_BY_CODE = PRE_FIX + "/code/{promotionCode}";
+    }
+
 }

@@ -30,7 +30,6 @@ public class Promotion extends BaseEntity {
     String promotionCode;
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "type", nullable = false)
     PromotionType type;
 
@@ -50,8 +49,7 @@ public class Promotion extends BaseEntity {
     LocalDate endDate;
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "type", nullable = false)
+    @Column(name = "status", nullable = false)
     PromotionStatus status;
 
     @OneToMany(mappedBy = "promotion")

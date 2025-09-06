@@ -11,7 +11,7 @@ public interface PromotionService {
 
     PromotionResponseDto addPromotion(PromotionRequestDto requestDto);
 
-    PromotionResponseDto updatePromotion(Long id, PromotionRequestDto categoryRequest);
+    PromotionResponseDto updatePromotion(Long id, PromotionRequestDto requestDto);
 
     PromotionResponseDto getPromotionById(Long id);
 

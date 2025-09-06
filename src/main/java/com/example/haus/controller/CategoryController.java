@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RestApiV1
 @Validated
 @RequiredArgsConstructor
+@Slf4j(topic = "CATEGORY-CONTROLLER")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CategoryController {
 
@@ -40,7 +42,7 @@ public class CategoryController {
 
     @Operation(
             summary = "Lấy danh mục theo ID",
-            description = "Dùng để admin thêm danh mục theo ID với role Admin",
+            description = "Dùng để admin lấy danh mục theo ID với role Admin",
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping(UrlConstant.Category.GET_CATEGORY_BY_ID)
@@ -83,6 +85,7 @@ public class CategoryController {
     )
     @DeleteMapping(UrlConstant.Category.DELETE_CATEGORY)
     public ResponseEntity<?> deleteCategory(@PathVariable Long categoryId){
+        categoryService.deleteCategory(categoryId);
         return ResponseUtil.success(
                 HttpStatus.NO_CONTENT,
                 SuccessMessage.Category.DELETE_CATEGORY_SUCCESS
@@ -91,7 +94,7 @@ public class CategoryController {
 
     @Operation(
             summary = "Lấy danh mục theo tên",
-            description = "Dùng để admin thêm danh mục theo tên với role Admin",
+            description = "Dùng để admin lấy danh mục theo tên với role Admin",
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping(UrlConstant.Category.GET_CATEGORY_BY_NAME)

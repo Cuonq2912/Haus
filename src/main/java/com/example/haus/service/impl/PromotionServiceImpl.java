@@ -3,6 +3,7 @@ package com.example.haus.service.impl;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.promotion.PromotionType;
 import com.example.haus.domain.dto.request.promotion.PromotionRequestDto;
+import com.example.haus.domain.dto.response.category.CategoryResponseDto;
 import com.example.haus.domain.dto.response.promotion.PromotionResponseDto;
 import com.example.haus.domain.entity.product.Category;
 import com.example.haus.domain.entity.product.Promotion;
@@ -45,30 +46,37 @@ public class PromotionServiceImpl implements PromotionService {
                         new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
         promotionMapper.updatePromotionFromDto(requestDto, promotion);
 
-        if (promotion.getType().equals(PromotionType.ORDER)) {
-            promotion.set
-        }
-
         return promotionMapper.promotionToPromotionResponseDto(promotionRepository.save(promotion));
     }
 
     @Override
     public PromotionResponseDto getPromotionById(Long id) {
-        return null;
+        Promotion promotion = promotionRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
+        return promotionMapper.promotionToPromotionResponseDto(promotion);
     }
 
     @Override
     public List<PromotionResponseDto> getAllPromotion() {
-        return List.of();
+        List<PromotionResponseDto> promotions = promotionRepository.findAll()
+                .stream().map(promotion ->
+                        promotionMapper.promotionToPromotionResponseDto(promotion)).toList();
+        return promotions;
     }
 
     @Override
     public void deletePromotion(Long id) {
-
+        Promotion promotion = promotionRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
+        promotionRepository.delete(promotion);
     }
 
     @Override
     public PromotionResponseDto getPromotionByPromotionCode(String promotionCode) {
-        return null;
+        Promotion promotion = promotionRepository.findByPromotionCode(promotionCode).orElseThrow(() ->
+                new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
+        return promotionMapper.promotionToPromotionResponseDto(promotion);
     }
 }
