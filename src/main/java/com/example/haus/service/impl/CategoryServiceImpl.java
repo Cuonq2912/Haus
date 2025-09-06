@@ -38,13 +38,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponseDto updateCategory(Long id, CategoryRequestDto categoryRequest) {
-        if (categoryRepository.existsByCategoryName(categoryRequest.getCategoryName())) {
-            throw new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_EXISTED);
-        }
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
-        categoryMapper.categoryRequestDtoToCategory(categoryRequest);
+        categoryMapper.updateCategoryFromDto(categoryRequest, category);
         return categoryMapper.categoryToCategoryResponseDto(categoryRepository.save(category));
     }
 

@@ -32,4 +32,18 @@ public class Cart extends BaseEntity {
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     List<CartItem> cartItems;
 
+    // ---------------- Helper methods ----------------
+    public void addCartItem(CartItem item) {
+        if (!cartItems.contains(item)) {
+            cartItems.add(item);
+            item.setCart(this);
+        }
+    }
+
+    public void removeCartItem(CartItem item) {
+        if (cartItems.contains(item)) {
+            cartItems.remove(item);
+            item.setCart(null);
+        }
+    }
 }

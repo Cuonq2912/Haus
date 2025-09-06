@@ -1,17 +1,19 @@
 package com.example.haus.domain.dto.response.category;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.example.haus.domain.dto.response.promotion.PromotionResponseDto;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CategoryResponseDto {
-    private Long categoryId;
-    private String categoryName;
-    private String description;
+    Long categoryId;
+    String categoryName;
+    String description;
+
+    PromotionResponseDto promotion;
 }
 

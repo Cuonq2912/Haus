@@ -1,8 +1,8 @@
 package com.example.haus.domain.entity.product;
 
-import com.example.haus.constant.PromotionStatus;
+import com.example.haus.constant.promotion.PromotionStatus;
+import com.example.haus.constant.promotion.PromotionType;
 import com.example.haus.domain.entity.BaseEntity;
-import com.example.haus.domain.entity.user.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -29,6 +29,11 @@ public class Promotion extends BaseEntity {
     @Column(name = "promotion_code", unique = true, nullable = false)
     String promotionCode;
 
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "type", nullable = false)
+    PromotionType type;
+
     @Column(name = "description", nullable = false)
     String description;
 
@@ -54,4 +59,37 @@ public class Promotion extends BaseEntity {
 
     @OneToMany(mappedBy = "promotion")
     List<Category> categories;
+
+
+    // ---------------- Helper methods ----------------
+
+    //Order Promotion
+    public void addOrder(Order order) {
+        if (!orders.contains(order)) {
+            orders.add(order);
+            order.setPromotion(this);
+        }
+    }
+
+    public void removeOrder(Order order) {
+        if (orders.contains(order)) {
+            orders.remove(order);
+            order.setPromotion(null);
+        }
+    }
+
+    // CategoryPromotion
+    public void addCategory(Category category) {
+        if (!categories.contains(category)) {
+            categories.add(category);
+            category.setPromotion(this);
+        }
+    }
+
+    public void removeCategory(Category category) {
+        if (categories.contains(category)) {
+            categories.remove(category);
+            category.setPromotion(null);
+        }
+    }
 }

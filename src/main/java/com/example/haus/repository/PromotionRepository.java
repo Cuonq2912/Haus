@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface PromotionRepository extends JpaRepository<Promotion, Long> {
 
-    boolean existsByPromotionName(String promotionName);
+    boolean existsByPromotionCode(String promotionCode);
 
-    Optional<Promotion> findByPromotionNameIgnoreCase(String promotionName);
+    Optional<Promotion> findByPromotionCode(String promotionCode);
 }

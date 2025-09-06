@@ -1,4 +1,4 @@
-package com.example.haus.constant;
+package com.example.haus.constant.promotion;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;

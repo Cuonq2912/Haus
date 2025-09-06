@@ -55,4 +55,9 @@ public class ErrorMessage {
         public static final String ERR_CATEGORY_EXISTED = "exception.category.existed";
         public static final String ERR_CATEGORY_NOT_EXISTED = "exception.category.not.existed";
     }
+
+    public static class Promotion {
+        public static final String ERR_PROMOTION_EXISTED = "exception.promotion.existed";
+        public static final String ERR_PROMOTION_NOT_EXISTED = "exception.promotion.not.existed";
+    }
 }

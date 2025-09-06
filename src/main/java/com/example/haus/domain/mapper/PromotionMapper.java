@@ -1,9 +1,7 @@
 package com.example.haus.domain.mapper;
 
-import com.example.haus.domain.dto.request.category.CategoryRequestDto;
 import com.example.haus.domain.dto.request.promotion.PromotionRequestDto;
-import com.example.haus.domain.dto.response.category.CategoryResponseDto;
-import com.example.haus.domain.entity.product.Category;
+import com.example.haus.domain.dto.response.promotion.PromotionResponseDto;
 import com.example.haus.domain.entity.product.Promotion;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
@@ -14,11 +12,12 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS
 )
-public interface CategoryMapper {
+public interface PromotionMapper {
 
-    Category categoryRequestDtoToCategory(CategoryRequestDto requestDto);
+    Promotion promotionRequestDtoToPromotion (PromotionRequestDto requestDto);
 
-    void updateCategoryFromDto(CategoryRequestDto requestDto, @MappingTarget Category category);
+    void updatePromotionFromDto(PromotionRequestDto requestDto, @MappingTarget Promotion promotion);
 
-    CategoryResponseDto categoryToCategoryResponseDto(Category category);
+    PromotionResponseDto promotionToPromotionResponseDto(Promotion promotion);
+
 }

@@ -1,4 +1,4 @@
-package com.example.haus.domain.entity.product;
+package com.example.haus.constant;
 
 public enum OrderStatus {
     PENDING,
