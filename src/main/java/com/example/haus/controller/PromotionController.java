@@ -73,7 +73,7 @@ public class PromotionController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PutMapping(UrlConstant.Promotion.UPDATE_PROMOTION)
-    public ResponseEntity<?> updatePromotion(@PathVariable("categoryId") Long promotionId, @Valid @RequestBody PromotionRequestDto promotionRequestDto){
+    public ResponseEntity<?> updatePromotion(@PathVariable("promotionId") Long promotionId, @Valid @RequestBody PromotionRequestDto promotionRequestDto){
         return ResponseUtil.success(
                 SuccessMessage.Promotion.UPDATE_PROMOTION_SUCCESS,
                 promotionService.updatePromotion(promotionId, promotionRequestDto)
