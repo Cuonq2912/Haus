@@ -1,6 +1,7 @@
 package com.example.haus.service.impl;
 
 import com.example.haus.constant.ErrorMessage;
+import com.example.haus.constant.SuccessMessage;
 import com.example.haus.domain.dto.request.category.CategoryRequestDto;
 import com.example.haus.domain.dto.response.category.CategoryResponseDto;
 import com.example.haus.domain.entity.product.Category;
@@ -40,28 +41,42 @@ public class CategoryServiceImpl implements CategoryService {
         if (categoryRepository.existsByCategoryName(categoryRequest.getCategoryName())) {
             throw new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_EXISTED);
         }
-        Category category = categoryRepository.findById(id).orElseThrow(()->new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
         categoryMapper.categoryRequestDtoToCategory(categoryRequest);
         return categoryMapper.categoryToCategoryResponseDto(categoryRepository.save(category));
     }
 
     @Override
     public CategoryResponseDto getCategoryById(Long id) {
-        return null;
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
+        return categoryMapper.categoryToCategoryResponseDto(category);
     }
 
     @Override
     public List<CategoryResponseDto> getAllCategory() {
-        return List.of();
+        List<CategoryResponseDto> categories = categoryRepository.findAll()
+                .stream().map(category ->
+                        categoryMapper.categoryToCategoryResponseDto(category)).toList();
+        return categories;
     }
 
     @Override
-    public String deleteCategory(Long id) {
-        return "";
+    public void deleteCategory(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
+        categoryRepository.delete(category);
     }
 
     @Override
     public CategoryResponseDto getCategoryByCategoryName(String categoryName) {
-        return null;
+        Category category = categoryRepository.findByCategoryNameIgnoreCase(categoryName).orElseThrow(() ->
+                new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
+        CategoryResponseDto categoryResponse =  categoryMapper.categoryToCategoryResponseDto(category);
+        return categoryResponse;
     }
 }

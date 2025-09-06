@@ -15,7 +15,7 @@ public interface CategoryService {
 
     List<CategoryResponseDto> getAllCategory();
 
-    String deleteCategory(Long id);
+    void deleteCategory(Long id);
 
     CategoryResponseDto getCategoryByCategoryName(String categoryName);
 

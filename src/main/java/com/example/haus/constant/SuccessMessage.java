@@ -22,6 +22,13 @@ public class SuccessMessage {
         public static final String SOFT_DELETE_SUCCESS = "User account has been deleted successfully.";
         public static final String UPDATE_PASSWORD_SUCCESS = "Update password successful";
         public static final String UPDATE_AVATAR_SUCCESS = "Update avatar user successful";
-        }
+    }
 
+    public static class Category {
+        public static final String ADD_CATEGORY_SUCCESS = "Add category successful";
+        public static final String UPDATE_CATEGORY_SUCCESS = "Update category successful";
+        public static final String GET_CATEGORY_SUCCESS = "Get category successful";
+        public static final String GET_ALL_CATEGORY_SUCCESS = "Get all category successful";
+        public static final String DELETE_CATEGORY_SUCCESS = "Delete category successful";
+    }
 }

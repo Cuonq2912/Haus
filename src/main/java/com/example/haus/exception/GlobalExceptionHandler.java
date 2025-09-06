@@ -89,6 +89,7 @@ public class GlobalExceptionHandler {
      * @param request
      * @return
      */
+    @ResponseStatus(UNAUTHORIZED)
     @ExceptionHandler({InternalAuthenticationServiceException.class, AuthenticationException.class, UnauthorizedException.class})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "Unauthorized",
