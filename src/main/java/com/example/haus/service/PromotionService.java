@@ -1,8 +1,6 @@
 package com.example.haus.service;
 
-import com.example.haus.domain.dto.request.category.CategoryRequestDto;
 import com.example.haus.domain.dto.request.promotion.PromotionRequestDto;
-import com.example.haus.domain.dto.response.category.CategoryResponseDto;
 import com.example.haus.domain.dto.response.promotion.PromotionResponseDto;
 
 import java.util.List;

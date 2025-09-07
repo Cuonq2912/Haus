@@ -3,7 +3,6 @@ package com.example.haus.config;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Configuration;
 
 public class DotenvInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 

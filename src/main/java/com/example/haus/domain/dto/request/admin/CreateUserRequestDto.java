@@ -31,7 +31,7 @@ public class CreateUserRequestDto {
 
     @Schema(description = "Mật khẩu", example = "User123@")
     @NotBlank(message = ErrorMessage.NOT_BLANK_FIELD)
-    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=\\S+$).{8,}$", message = ErrorMessage.INVALID_FORMAT_PASSWORD)
+    @Pattern(regexp = "^(?=.*\\d)(?=.*[a-z])(?=\\S+$).{8,}$", message = ErrorMessage.INVALID_FORMAT_PASSWORD)
     String password;
 
     @Schema(description = "Họ/Tên đệm", example = "Phạm Văn")
@@ -47,7 +47,7 @@ public class CreateUserRequestDto {
     Date dateOfBirth;
 
     @Schema(description = "Số điện thoại", example = "0123456789")
-    @PhoneNumber(name = "phone")
+    @PhoneNumber()
     String phone;
 
     @Schema(description = "Quốc tịch", example = "Việt Nam")

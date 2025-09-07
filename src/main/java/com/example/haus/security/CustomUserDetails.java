@@ -1,7 +1,6 @@
 package com.example.haus.security;
 
 import com.example.haus.domain.entity.user.User;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

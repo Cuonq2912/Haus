@@ -1,7 +1,6 @@
 package com.example.haus.domain.dto.pagination;
 
 import com.example.haus.constant.CommonConstant;
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

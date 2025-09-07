@@ -1,11 +1,8 @@
 package com.example.haus.service.impl;
 
 import com.example.haus.constant.ErrorMessage;
-import com.example.haus.constant.promotion.PromotionType;
 import com.example.haus.domain.dto.request.promotion.PromotionRequestDto;
-import com.example.haus.domain.dto.response.category.CategoryResponseDto;
 import com.example.haus.domain.dto.response.promotion.PromotionResponseDto;
-import com.example.haus.domain.entity.product.Category;
 import com.example.haus.domain.entity.product.Promotion;
 import com.example.haus.domain.mapper.PromotionMapper;
 import com.example.haus.exception.ResourceNotFoundException;
@@ -59,10 +56,9 @@ public class PromotionServiceImpl implements PromotionService {
 
     @Override
     public List<PromotionResponseDto> getAllPromotion() {
-        List<PromotionResponseDto> promotions = promotionRepository.findAll()
+        return promotionRepository.findAll()
                 .stream().map(promotion ->
                         promotionMapper.promotionToPromotionResponseDto(promotion)).toList();
-        return promotions;
     }
 
     @Override

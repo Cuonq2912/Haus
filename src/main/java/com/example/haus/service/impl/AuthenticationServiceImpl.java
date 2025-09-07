@@ -25,6 +25,7 @@ import com.example.haus.service.AuthenticationService;
 import com.example.haus.service.EmailService;
 import com.example.haus.service.JwtService;
 import com.example.haus.service.UserService;
+import com.example.haus.utils.OtpUtils;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -107,15 +108,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void logout(LogoutRequestDto request) {
-        String JwtId = null;
+        String jwtId = null;
         Date expirationTime = null;
         try {
             SignedJWT signedJwt = SignedJWT.parse(request.getToken());
 
-            JwtId = signedJwt.getJWTClaimsSet().getJWTID();
+            jwtId = signedJwt.getJWTClaimsSet().getJWTID();
             expirationTime = signedJwt.getJWTClaimsSet().getExpirationTime();
 
-            invalidatedTokenRepository.save(new InvalidatedToken(JwtId, expirationTime));
+            invalidatedTokenRepository.save(new InvalidatedToken(jwtId, expirationTime));
 
         } catch (ParseException ex) {
             log.error("Signed Jwt parsed fail, message = {}", ex.getMessage());
@@ -158,7 +159,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (userRepository.existsUserByEmail(request.getEmail()))
             throw new InvalidDataException(ErrorMessage.User.ERR_EMAIL_EXISTED);
 
-        String otp = generateOtp();
+        String otp = OtpUtils.generateOtp();
 
         PendingRegistrationRequestDto pending = new PendingRegistrationRequestDto();
 
@@ -207,7 +208,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (!userRepository.existsUserByEmail(request.getEmail()))
             throw new ResourceNotFoundException(ErrorMessage.User.ERR_EMAIL_NOT_EXISTED);
 
-        String otp = generateOtp();
+        String otp = OtpUtils.generateOtp();
 
         PendingResetPasswordRequestDto pending = new PendingResetPasswordRequestDto();
 
@@ -257,10 +258,4 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return authMapper.userToUserResponseDto(user);
     }
 
-    @Override
-    public String generateOtp() {
-        Random random = new Random();
-        int otp = 100000 + random.nextInt(900000);
-        return String.valueOf(otp);
-    }
 }

@@ -1,10 +1,8 @@
 package com.example.haus.domain.mapper;
 
 import com.example.haus.domain.dto.request.category.CategoryRequestDto;
-import com.example.haus.domain.dto.request.promotion.PromotionRequestDto;
 import com.example.haus.domain.dto.response.category.CategoryResponseDto;
 import com.example.haus.domain.entity.product.Category;
-import com.example.haus.domain.entity.product.Promotion;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValueCheckStrategy;

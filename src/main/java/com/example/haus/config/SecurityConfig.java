@@ -2,13 +2,11 @@ package com.example.haus.config;
 
 import com.example.haus.constant.RoleConstant;
 import com.example.haus.repository.UserRepository;
-import com.example.haus.security.CustomUserDetails;
 import com.example.haus.security.CustomUserDetailsService;
 import com.example.haus.security.CustomizePreFilter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +22,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -44,16 +41,16 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     @Value("${security.public-endpoints}")
-    String[] PUBLIC_END_POINT;
+    String[] publicEndpoints;
 
     @Value("${security.user-endpoints}")
-    String[] USER_END_POINT;
+    String[] userEndpoints;
 
     @Value("${security.admin-endpoints}")
-    String[] ADMIN_END_POINT;
+    String[] adminEndpoints;
 
     @Value("${security.swagger-endpoints}")
-    String[] OPEN_API;
+    String[] swaggerEndpoints;
 
     final CustomUserDetailsService customUserDetailsService;
 
@@ -67,10 +64,10 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
-                                .requestMatchers(PUBLIC_END_POINT).permitAll()
-                                .requestMatchers(OPEN_API).permitAll()
-                                .requestMatchers(USER_END_POINT).hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
-                                .requestMatchers(ADMIN_END_POINT).hasAnyAuthority(RoleConstant.ADMIN)
+                                .requestMatchers(publicEndpoints).permitAll()
+                                .requestMatchers(swaggerEndpoints).permitAll()
+                                .requestMatchers(userEndpoints).hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
+                                .requestMatchers(adminEndpoints).hasAnyAuthority(RoleConstant.ADMIN)
 
                                 .requestMatchers(HttpMethod.GET, "/api/v1/category").hasAnyAuthority(RoleConstant.ADMIN, RoleConstant.USER)
                                 .requestMatchers(HttpMethod.GET, "/api/v1/promotion").hasAnyAuthority(RoleConstant.ADMIN, RoleConstant.USER)
@@ -105,14 +102,6 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
-        daoAuthenticationProvider.setUserDetailsService(userDetailsService());
-        return daoAuthenticationProvider;
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return customUserDetailsService;
+        return new DaoAuthenticationProvider(customUserDetailsService);
     }
 }

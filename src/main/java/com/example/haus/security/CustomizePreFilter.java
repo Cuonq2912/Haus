@@ -54,7 +54,7 @@ public class CustomizePreFilter extends OncePerRequestFilter {
         try {
             String username = jwtService.extractUserName(token, TokenType.ACCESS_TOKEN);
 
-            if (username.length() > 0 && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (username.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
                 if (jwtService.isValid(token, TokenType.ACCESS_TOKEN, username)) {

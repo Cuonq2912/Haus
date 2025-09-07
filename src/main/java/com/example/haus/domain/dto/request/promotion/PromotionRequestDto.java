@@ -1,10 +1,14 @@
 package com.example.haus.domain.dto.request.promotion;
 
+import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.promotion.PromotionStatus;
 import com.example.haus.constant.promotion.PromotionType;
 import com.example.haus.domain.entity.product.Promotion;
+import com.example.haus.domain.validator.PositiveOrNull;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
 
@@ -16,22 +20,31 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PromotionRequestDto {
 
-    String promotionCode; // bắt buộc, duy nhất
-    String description;   // mô tả
+    @NotBlank(message = ErrorMessage.Promotion.ERR_PROMOTION_CODE_NOT_BLANK)
+    @Length(min = 6, max = 6, message = ErrorMessage.Promotion.ERR_PROMOTION_CODE_LENGTH)
+    String promotionCode;
+    @NotNull(message = ErrorMessage.Promotion.ERR_PROMOTION_DESCRIPTION_NOT_NULL)
+    String description;
 
-    PromotionType type;   // ENUM: ORDER / CATEGORY
+    @NotBlank(message = ErrorMessage.Promotion.ERR_PROMOTION_TYPE_NOT_BLANK)
+    PromotionType type;
 
-    PromotionStatus status; // ENUM: ACTIVE / INACTIVE / EXPIRED
+    @NotBlank(message = ErrorMessage.Promotion.ERR_PROMOTION_STATUS_NOT_BLANK)
+    PromotionStatus status;
+    @NotEmpty(message = ErrorMessage.Promotion.ERR_PROMOTION_START_DATE_NOT_EMPTY)
     LocalDate startDate;
+    @NotEmpty(message = ErrorMessage.Promotion.ERR_PROMOTION_END_DATE_NOT_EMPTY)
     LocalDate endDate;
 
-    // --- Chỉ áp dụng cho loại khuyến mãi theo đơn hàng (only order)---
-    Float minPriceOrder;  // giá trị tối thiểu
-    Float maxPriceOrder;  // giá trị tối đa
+    @PositiveOrNull
+    Float minPriceOrder;
+    @PositiveOrNull
+    Float maxPriceOrder;
 
+    @NotBlank(message = ErrorMessage.Promotion.ERR_PROMOTION_DISCOUNT_PERCENT_NOT_BLANK)
+    @Min(value = 0, message = ErrorMessage.Promotion.ERR_PROMOTION_DISCOUNT_PERCENT_MIN_VALIDATE)
+    @Max(value = 100, message = ErrorMessage.Promotion.ERR_PROMOTION_DISCOUNT_PERCENT_MAX_VALIDATE)
+    Float discountPercent;
 
-    Float discountPercent; // % giảm giá
-
-    // --- Chỉ áp dụng cho loại khuyến mãi theo danh mục ---
-    Long categoryId; // nếu type = CATEGORY
+    Long categoryId;
 }

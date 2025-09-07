@@ -1,6 +1,5 @@
 package com.example.haus.domain.dto.pagination;
 
-import com.example.haus.constant.CommonConstant;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

@@ -1,7 +1,6 @@
 package com.example.haus.service.impl;
 
 import com.example.haus.constant.ErrorMessage;
-import com.example.haus.constant.SuccessMessage;
 import com.example.haus.domain.dto.request.category.CategoryRequestDto;
 import com.example.haus.domain.dto.response.category.CategoryResponseDto;
 import com.example.haus.domain.entity.product.Category;
@@ -56,10 +55,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryResponseDto> getAllCategory() {
-        List<CategoryResponseDto> categories = categoryRepository.findAll()
-                .stream().map(category ->
-                        categoryMapper.categoryToCategoryResponseDto(category)).toList();
-        return categories;
+        return categoryRepository.findAll()
+                .stream()
+                .map(categoryMapper::categoryToCategoryResponseDto)
+                .toList();
     }
 
     @Override
@@ -74,7 +73,6 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponseDto getCategoryByCategoryName(String categoryName) {
         Category category = categoryRepository.findByCategoryNameIgnoreCase(categoryName).orElseThrow(() ->
                 new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
-        CategoryResponseDto categoryResponse =  categoryMapper.categoryToCategoryResponseDto(category);
-        return categoryResponse;
+        return categoryMapper.categoryToCategoryResponseDto(category);
     }
 }

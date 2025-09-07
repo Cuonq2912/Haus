@@ -2,6 +2,8 @@ package com.example.haus.constant;
 
 public class UrlConstant {
 
+    private UrlConstant() {}
+
     public static class Auth {
         private static final String PRE_FIX = "/auth";
 
@@ -39,6 +41,9 @@ public class UrlConstant {
     }
 
     public static class Category {
+
+        private Category() {}
+
         private static final String PRE_FIX = "/category";
 
         public static final String ADD_CATEGORY = PRE_FIX;
@@ -51,6 +56,9 @@ public class UrlConstant {
     }
 
     public static class Promotion {
+
+        private Promotion() {}
+
         private static final String PRE_FIX = "/promotion";
 
         public static final String ADD_PROMOTION = PRE_FIX;
