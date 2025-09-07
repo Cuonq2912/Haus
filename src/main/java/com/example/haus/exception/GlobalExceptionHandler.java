@@ -50,7 +50,7 @@ public class GlobalExceptionHandler {
                                 "status": 400,
                                 "path": "/api/v1",
                                 "error": "Payload invalid | Parameter invalid | Invalid data",
-                                "message": "{data} must not be .... " 
+                                "message": "{data} must not be null || empty || blank || must be required " 
                             }
                             """
 

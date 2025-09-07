@@ -33,6 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
             throw new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_EXISTED);
         }
         Category category = categoryMapper.categoryRequestDtoToCategory(categoryRequest);
+        category.setDeletedAt(null);
         return categoryMapper.categoryToCategoryResponseDto(categoryRepository.save(category));
     }
 

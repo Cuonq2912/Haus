@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -66,11 +67,13 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
-                                .requestMatchers("**").permitAll()
                                 .requestMatchers(PUBLIC_END_POINT).permitAll()
                                 .requestMatchers(OPEN_API).permitAll()
                                 .requestMatchers(USER_END_POINT).hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
                                 .requestMatchers(ADMIN_END_POINT).hasAnyAuthority(RoleConstant.ADMIN)
+
+                                .requestMatchers(HttpMethod.GET, "/api/v1/category").hasAnyAuthority(RoleConstant.ADMIN, RoleConstant.USER)
+                                .requestMatchers(HttpMethod.GET, "/api/v1/promotion").hasAnyAuthority(RoleConstant.ADMIN, RoleConstant.USER)
                                 .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(customizePreFilter, UsernamePasswordAuthenticationFilter.class);

@@ -31,7 +31,7 @@ public class Promotion extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    PromotionType type;
+    PromotionType type; //Order, Category
 
     @Column(name = "description", nullable = false)
     String description;
