@@ -45,6 +45,12 @@ public class UrlConstant {
         public static final String DELETE_PRODUCT = PRE_FIX + "/{id}";
         public static final String GET_ALL_PRODUCTS = PRE_FIX;
 
+        public static final String GET_PRODUCT_VARIATIONS_BY_PRODUCT_ID = PRE_FIX + "/{productId}/variations";
+        public static final String GET_PRODUCT_VARIATION_BY_ID = PRE_FIX + "/variation/{variationId}";
+        public static final String CREATE_PRODUCT_VARIATION = PRE_FIX + "/variation";
+        public static final String UPDATE_PRODUCT_VARIATION = PRE_FIX + "/variation";
+        public static final String DELETE_PRODUCT_VARIATION = PRE_FIX + "/variation/{variationId}";
+
         private Product() {
         }
     }

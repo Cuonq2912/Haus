@@ -1,5 +1,7 @@
 package com.example.haus.domain.response.product;
 
+import com.example.haus.constant.MediaType;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -8,18 +10,11 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductVariationResponseDto {
+public class MediaResponseDto {
 
     Long id;
 
-    String color;
+    String url;
 
-    String size;
-
-    Double price;
-
-    Integer inventoryQuantity;
-
-    MediaResponseDto media;
-
+    MediaType type;
 }

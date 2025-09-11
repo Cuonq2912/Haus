@@ -32,5 +32,12 @@ public class SuccessMessage {
         public static final String UPDATE_PRODUCT_SUCCESS = "Update product successful";
         public static final String DELETE_PRODUCT_SUCCESS = "Delete product successful";
         public static final String GET_ALL_PRODUCTS_SUCCESS = "Get all products successful";
+
+        // Product Variation Messages
+        public static final String GET_PRODUCT_VARIATIONS_SUCCESS = "Get product variations successful";
+        public static final String GET_PRODUCT_VARIATION_SUCCESS = "Get product variation successful";
+        public static final String CREATE_PRODUCT_VARIATION_SUCCESS = "Create product variation successful";
+        public static final String UPDATE_PRODUCT_VARIATION_SUCCESS = "Update product variation successful";
+        public static final String DELETE_PRODUCT_VARIATION_SUCCESS = "Delete product variation successful";
     }
 }

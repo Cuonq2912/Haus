@@ -10,9 +10,11 @@ import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.ProductRepository;
 import com.example.haus.service.ProductService;
+import com.example.haus.util.UploadFileUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,8 @@ import java.util.Date;
 public class ProductServiceImpl implements ProductService {
 
     ProductRepository productRepository;
+
+    UploadFileUtil uploadFileUtil;
 
     ProductMapper productMapper;
 
@@ -71,8 +75,8 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED));
 
-        if (!product.getProductName().equals(request.getProductName()) && 
-            productRepository.existsProductByProductName(request.getProductName())) {
+        if (!product.getProductName().equals(request.getProductName()) &&
+                productRepository.existsProductByProductName(request.getProductName())) {
             throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_NAME_EXISTED);
         }
 
@@ -90,13 +94,27 @@ public class ProductServiceImpl implements ProductService {
         if (productId == null || productId <= 0) {
             throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
         }
-        if (!productRepository.existsById(productId)) {
-            throw new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED);
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED));
+
+        if (product.getMedias() != null) {
+            product.getMedias().forEach(media -> {
+                if (StringUtils.isNotBlank(media.getUrl())) {
+                    uploadFileUtil.destroyFileWithUrl(media.getUrl());
+                }
+            });
         }
-        // delete relate entity
+
+        if (product.getProductVariations() != null) {
+            product.getProductVariations().forEach(variation -> {
+                if (variation.getMedia() != null && StringUtils.isNotBlank(variation.getMedia().getUrl())) {
+                    uploadFileUtil.destroyFileWithUrl(variation.getMedia().getUrl());
+                }
+            });
+        }
+
         productRepository.deleteById(productId);
     }
 
-
 }
-

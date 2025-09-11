@@ -31,7 +31,6 @@ public abstract class BaseEntity {
     Date updatedAt;
 
     @Column()
-    @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     Date deletedAt;
 

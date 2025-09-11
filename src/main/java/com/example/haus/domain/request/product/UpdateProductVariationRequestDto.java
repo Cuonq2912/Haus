@@ -4,10 +4,11 @@ import com.example.haus.constant.ErrorMessage;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.web.multipart.MultipartFile;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,9 +17,12 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateProductVariationRequestDto {
 
-    @Schema(description = "URL hình ảnh mới của biến thể sản phẩm", example = "https://example.com/images/sofa-blue.jpg")
-    @Pattern(regexp = "^https?://.*\\.(jpg|jpeg|png|gif|webp)$", message = ErrorMessage.INVALID_FORMAT_SOME_THING_FIELD)
-    String imageUrl;
+    @Schema(description = "ID của product variation cần cập nhật", example = "1")
+    @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
+    Long id;
+
+    @Schema(description = "File ảnh mới của biến thể sản phẩm")
+    MultipartFile imageFile;
 
     @Schema(description = "Màu sắc mới của biến thể", example = "Xanh")
     @Size(max = 50, message = ErrorMessage.INVALID_SOME_THING_FIELD)

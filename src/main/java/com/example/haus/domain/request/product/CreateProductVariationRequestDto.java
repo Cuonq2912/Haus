@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.web.multipart.MultipartFile;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,10 +14,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateProductVariationRequestDto {
 
-    @Schema(description = "URL hình ảnh sản phẩm", example = "https://example.com/images/sofa-red.jpg")
-    @NotBlank(message = ErrorMessage.NOT_BLANK_FIELD)
-    @Pattern(regexp = "^https?://.*\\.(jpg|jpeg|png|gif|webp)$", message = ErrorMessage.INVALID_FORMAT_SOME_THING_FIELD)
-    String imageUrl;
+    @Schema(description = "File ảnh sản phẩm")
+    MultipartFile imageFile;
 
     @Schema(description = "Màu sắc sản phẩm", example = "Đỏ")
     @NotBlank(message = ErrorMessage.NOT_BLANK_FIELD)

@@ -4,8 +4,11 @@ import com.example.haus.domain.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "products")
@@ -53,5 +56,9 @@ public class Product extends BaseEntity {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     List<ProductVariation> productVariations;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
+    @JsonIgnore
+    Set<Media> medias = new HashSet<>();
 
 }
