@@ -56,8 +56,6 @@ public class SecurityConfig {
 
     final CustomizePreFilter customizePreFilter;
 
-    final UserRepository userRepository;
-
     @Bean
     public SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
