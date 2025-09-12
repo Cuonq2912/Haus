@@ -39,7 +39,7 @@ public class UpdateUserRequestDto {
     String phone;
 
     @Schema(description = "Giới tính", example = "MALE / FEMALE / OTHER")
-    @GenderSubset(name = "gender", anyOf = {Gender.MALE, Gender.FEMALE, Gender.OTHER})
+    @GenderSubset(anyOf = {Gender.MALE, Gender.FEMALE, Gender.OTHER})
     Gender gender;
 
     @Schema(description = "Quốc tịch", example = "Việt Nam")

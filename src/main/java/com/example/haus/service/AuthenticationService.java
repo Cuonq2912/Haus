@@ -5,10 +5,6 @@ import com.example.haus.domain.dto.request.auth.otp.VerifyOtpRequestDto;
 import com.example.haus.domain.dto.response.auth.LoginResponseDto;
 import com.example.haus.domain.dto.response.auth.RefreshTokenResponseDto;
 import com.example.haus.domain.dto.response.user.UserResponseDto;
-import jakarta.servlet.http.HttpServletRequest;
-
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 
 public interface AuthenticationService {
     LoginResponseDto authentication(LoginRequestDto request);
@@ -29,5 +25,4 @@ public interface AuthenticationService {
 
     UserResponseDto resetPassword(ResetPasswordRequestDto request);
 
-    String generateOtp();
 }

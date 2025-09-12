@@ -14,7 +14,8 @@ public class ResponseUtil {
 
     public static ResponseEntity<ResponseData<?>> success(HttpStatus status, String message) {
         ResponseData<?> response = new ResponseData<>(status.value(), message);
-        return new ResponseEntity<>(response, status);
+
+        return new ResponseEntity<>(response, status == HttpStatus.NO_CONTENT ? HttpStatus.OK : status);
     }
 
     public static ResponseEntity<ResponseData<?>> success(HttpStatus status, String message, Object data) {

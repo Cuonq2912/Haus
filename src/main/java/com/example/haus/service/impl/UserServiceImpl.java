@@ -70,9 +70,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
-        UserResponseDto userResponseDto = userMapper.userToUserResponseDto(user);
-
-        return userResponseDto;
+        return userMapper.userToUserResponseDto(user);
     }
 
     @Override
@@ -93,9 +91,7 @@ public class UserServiceImpl implements UserService {
 
         User updatedUser = userRepository.save(user);
 
-        UserResponseDto userResponseDto = userMapper.userToUserResponseDto(updatedUser);
-
-        return userResponseDto;
+        return userMapper.userToUserResponseDto(updatedUser);
     }
 
     @Override

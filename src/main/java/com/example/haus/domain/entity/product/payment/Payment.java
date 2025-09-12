@@ -5,7 +5,7 @@ import com.example.haus.domain.entity.product.Order;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDate;
 
@@ -20,8 +20,8 @@ import java.time.LocalDate;
 public class Payment extends BaseEntity {
 
   @Id
-  @GeneratedValue(generator = "uuid2")
-  @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
+  @GeneratedValue
+  @UuidGenerator
   @Column(name = "id", insertable = false, updatable = false, nullable = false, columnDefinition = "CHAR(36)")
   String id;
 

@@ -49,14 +49,15 @@ public class CustomizePreFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+
         final String token = authHeader.substring(7);
         try {
             String username = jwtService.extractUserName(token, TokenType.ACCESS_TOKEN);
 
-            if (username.length() > 0 && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (!username.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
-                if (jwtService.isValid(token, TokenType.ACCESS_TOKEN, username)) {
+                if (jwtService.isValid(token, TokenType.ACCESS_TOKEN, userDetails.getUsername())) {
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

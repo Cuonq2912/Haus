@@ -36,4 +36,7 @@ public class Category extends BaseEntity {
     )
     List<Product> products;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "promotion_id")
+    Promotion promotion;
 }

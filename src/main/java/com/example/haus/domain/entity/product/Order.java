@@ -1,5 +1,6 @@
 package com.example.haus.domain.entity.product;
 
+import com.example.haus.constant.OrderStatus;
 import com.example.haus.domain.entity.BaseEntity;
 import com.example.haus.domain.entity.product.payment.Payment;
 import com.example.haus.domain.entity.user.User;
@@ -51,4 +52,26 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "promotion_id")
     Promotion promotion;
 
+    // ---------------- Helper methods ----------------
+
+    public void addOrderItem(OrderItem orderItem) {
+        if (!orderItems.contains(orderItem)) {
+            orderItems.add(orderItem);
+            orderItem.setOrder(this);
+        }
+    }
+
+    public void removeOrderItem(OrderItem orderItem) {
+        if (orderItems.contains(orderItem)) {
+            orderItems.remove(orderItem);
+            orderItem.setOrder(null);
+        }
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
+        if (payment != null) {
+            payment.setOrder(this);
+        }
+    }
 }

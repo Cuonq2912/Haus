@@ -6,10 +6,7 @@ import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.request.auth.*;
 import com.example.haus.domain.dto.request.auth.otp.VerifyOtpRequestDto;
-import com.example.haus.domain.dto.response.auth.LoginResponseDto;
-import com.example.haus.domain.dto.response.auth.RefreshTokenResponseDto;
 import com.example.haus.service.AuthenticationService;
-import com.google.api.client.auth.oauth2.RefreshTokenRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -102,10 +99,9 @@ public class AuthController {
     )
     @PostMapping(UrlConstant.Auth.VERIFY_OTP_TO_RESET_PASSWORD)
     public ResponseEntity<?> verifyToResetPassword(@Valid @RequestBody VerifyOtpRequestDto request) {
-        boolean isVerified = authenticationService.verifyOtpToResetPassword(request);
         return ResponseUtil.success(
                 HttpStatus.OK,
-                SuccessMessage.Auth.VERIFY_OTP_TO_RESET_PASSWORD_SUCCESS);
+                authenticationService.verifyOtpToResetPassword(request) ? SuccessMessage.Auth.VERIFY_OTP_TO_RESET_PASSWORD_SUCCESS : null);
     }
 
     @Operation(

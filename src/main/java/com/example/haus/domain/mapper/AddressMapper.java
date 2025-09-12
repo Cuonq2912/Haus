@@ -13,6 +13,6 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 public interface AddressMapper {
     UpdateAddressRequestDto addressUpdateAddressRequestDto(Address address);
 
-    Address updateAddressRequestDtoToAddress(UpdateAddressRequestDto UpdateAddressRequestDto);
+    Address updateAddressRequestDtoToAddress(UpdateAddressRequestDto updateAddressRequestDto);
 
 }

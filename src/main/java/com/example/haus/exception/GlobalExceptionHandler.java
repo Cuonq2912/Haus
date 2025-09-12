@@ -50,7 +50,7 @@ public class GlobalExceptionHandler {
                                 "status": 400,
                                 "path": "/api/v1",
                                 "error": "Payload invalid | Parameter invalid | Invalid data",
-                                "message": "{data} must not be .... " 
+                                "message": "{data} must not be null || empty || blank || must be required " 
                             }
                             """
 
@@ -89,19 +89,20 @@ public class GlobalExceptionHandler {
      * @param request
      * @return
      */
+    @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler({InternalAuthenticationServiceException.class, AuthenticationException.class, UnauthorizedException.class})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "401", description = "Unauthorized",
+            @ApiResponse(responseCode = "400", description = "Unauthorized",
                     content = {@Content(mediaType = APPLICATION_JSON_VALUE,
                             examples = @ExampleObject(
-                                    name = "401 Response",
-                                    summary = "Handle exception when resource not found",
+                                    name = "400 Response",
+                                    summary = "Handle exception when authenticated failed",
                                     value = """
                                             {
                                               "timestamp": "2023-10-19T06:07:35.321+00:00",
-                                              "status": 401,
+                                              "status": 400,
                                               "path": "/api/v1/...",
-                                              "error": "Unauthorized",
+                                              "error": "Bad request",
                                               "message": "Username or password is incorrect"
                                             }
                                             """
@@ -111,8 +112,8 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(new Date());
         errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
-        errorResponse.setStatus(UNAUTHORIZED.value());
-        errorResponse.setError(UNAUTHORIZED.getReasonPhrase());
+        errorResponse.setStatus(BAD_REQUEST.value());
+        errorResponse.setError(BAD_REQUEST.getReasonPhrase());
         errorResponse.setMessage("Email or password is incorrect");
 
         return errorResponse;
