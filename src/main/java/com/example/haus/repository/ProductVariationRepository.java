@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface ProductVariationRepository extends JpaRepository<ProductVariation, Long> {
 
-    @Query("SELECT pv FROM ProductVariation pv WHERE pv.product.id = :productId")
-    List<ProductVariation> findByProductId(@Param("productId") Long productId);
+    @Query("SELECT pv FROM ProductVariation pv WHERE pv.product.id = :productId AND pv.isDeleted = FALSE")
+    List<ProductVariation> findByProductIdAndIsDeletedFalse(@Param("productId") Long productId);
 
 }

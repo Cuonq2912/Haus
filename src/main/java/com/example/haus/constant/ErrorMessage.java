@@ -59,5 +59,6 @@ public class ErrorMessage {
         public static final String ERR_PRODUCT_NAME_EXISTED = "exception.product.name.existed";
         public static final String ERR_PRODUCT_ALREADY_DELETED = "exception.product.already.deleted";
         public static final String ERR_PRODUCT_VARIATION_NOT_EXISTED = "exception.product.variation.not.existed";
+        public static final String ERR_PRODUCT_VARIATION_ALREADY_DELETED = "exception.product.variation.already.deleted";
     }
 }

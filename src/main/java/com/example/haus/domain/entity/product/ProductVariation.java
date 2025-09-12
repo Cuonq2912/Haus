@@ -32,6 +32,10 @@ public class ProductVariation extends BaseEntity {
     @Column(nullable = false)
     Integer inventoryQuantity;
 
+
+    @Column()
+    Boolean isDeleted;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     Product product;

@@ -27,15 +27,15 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     String productName;
 
-    @Column(nullable = false)
-    Double price;
-
     @Lob
     @Column(columnDefinition = "TEXT")
     String description;
 
     @Column(nullable = false)
     Integer inventoryQuantity;
+
+    @Column()
+    Boolean isDeleted;
 
     @ManyToMany
     @JoinTable(
@@ -57,8 +57,5 @@ public class Product extends BaseEntity {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     List<ProductVariation> productVariations;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
-    @JsonIgnore
-    Set<Media> medias = new HashSet<>();
 
 }

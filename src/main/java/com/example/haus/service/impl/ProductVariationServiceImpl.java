@@ -1,5 +1,6 @@
 package com.example.haus.service.impl;
 
+import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.MediaType;
 import com.example.haus.domain.entity.product.Media;
@@ -44,7 +45,14 @@ public class ProductVariationServiceImpl implements ProductVariationService {
             throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
         }
 
-        List<ProductVariation> productVariations = productVariationRepository.findByProductId(productId);
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED));
+
+        if(product.getIsDeleted())
+            throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_ALREADY_DELETED);
+
+        List<ProductVariation> productVariations = productVariationRepository
+                .findByProductIdAndIsDeletedFalse(productId);
         return productVariationMapper.toListProductVariationResponseDto(productVariations);
     }
 
@@ -55,9 +63,13 @@ public class ProductVariationServiceImpl implements ProductVariationService {
             throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
         }
 
+
         ProductVariation productVariation = productVariationRepository.findById(productVariationId)
                 .orElseThrow(
                         () -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
+
+        if(productVariation.getIsDeleted())
+            throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_ALREADY_DELETED);
 
         return productVariationMapper.toProductVariationResponseDto(productVariation);
     }
@@ -105,9 +117,13 @@ public class ProductVariationServiceImpl implements ProductVariationService {
             throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED);
         }
 
+
         ProductVariation existingVariation = productVariationRepository.findById(request.getId())
                 .orElseThrow(
                         () -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
+
+        if(existingVariation.getIsDeleted())
+            throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_ALREADY_DELETED);
 
         Product product = existingVariation.getProduct();
         Integer oldVariationQuantity = existingVariation.getInventoryQuantity();
@@ -165,12 +181,13 @@ public class ProductVariationServiceImpl implements ProductVariationService {
         product.setInventoryQuantity(totalQuantity);
         productRepository.save(product);
 
-        productVariationRepository.delete(productVariation);
+        productVariation.setIsDeleted(CommonConstant.TRUE);
     }
 
     private int calculateTotalInventoryQuantity(Long productId, Long excludeVariationId, Integer overrideQuantity,
             Long overrideVariationId) {
-        List<ProductVariation> allVariations = productVariationRepository.findByProductId(productId);
+        List<ProductVariation> allVariations = productVariationRepository
+                .findByProductIdAndIsDeletedFalse(productId);
         int totalQuantity = 0;
 
         for (ProductVariation variation : allVariations) {

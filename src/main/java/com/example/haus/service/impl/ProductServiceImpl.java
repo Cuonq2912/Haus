@@ -1,5 +1,6 @@
 package com.example.haus.service.impl;
 
+import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.domain.entity.product.Product;
 import com.example.haus.domain.mapper.ProductMapper;
@@ -14,7 +15,6 @@ import com.example.haus.util.UploadFileUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,8 +28,6 @@ public class ProductServiceImpl implements ProductService {
 
     ProductRepository productRepository;
 
-    UploadFileUtil uploadFileUtil;
-
     ProductMapper productMapper;
 
     @Override
@@ -41,13 +39,17 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED));
+
+        if(product.getIsDeleted())
+            throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_ALREADY_DELETED);
+
         return productMapper.toProductResponseDto(product);
     }
 
     @Override
     public ProductResponseDto createProduct(CreateProductRequestDto request) {
 
-        if (productRepository.existsProductByProductName(request.getProductName())) {
+        if (productRepository.existsByProductNameAndIsDeletedFalse(request.getProductName())) {
             throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_NAME_EXISTED);
         }
 
@@ -76,7 +78,7 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED));
 
         if (!product.getProductName().equals(request.getProductName()) &&
-                productRepository.existsProductByProductName(request.getProductName())) {
+                productRepository.existsByProductNameAndIsDeletedTrue(request.getProductName())) {
             throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_NAME_EXISTED);
         }
 
@@ -94,27 +96,11 @@ public class ProductServiceImpl implements ProductService {
         if (productId == null || productId <= 0) {
             throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
         }
-
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED));
 
-        if (product.getMedias() != null) {
-            product.getMedias().forEach(media -> {
-                if (StringUtils.isNotBlank(media.getUrl())) {
-                    uploadFileUtil.destroyFileWithUrl(media.getUrl());
-                }
-            });
-        }
+        product.setIsDeleted(CommonConstant.TRUE);
 
-        if (product.getProductVariations() != null) {
-            product.getProductVariations().forEach(variation -> {
-                if (variation.getMedia() != null && StringUtils.isNotBlank(variation.getMedia().getUrl())) {
-                    uploadFileUtil.destroyFileWithUrl(variation.getMedia().getUrl());
-                }
-            });
-        }
-
-        productRepository.deleteById(productId);
     }
 
 }
