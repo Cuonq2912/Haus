@@ -1,6 +1,5 @@
-package com.example.haus.domain.response.auth;
+package com.example.haus.domain.dto.response.auth;
 
-import com.example.haus.constant.CommonConstant;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

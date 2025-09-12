@@ -1,4 +1,4 @@
-package com.example.haus.domain.request.user.profile;
+package com.example.haus.domain.dto.request.user.profile;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;

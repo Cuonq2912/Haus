@@ -1,16 +1,15 @@
 package com.example.haus.service.impl;
 
 import com.cloudinary.Cloudinary;
-import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.domain.entity.user.User;
 import com.example.haus.domain.mapper.UserMapper;
-import com.example.haus.domain.request.user.profile.ConfirmPasswordUpdateUserRequestDto;
-import com.example.haus.domain.request.user.profile.UpdatePasswordRequestDto;
-import com.example.haus.domain.request.user.profile.UpdateUserRequestDto;
-import com.example.haus.domain.response.user.UserResponseDto;
+import com.example.haus.domain.dto.request.user.profile.ConfirmPasswordUpdateUserRequestDto;
+import com.example.haus.domain.dto.request.user.profile.UpdatePasswordRequestDto;
+import com.example.haus.domain.dto.request.user.profile.UpdateUserRequestDto;
+import com.example.haus.domain.dto.response.user.UserResponseDto;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.exception.UploadFileException;

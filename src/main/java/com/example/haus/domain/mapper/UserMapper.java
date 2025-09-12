@@ -1,9 +1,9 @@
 package com.example.haus.domain.mapper;
 
 import com.example.haus.domain.entity.user.User;
-import com.example.haus.domain.request.admin.CreateUserRequestDto;
-import com.example.haus.domain.request.user.profile.UpdateUserRequestDto;
-import com.example.haus.domain.response.user.UserResponseDto;
+import com.example.haus.domain.dto.request.admin.CreateUserRequestDto;
+import com.example.haus.domain.dto.request.user.profile.UpdateUserRequestDto;
+import com.example.haus.domain.dto.response.user.UserResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValueCheckStrategy;

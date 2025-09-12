@@ -1,4 +1,4 @@
-package com.example.haus.domain.request.admin;
+package com.example.haus.domain.dto.request.admin;
 
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.UserType;
@@ -15,7 +15,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
 import java.util.Date;
 
 @Getter

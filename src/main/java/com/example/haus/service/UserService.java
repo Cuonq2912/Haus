@@ -1,8 +1,8 @@
 package com.example.haus.service;
 
-import com.example.haus.domain.request.user.profile.ConfirmPasswordUpdateUserRequestDto;
-import com.example.haus.domain.request.user.profile.UpdatePasswordRequestDto;
-import com.example.haus.domain.response.user.UserResponseDto;
+import com.example.haus.domain.dto.request.user.profile.ConfirmPasswordUpdateUserRequestDto;
+import com.example.haus.domain.dto.request.user.profile.UpdatePasswordRequestDto;
+import com.example.haus.domain.dto.response.user.UserResponseDto;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.multipart.MultipartFile;
 

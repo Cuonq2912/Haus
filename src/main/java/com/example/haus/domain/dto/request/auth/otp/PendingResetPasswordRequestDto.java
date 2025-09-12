@@ -1,6 +1,6 @@
-package com.example.haus.domain.request.auth.otp;
+package com.example.haus.domain.dto.request.auth.otp;
 
-import com.example.haus.domain.request.auth.RegisterRequestDto;
+import com.example.haus.domain.dto.request.auth.ForgotPasswordRequestDto;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -11,8 +11,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PendingRegistrationRequestDto {
-    RegisterRequestDto request;
+public class PendingResetPasswordRequestDto {
+
+    ForgotPasswordRequestDto request;
     String otp;
     LocalDateTime expireAt;
 

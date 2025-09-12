@@ -1,4 +1,4 @@
-package com.example.haus.domain.response.utils;
+package com.example.haus.domain.dto.response.utils;
 
 import lombok.Getter;
 import lombok.Setter;

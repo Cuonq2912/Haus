@@ -1,7 +1,7 @@
 package com.example.haus.exception;
 
 
-import com.example.haus.domain.response.utils.ErrorResponse;
+import com.example.haus.domain.dto.response.utils.ErrorResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

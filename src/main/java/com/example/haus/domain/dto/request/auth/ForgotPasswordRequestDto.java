@@ -1,4 +1,4 @@
-package com.example.haus.domain.request.auth;
+package com.example.haus.domain.dto.request.auth;
 
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.domain.validator.Email;

@@ -1,4 +1,4 @@
-package com.example.haus.domain.response.user;
+package com.example.haus.domain.dto.response.user;
 
 import com.example.haus.domain.entity.user.Gender;
 import com.example.haus.domain.entity.user.Role;
