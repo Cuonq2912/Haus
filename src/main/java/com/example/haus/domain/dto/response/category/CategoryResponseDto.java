@@ -3,6 +3,7 @@ package com.example.haus.domain.dto.response.category;
 import com.example.haus.domain.dto.response.promotion.PromotionResponseDto;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import java.util.List;
 
 @Getter
 @Setter
@@ -14,6 +15,7 @@ public class CategoryResponseDto {
     String categoryName;
     String description;
 
+    List<CategoryResponseDto> subCategories;
+
     PromotionResponseDto promotion;
 }
-

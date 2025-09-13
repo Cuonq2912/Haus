@@ -64,11 +64,10 @@ public class SecurityConfig {
                         authorizationManagerRequestMatcherRegistry
                                 .requestMatchers(publicEndpoints).permitAll()
                                 .requestMatchers(swaggerEndpoints).permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/category").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/promotion").permitAll()
                                 .requestMatchers(userEndpoints).hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
                                 .requestMatchers(adminEndpoints).hasAnyAuthority(RoleConstant.ADMIN)
-
-                                .requestMatchers(HttpMethod.GET, "/api/v1/category").hasAnyAuthority(RoleConstant.ADMIN, RoleConstant.USER)
-                                .requestMatchers(HttpMethod.GET, "/api/v1/promotion").hasAnyAuthority(RoleConstant.ADMIN, RoleConstant.USER)
                                 .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(customizePreFilter, UsernamePasswordAuthenticationFilter.class);

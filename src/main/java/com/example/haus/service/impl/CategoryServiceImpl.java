@@ -14,7 +14,10 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -55,10 +58,30 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryResponseDto> getAllCategory() {
-        return categoryRepository.findAll()
-                .stream()
-                .map(categoryMapper::categoryToCategoryResponseDto)
-                .toList();
+        List<Category> allCategories = categoryRepository.findAll();
+
+        Map<Long, CategoryResponseDto> categoryMap = new HashMap<>();
+        for (Category category : allCategories) {
+            categoryMap.put(category.getId(), categoryMapper.categoryToCategoryResponseDto(category));
+        }
+
+        List<CategoryResponseDto> topLevelCategories = new ArrayList<>();
+
+        for (Category category : allCategories) {
+            CategoryResponseDto currentDto = categoryMap.get(category.getId());
+            if (category.getParentCategory() != null) {
+                CategoryResponseDto parentDto = categoryMap.get(category.getParentCategory().getId());
+                if (parentDto != null) {
+                    if (parentDto.getSubCategories() == null) {
+                        parentDto.setSubCategories(new ArrayList<>());
+                    }
+                    parentDto.getSubCategories().add(currentDto);
+                }
+            } else {
+                topLevelCategories.add(currentDto);
+            }
+        }
+        return topLevelCategories;
     }
 
     @Override

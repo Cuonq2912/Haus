@@ -43,8 +43,6 @@ public class CustomizePreFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
 
-//        log.info("Auth Header = {}", authHeader);
-
         if (StringUtils.isBlank(authHeader) || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
