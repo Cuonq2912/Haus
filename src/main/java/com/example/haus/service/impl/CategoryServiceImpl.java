@@ -57,7 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryResponseDto> getAllCategory() {
+    public List<CategoryResponseDto> getAllCategories() {
         List<Category> allCategories = categoryRepository.findAll();
 
         Map<Long, CategoryResponseDto> categoryMap = new HashMap<>();
@@ -82,6 +82,12 @@ public class CategoryServiceImpl implements CategoryService {
             }
         }
         return topLevelCategories;
+    }
+
+    @Override
+    public List<CategoryResponseDto> getAllSubCategories() {
+        List<Category> categories = categoryRepository.findByParentCategoryIsNotNull();
+        return categories.stream().map(category -> categoryMapper.categoryToCategoryResponseDto(category)).toList();
     }
 
     @Override

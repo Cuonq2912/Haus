@@ -58,10 +58,22 @@ public class CategoryController {
             description = "Dùng để front end lấy ra tất cả danh mục render ra UI"
     )
     @GetMapping(UrlConstant.Category.GET_ALL_CATEGORY)
-    public ResponseEntity<?> getAllCategory(){
+    public ResponseEntity<?> getAllCategories(){
         return ResponseUtil.success(
                 SuccessMessage.Category.GET_ALL_CATEGORY_SUCCESS,
-                categoryService.getAllCategory()
+                categoryService.getAllCategories()
+        );
+    }
+
+    @Operation(
+            summary = "Lấy tất cả danh mục con để hiện trong lúc tạo ",
+            description = "Dùng để front end lấy ra tất cả danh mục render ra UI"
+    )
+    @GetMapping(UrlConstant.Category.GET_ALL_SUB_CATEGORY)
+    public ResponseEntity<?> getAllSubCategories(){
+        return ResponseUtil.success(
+                SuccessMessage.Category.GET_ALL_CATEGORY_SUCCESS,
+                categoryService.getAllSubCategories()
         );
     }
 
