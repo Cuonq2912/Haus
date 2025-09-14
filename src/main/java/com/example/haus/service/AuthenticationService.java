@@ -25,5 +25,4 @@ public interface AuthenticationService {
 
     UserResponseDto resetPassword(ResetPasswordRequestDto request);
 
-    String generateOtp();
 }

@@ -34,9 +34,8 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     Integer inventoryQuantity;
 
-    List<String> color;
-
-    List<String> imageUrl;
+    @Column()
+    Boolean isDeleted;
 
     @ManyToMany
     @JoinTable(
@@ -54,6 +53,10 @@ public class Product extends BaseEntity {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     List<OrderItem> orderItems;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    List<ProductVariation> productVariations;
+
 
     // ---------------- Helper methods ----------------
     //Category

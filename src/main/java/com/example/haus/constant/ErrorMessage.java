@@ -44,6 +44,7 @@ public class ErrorMessage {
         public static final String ERR_MALFORMED_TOKEN = "exception.auth.malformed.token";
         //OTP
         public static final String ERR_PENDING_RESET_REQUEST_NULL = "exception.auth.pending.reset.request.null";
+        public static final String ERR_PENDING_REGISTER_REQUEST_NULL = "exception.auth.pending.register.request.null";
         public static final String ERR_OTP_EXPIRED = "exception.auth.otp.expired";
         public static final String ERR_OTP_NOT_MATCH = "exception.auth.otp.not.match";
     }
@@ -94,5 +95,15 @@ public class ErrorMessage {
         public static final String ERR_PROMOTION_DISCOUNT_PERCENT_NOT_BLANK = "exception.promotion.discount.percent.must.be.not.blank";
         public static final String ERR_PROMOTION_DISCOUNT_PERCENT_MIN_VALIDATE = "exception.promotion.discount.percent.must.be.greater.than.or.equal.to.0";
         public static final String ERR_PROMOTION_DISCOUNT_PERCENT_MAX_VALIDATE = "exception.promotion.discount.percent.must.be.less.than.or.equal.to.110";
+    }
+
+    public static class Product {
+        public static final String ERR_PRICE_INVALID = "exception.product.price.invalid";
+        public static final String ERR_QUANTITY_INVALID = "exception.product.quantity.invalid";
+        public static final String ERR_PRODUCT_NOT_EXISTED = "exception.product.not.existed";
+        public static final String ERR_PRODUCT_NAME_EXISTED = "exception.product.name.existed";
+        public static final String ERR_PRODUCT_ALREADY_DELETED = "exception.product.already.deleted";
+        public static final String ERR_PRODUCT_VARIATION_NOT_EXISTED = "exception.product.variation.not.existed";
+        public static final String ERR_PRODUCT_VARIATION_ALREADY_DELETED = "exception.product.variation.already.deleted";
     }
 }
