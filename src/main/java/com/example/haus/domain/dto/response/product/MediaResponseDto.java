@@ -1,4 +1,4 @@
-package com.example.haus.domain.response.product;
+package com.example.haus.domain.dto.response.product;
 
 import com.example.haus.constant.MediaType;
 import jakarta.persistence.*;

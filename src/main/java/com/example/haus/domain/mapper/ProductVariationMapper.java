@@ -1,11 +1,10 @@
 package com.example.haus.domain.mapper;
 
 import com.example.haus.domain.entity.product.ProductVariation;
-import com.example.haus.domain.request.product.CreateProductVariationRequestDto;
-import com.example.haus.domain.request.product.UpdateProductVariationRequestDto;
-import com.example.haus.domain.response.product.ProductVariationResponseDto;
+import com.example.haus.domain.dto.request.product.CreateProductVariationRequestDto;
+import com.example.haus.domain.dto.request.product.UpdateProductVariationRequestDto;
+import com.example.haus.domain.dto.response.product.ProductVariationResponseDto;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.NullValuePropertyMappingStrategy;

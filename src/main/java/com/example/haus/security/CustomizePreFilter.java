@@ -85,7 +85,7 @@ public class CustomizePreFilter extends OncePerRequestFilter {
             "status": %d,
             "path": "%s",
             "error": "%s",
-            "message": "%s",
+            "message": "%s"
         }
         """,
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMM d, yyyy, h:mm:ss a", Locale.ENGLISH)),

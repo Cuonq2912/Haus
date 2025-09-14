@@ -1,9 +1,10 @@
 package com.example.haus.domain.dto.response.product;
 
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.List;
+import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,11 +14,15 @@ import java.util.List;
 public class ProductResponseDto {
 
     Long id;
-    String productName;
-    Double price;
-    String description;
-    Integer inventoryQuantity;
-    List<String> color;
-    List<String> imageUrl;
 
+    String productName;
+
+
+    String description;
+
+    Integer inventoryQuantity;
+
+    Date updatedAt;
+
+    Long categoryId;
 }

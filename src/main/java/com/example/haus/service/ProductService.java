@@ -1,9 +1,9 @@
 package com.example.haus.service;
 
 
-import com.example.haus.domain.request.product.CreateProductRequestDto;
-import com.example.haus.domain.request.product.UpdateProductRequestDto;
-import com.example.haus.domain.response.product.ProductResponseDto;
+import com.example.haus.domain.dto.request.product.CreateProductRequestDto;
+import com.example.haus.domain.dto.request.product.UpdateProductRequestDto;
+import com.example.haus.domain.dto.response.product.ProductResponseDto;
 
 public interface ProductService {
 

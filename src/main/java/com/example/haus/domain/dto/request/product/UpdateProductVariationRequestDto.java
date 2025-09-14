@@ -1,4 +1,4 @@
-package com.example.haus.domain.request.product;
+package com.example.haus.domain.dto.request.product;
 
 import com.example.haus.constant.ErrorMessage;
 import io.swagger.v3.oas.annotations.media.Schema;

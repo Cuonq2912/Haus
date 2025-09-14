@@ -23,7 +23,7 @@ import com.example.haus.service.AuthenticationService;
 import com.example.haus.service.EmailService;
 import com.example.haus.service.JwtService;
 import com.example.haus.service.UserService;
-import com.example.haus.utils.OtpUtils;
+import com.example.haus.util.OtpUtil;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -157,7 +157,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (userRepository.existsUserByEmail(request.getEmail()))
             throw new InvalidDataException(ErrorMessage.User.ERR_EMAIL_EXISTED);
 
-        String otp = OtpUtils.generateOtp();
+        String otp = OtpUtil.generateOtp();
 
         PendingRegistrationRequestDto pending = new PendingRegistrationRequestDto();
 
@@ -207,7 +207,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (!userRepository.existsUserByEmail(request.getEmail()))
             throw new ResourceNotFoundException(ErrorMessage.User.ERR_EMAIL_NOT_EXISTED);
 
-        String otp = OtpUtils.generateOtp();
+        String otp = OtpUtil.generateOtp();
 
         PendingResetPasswordRequestDto pending = new PendingResetPasswordRequestDto();
 

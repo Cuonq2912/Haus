@@ -1,28 +1,25 @@
-package com.example.haus.domain.response.product;
-
+package com.example.haus.domain.dto.response.product;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductResponseDto {
+public class ProductVariationResponseDto {
 
     Long id;
 
-    String productName;
+    String color;
 
+    String size;
 
-    String description;
+    Double price;
 
     Integer inventoryQuantity;
 
-    Date updatedAt;
+    MediaResponseDto media;
 
-    Long categoryId;
 }

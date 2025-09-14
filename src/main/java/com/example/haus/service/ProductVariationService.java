@@ -1,8 +1,8 @@
 package com.example.haus.service;
 
-import com.example.haus.domain.request.product.CreateProductVariationRequestDto;
-import com.example.haus.domain.request.product.UpdateProductVariationRequestDto;
-import com.example.haus.domain.response.product.ProductVariationResponseDto;
+import com.example.haus.domain.dto.request.product.CreateProductVariationRequestDto;
+import com.example.haus.domain.dto.request.product.UpdateProductVariationRequestDto;
+import com.example.haus.domain.dto.response.product.ProductVariationResponseDto;
 
 import java.util.List;
 

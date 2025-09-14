@@ -1,8 +1,8 @@
-package com.example.haus.utils;
+package com.example.haus.util;
 
 import java.util.Random;
 
-public final class OtpUtils {
+public final class OtpUtil {
 
     private static final Random random = new Random();
 
@@ -11,7 +11,7 @@ public final class OtpUtils {
         return String.valueOf(otp);
     }
 
-    private OtpUtils() {
+    private OtpUtil() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 }
