@@ -2,7 +2,11 @@ package com.example.haus.constant;
 
 public class SuccessMessage {
 
+    private SuccessMessage() {}
+
     public static class Auth {
+
+        private Auth() {}
 
         public static final String LOGIN_SUCCESS = "Login successful";
         public static final String LOGOUT_SUCCESS = "Logout successful";
@@ -17,11 +21,34 @@ public class SuccessMessage {
 
     public static class User {
 
+        private User() {}
+
         public static final String GET_MY_PROFILE_SUCCESS = "Get my profile successful";
         public static final String UPDATE_PROFILE_SUCCESS = "Update profile successful";
         public static final String SOFT_DELETE_SUCCESS = "User account has been deleted successfully.";
         public static final String UPDATE_PASSWORD_SUCCESS = "Update password successful";
         public static final String UPDATE_AVATAR_SUCCESS = "Update avatar user successful";
-        }
+    }
 
+    public static class Category {
+
+        private Category() {}
+
+        public static final String ADD_CATEGORY_SUCCESS = "Add category successful";
+        public static final String UPDATE_CATEGORY_SUCCESS = "Update category successful";
+        public static final String GET_CATEGORY_SUCCESS = "Get category successful";
+        public static final String GET_ALL_CATEGORY_SUCCESS = "Get all category successful";
+        public static final String DELETE_CATEGORY_SUCCESS = "Delete category successful";
+    }
+
+    public static class Promotion {
+
+        private Promotion() {}
+
+        public static final String ADD_PROMOTION_SUCCESS = "Add promotion successful";
+        public static final String UPDATE_PROMOTION_SUCCESS = "Update promotion successful";
+        public static final String GET_PROMOTION_SUCCESS = "Get promotion successful";
+        public static final String GET_ALL_PROMOTION_SUCCESS = "Get all promotion successful";
+        public static final String DELETE_PROMOTION_SUCCESS = "Delete promotion successful";
+    }
 }

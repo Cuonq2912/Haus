@@ -6,3 +6,4 @@ spring:
     name: Haus
   profiles:
     active: @spring.profiles.active@
+

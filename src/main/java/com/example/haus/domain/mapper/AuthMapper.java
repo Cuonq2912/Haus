@@ -1,8 +1,8 @@
 package com.example.haus.domain.mapper;
 
 import com.example.haus.domain.entity.user.User;
-import com.example.haus.domain.request.auth.RegisterRequestDto;
-import com.example.haus.domain.response.user.UserResponseDto;
+import com.example.haus.domain.dto.request.auth.RegisterRequestDto;
+import com.example.haus.domain.dto.response.user.UserResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;

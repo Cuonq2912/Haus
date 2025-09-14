@@ -30,4 +30,18 @@ public class PaymentMethod extends BaseEntity {
     @OneToMany(mappedBy = "paymentMethod")
     List<Payment> payments;
 
+    // ---------------- Helper methods ----------------
+    public void addPayment(Payment payment) {
+        if (!payments.contains(payment)) {
+            payments.add(payment);
+            payment.setPaymentMethod(this);
+        }
+    }
+
+    public void removePayment(Payment payment) {
+        if (payments.contains(payment)) {
+            payments.remove(payment);
+            payment.setPaymentMethod(null);
+        }
+    }
 }

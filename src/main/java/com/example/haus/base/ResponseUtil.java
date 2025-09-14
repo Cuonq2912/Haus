@@ -1,7 +1,7 @@
 package com.example.haus.base;
 
-import com.example.haus.domain.response.utils.ResponseData;
-import com.example.haus.domain.response.utils.ResponseError;
+import com.example.haus.domain.dto.response.utils.ResponseData;
+import com.example.haus.domain.dto.response.utils.ResponseError;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ public class ResponseUtil {
 
     public static ResponseEntity<ResponseData<?>> success(HttpStatus status, String message) {
         ResponseData<?> response = new ResponseData<>(status.value(), message);
-        return new ResponseEntity<>(response, status);
+        return new ResponseEntity<>(response, status == HttpStatus.NO_CONTENT ? HttpStatus.OK : status);
     }
 
     public static ResponseEntity<ResponseData<?>> success(HttpStatus status, String message, Object data) {

@@ -24,6 +24,13 @@ public class Category extends BaseEntity {
     @Column(nullable = false, unique = true)
     String categoryName;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id", nullable = false)
+    private Category parentCategory;
+
+    @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<Category> subCategories;
+
     @Lob
     @Column(columnDefinition = "TEXT")
     String description;
@@ -36,4 +43,7 @@ public class Category extends BaseEntity {
     )
     List<Product> products;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "promotion_id")
+    Promotion promotion;
 }

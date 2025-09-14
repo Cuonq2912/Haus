@@ -29,6 +29,9 @@ public class News extends BaseEntity {
     @Column(columnDefinition = "TEXT", nullable = false)
     String content;
 
+    @ElementCollection
+    @CollectionTable(name = "news_images", joinColumns = @JoinColumn(name = "news_id"))
+    @Column(name = "image_url")
     List<String> images;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,4 +41,15 @@ public class News extends BaseEntity {
     @OneToMany(mappedBy = "news", cascade = CascadeType.ALL, orphanRemoval = true)
     List<CommentNews> comments;
 
+    /* ========= Helper methods ========= */
+
+    public void addComment(CommentNews comment) {
+        comments.add(comment);
+        comment.setNews(this);
+    }
+
+    public void removeComment(CommentNews comment) {
+        comments.remove(comment);
+        comment.setNews(null);
+    }
 }
