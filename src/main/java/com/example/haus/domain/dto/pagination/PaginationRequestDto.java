@@ -1,6 +1,7 @@
 package com.example.haus.domain.dto.pagination;
 
 import com.example.haus.constant.CommonConstant;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -11,7 +12,10 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PaginationRequestDto {
 
+    @Parameter(description = "Page you want to retrieve (0..N)")
     Integer pageNum = CommonConstant.ZERO_INT_VALUE;
+
+    @Parameter(description = "Number of records per page.")
     Integer pageSize = CommonConstant.ZERO_INT_VALUE;
 
     public int getPageNum() {

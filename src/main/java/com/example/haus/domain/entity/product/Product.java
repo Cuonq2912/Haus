@@ -21,6 +21,9 @@ public class Product extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
+    @Column(nullable = false, unique = true)
+    String productCode;
+
     @Column(nullable = false)
     String productName;
 
@@ -30,6 +33,10 @@ public class Product extends BaseEntity {
     @Lob
     @Column(columnDefinition = "TEXT")
     String description;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    String detailDescription;
 
     @Column(nullable = false)
     Integer inventoryQuantity;

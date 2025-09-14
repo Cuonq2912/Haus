@@ -2,13 +2,14 @@ package com.example.haus.constant;
 
 public class UrlConstant {
 
-    private UrlConstant() {}
+    private UrlConstant() {
+    }
 
     public static class Auth {
         private static final String PRE_FIX = "/auth";
 
         public static final String LOGIN = PRE_FIX + "/login";
-//        public static final String LOGIN_WITH_GOOGLE = PRE_FIX + "/google";
+        // public static final String LOGIN_WITH_GOOGLE = PRE_FIX + "/google";
         public static final String REGISTER = PRE_FIX + "/register";
         public static final String VERIFY_OTP = PRE_FIX + "/verify-otp";
         public static final String FORGOT_PASSWORD = PRE_FIX + "/forgot-password";
@@ -24,10 +25,11 @@ public class UrlConstant {
     public static class User {
         private static final String PRE_FIX = "/user";
 
-//        public static final String GET_USERS = PRE_FIX;
-//        public static final String GET_USER = PRE_FIX + "/{userId}";
-//        public static final String GET_CURRENT_USER = PRE_FIX + "/current";
-//        public static final String FILL_PERSONAL_INFORMATION = PRE_FIX + "/personal-information";
+        // public static final String GET_USERS = PRE_FIX;
+        // public static final String GET_USER = PRE_FIX + "/{userId}";
+        // public static final String GET_CURRENT_USER = PRE_FIX + "/current";
+        // public static final String FILL_PERSONAL_INFORMATION = PRE_FIX +
+        // "/personal-information";
         public static final String UPLOAD_AVATAR = PRE_FIX + "/upload-avatar";
         public static final String DELETE_MY_ACCOUNT = PRE_FIX + "/delete-my-account";
         public static final String GET_PROFILE = PRE_FIX + "/profile";
@@ -40,7 +42,8 @@ public class UrlConstant {
 
     public static class Category {
 
-        private Category() {}
+        private Category() {
+        }
 
         private static final String PRE_FIX = "/category";
 
@@ -56,7 +59,8 @@ public class UrlConstant {
 
     public static class Promotion {
 
-        private Promotion() {}
+        private Promotion() {
+        }
 
         private static final String PRE_FIX = "/promotion";
 
@@ -82,6 +86,12 @@ public class UrlConstant {
         public static final String CREATE_PRODUCT_VARIATION = PRE_FIX + "/variation";
         public static final String UPDATE_PRODUCT_VARIATION = PRE_FIX + "/variation";
         public static final String DELETE_PRODUCT_VARIATION = PRE_FIX + "/variation/{variationId}";
+
+        public static final String GET_PRODUCTS_BY_CATEGORY = PRE_FIX + "/category/{categoryName}";
+        public static final String GET_PRODUCTS_BY_CATEGORY_ID = PRE_FIX + "/category-id/{categoryId}";
+
+        public static final String SEARCH_PRODUCTS_BY_KEYWORD = PRE_FIX + "/search";
+        public static final String FILTER_PRODUCTS = PRE_FIX + "/filter";
 
         private Product() {
         }

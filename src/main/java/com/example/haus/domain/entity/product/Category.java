@@ -31,7 +31,6 @@ public class Category extends BaseEntity {
     @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Category> subCategories;
 
-    @Lob
     @Column(columnDefinition = "TEXT")
     String description;
 

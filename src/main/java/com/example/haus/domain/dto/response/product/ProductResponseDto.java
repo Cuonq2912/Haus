@@ -13,16 +13,17 @@ import java.util.Date;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductResponseDto {
 
-    Long id;
+    String productCode;
 
     String productName;
 
-
     String description;
+
+    String detailDescription;
 
     Integer inventoryQuantity;
 
     Date updatedAt;
 
-    Long categoryId;
+    String categoryName;
 }
