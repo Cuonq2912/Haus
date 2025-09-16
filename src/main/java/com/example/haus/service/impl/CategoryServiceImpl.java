@@ -5,6 +5,7 @@ import com.example.haus.domain.dto.request.category.CategoryRequestDto;
 import com.example.haus.domain.dto.response.category.CategoryResponseDto;
 import com.example.haus.domain.entity.product.Category;
 import com.example.haus.domain.mapper.CategoryMapper;
+import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.CategoryRepository;
 import com.example.haus.service.CategoryService;
@@ -93,8 +94,12 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
+            .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
+    
+        if (!category.getProducts().isEmpty()) {
+            throw new InvalidDataException(ErrorMessage.Category.ERR_CATEGORY_BEING_USED);
+        }
+
         categoryRepository.delete(category);
     }
 

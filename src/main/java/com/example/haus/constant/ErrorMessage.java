@@ -2,14 +2,15 @@ package com.example.haus.constant;
 
 public class ErrorMessage {
 
-    private ErrorMessage() {}
+    private ErrorMessage() {
+    }
 
     public static final String ERR_EXCEPTION_GENERAL = "exception.general";
     public static final String UNAUTHORIZED = "exception.unauthorized";
     public static final String FORBIDDEN = "exception.forbidden";
     public static final String FORBIDDEN_UPDATE_DELETE = "exception.forbidden.update-delete";
 
-    //error validation dto
+    // error validation dto
     public static final String INVALID_SOME_THING_FIELD = "invalid.general";
     public static final String INVALID_FORMAT_SOME_THING_FIELD = "invalid.general.format";
     public static final String INVALID_SOME_THING_FIELD_IS_REQUIRED = "invalid.general.required";
@@ -21,7 +22,8 @@ public class ErrorMessage {
 
     public static class Validator {
 
-        private Validator() {}
+        private Validator() {
+        }
 
         public static final String ERR_INPUT_CONSTRAINT_VALIDATE = "exception.input.value.must.be.greater.than.or.equal.to.0.if.entry.data";
         public static final String ERR_PHONE_VALIDATOR = "exception.phone.not.matches.pattern";
@@ -32,7 +34,8 @@ public class ErrorMessage {
 
     public static class Auth {
 
-        private Auth() {}
+        private Auth() {
+        }
 
         public static final String ERR_INCORRECT_USERNAME = "exception.auth.incorrect.username";
         public static final String ERR_INCORRECT_PASSWORD = "exception.auth.incorrect.password";
@@ -42,7 +45,7 @@ public class ErrorMessage {
         public static final String EXPIRED_REFRESH_TOKEN = "exception.auth.expired.refresh.token";
         public static final String ERR_TOKEN_INVALIDATED = "exception.auth.token.invalidated";
         public static final String ERR_MALFORMED_TOKEN = "exception.auth.malformed.token";
-        //OTP
+        // OTP
         public static final String ERR_PENDING_RESET_REQUEST_NULL = "exception.auth.pending.reset.request.null";
         public static final String ERR_PENDING_REGISTER_REQUEST_NULL = "exception.auth.pending.register.request.null";
         public static final String ERR_OTP_EXPIRED = "exception.auth.otp.expired";
@@ -51,7 +54,8 @@ public class ErrorMessage {
 
     public static class User {
 
-        private User() {}
+        private User() {
+        }
 
         public static final String ERR_USER_NOT_EXISTED = "exception.user.user.not.existed";
         public static final String ERR_USERNAME_EXISTED = "exception.user.username.existed";
@@ -73,15 +77,18 @@ public class ErrorMessage {
 
     public static class Category {
 
-        private Category() {}
+        private Category() {
+        }
 
         public static final String ERR_CATEGORY_EXISTED = "exception.category.existed";
         public static final String ERR_CATEGORY_NOT_EXISTED = "exception.category.not.existed";
+        public static final String ERR_CATEGORY_BEING_USED = "exception.category.being.used.cannot.delete";
     }
 
     public static class Promotion {
 
-        private Promotion() {}
+        private Promotion() {
+        }
 
         public static final String ERR_PROMOTION_EXISTED = "exception.promotion.existed";
         public static final String ERR_PROMOTION_NOT_EXISTED = "exception.promotion.not.existed";
