@@ -129,7 +129,7 @@ public class JwtServiceImpl implements JwtService {
         try {
             return Jwts.parserBuilder().setSigningKey(getKey(type)).build().parseClaimsJws(token).getBody();
         } catch (Exception e) {
-//            log.error("Extra all claim failed, message = {}", e.getMessage());
+            log.error("Extra all claim failed, message = {}", e.getMessage());
             throw new AccessDeniedException("Access denied: "+  e.getMessage());
         }
     }

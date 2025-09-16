@@ -1,18 +1,16 @@
 package com.example.haus.config;
 
 import com.example.haus.constant.RoleConstant;
-import com.example.haus.repository.UserRepository;
-import com.example.haus.security.CustomUserDetails;
 import com.example.haus.security.CustomUserDetailsService;
 import com.example.haus.security.CustomizePreFilter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -43,22 +41,20 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     @Value("${security.public-endpoints}")
-    String[] PUBLIC_END_POINT;
+    String[] publicEndpoints;
 
     @Value("${security.user-endpoints}")
-    String[] USER_END_POINT;
+    String[] userEndpoints;
 
     @Value("${security.admin-endpoints}")
-    String[] ADMIN_END_POINT;
+    String[] adminEndpoints;
 
     @Value("${security.swagger-endpoints}")
-    String[] OPEN_API;
+    String[] swaggerEndpoints;
 
     final CustomUserDetailsService customUserDetailsService;
 
     final CustomizePreFilter customizePreFilter;
-
-    final UserRepository userRepository;
 
     @Bean
     public SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
@@ -66,10 +62,13 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
-                                .requestMatchers(PUBLIC_END_POINT).permitAll()
-                                .requestMatchers(OPEN_API).permitAll()
-                                .requestMatchers(USER_END_POINT).hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
-                                .requestMatchers(ADMIN_END_POINT).hasAnyAuthority(RoleConstant.ADMIN)
+                                .requestMatchers(publicEndpoints).permitAll()
+                                .requestMatchers(swaggerEndpoints).permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/category").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/category/sub").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/promotion").permitAll()
+                                .requestMatchers(userEndpoints).hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
+                                .requestMatchers(adminEndpoints).hasAnyAuthority(RoleConstant.ADMIN)
                                 .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(customizePreFilter, UsernamePasswordAuthenticationFilter.class);

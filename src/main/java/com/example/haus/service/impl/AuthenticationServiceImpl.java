@@ -2,20 +2,18 @@ package com.example.haus.service.impl;
 
 import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
-import com.example.haus.constant.RoleConstant;
 import com.example.haus.constant.TokenType;
 import com.example.haus.domain.entity.InvalidatedToken;
 import com.example.haus.domain.entity.user.Role;
 import com.example.haus.domain.entity.user.User;
 import com.example.haus.domain.mapper.AuthMapper;
-import com.example.haus.domain.request.auth.*;
-import com.example.haus.domain.request.auth.otp.PendingRegistrationRequestDto;
-import com.example.haus.domain.request.auth.otp.PendingResetPasswordRequestDto;
-import com.example.haus.domain.request.auth.otp.VerifyOtpRequestDto;
-import com.example.haus.domain.response.auth.LoginResponseDto;
-import com.example.haus.domain.response.auth.RefreshTokenResponseDto;
-import com.example.haus.domain.response.user.UserResponseDto;
-import com.example.haus.exception.InternalServerException;
+import com.example.haus.domain.dto.request.auth.*;
+import com.example.haus.domain.dto.request.auth.otp.PendingRegistrationRequestDto;
+import com.example.haus.domain.dto.request.auth.otp.PendingResetPasswordRequestDto;
+import com.example.haus.domain.dto.request.auth.otp.VerifyOtpRequestDto;
+import com.example.haus.domain.dto.response.auth.LoginResponseDto;
+import com.example.haus.domain.dto.response.auth.RefreshTokenResponseDto;
+import com.example.haus.domain.dto.response.user.UserResponseDto;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.InvalidatedTokenRepository;
@@ -25,6 +23,7 @@ import com.example.haus.service.AuthenticationService;
 import com.example.haus.service.EmailService;
 import com.example.haus.service.JwtService;
 import com.example.haus.service.UserService;
+import com.example.haus.util.OtpUtil;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -107,15 +106,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void logout(LogoutRequestDto request) {
-        String JwtId = null;
+        String jwtId = null;
         Date expirationTime = null;
         try {
             SignedJWT signedJwt = SignedJWT.parse(request.getToken());
 
-            JwtId = signedJwt.getJWTClaimsSet().getJWTID();
+            jwtId = signedJwt.getJWTClaimsSet().getJWTID();
             expirationTime = signedJwt.getJWTClaimsSet().getExpirationTime();
 
-            invalidatedTokenRepository.save(new InvalidatedToken(JwtId, expirationTime));
+            invalidatedTokenRepository.save(new InvalidatedToken(jwtId, expirationTime));
 
         } catch (ParseException ex) {
             log.error("Signed Jwt parsed fail, message = {}", ex.getMessage());
@@ -158,7 +157,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (userRepository.existsUserByEmail(request.getEmail()))
             throw new InvalidDataException(ErrorMessage.User.ERR_EMAIL_EXISTED);
 
-        String otp = generateOtp();
+        String otp = OtpUtil.generateOtp();
 
         PendingRegistrationRequestDto pending = new PendingRegistrationRequestDto();
 
@@ -175,8 +174,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public UserResponseDto verifyOtpToRegister(VerifyOtpRequestDto request) {
         PendingRegistrationRequestDto pending = pendingRegisterMap.get(request.getEmail());
 
-        if (pending == null)
-            throw new InvalidDataException(ErrorMessage.Auth.ERR_PENDING_RESET_REQUEST_NULL);
+        if (pending == null){
+            throw new InvalidDataException(ErrorMessage.Auth.ERR_PENDING_REGISTER_REQUEST_NULL);
+        }
 
         if (pending.isExpired())
             throw new InvalidDataException(ErrorMessage.Auth.ERR_OTP_EXPIRED);
@@ -207,7 +207,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (!userRepository.existsUserByEmail(request.getEmail()))
             throw new ResourceNotFoundException(ErrorMessage.User.ERR_EMAIL_NOT_EXISTED);
 
-        String otp = generateOtp();
+        String otp = OtpUtil.generateOtp();
 
         PendingResetPasswordRequestDto pending = new PendingResetPasswordRequestDto();
 
@@ -257,10 +257,4 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return authMapper.userToUserResponseDto(user);
     }
 
-    @Override
-    public String generateOtp() {
-        Random random = new Random();
-        int otp = 100000 + random.nextInt(900000);
-        return String.valueOf(otp);
-    }
 }

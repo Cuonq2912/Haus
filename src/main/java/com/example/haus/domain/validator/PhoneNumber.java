@@ -1,5 +1,6 @@
 package com.example.haus.domain.validator;
 
+import com.example.haus.constant.ErrorMessage;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -11,8 +12,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = PhoneNumberValidator.class)
 public @interface PhoneNumber {
 
-    String name();
-    String message() default "{name} invalid data";
+    String message() default ErrorMessage.Validator.ERR_PHONE_VALIDATOR;
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

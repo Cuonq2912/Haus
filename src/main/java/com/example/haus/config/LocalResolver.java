@@ -14,7 +14,7 @@ import java.util.Locale;
 @Configuration
 public class LocalResolver extends AcceptHeaderLocaleResolver implements WebMvcConfigurer {
 
-    private List<Locale> locales = List.of(new Locale("en"), new Locale("fr"), new Locale("vi"));
+    private List<Locale> locales = List.of(Locale.forLanguageTag("en"), Locale.forLanguageTag("fr"), Locale.forLanguageTag("vi"));
 
     @Override
     public Locale resolveLocale(HttpServletRequest request) {

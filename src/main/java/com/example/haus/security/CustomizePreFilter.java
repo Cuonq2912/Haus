@@ -43,20 +43,19 @@ public class CustomizePreFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
 
-//        log.info("Auth Header = {}", authHeader);
-
         if (StringUtils.isBlank(authHeader) || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
+
         final String token = authHeader.substring(7);
         try {
             String username = jwtService.extractUserName(token, TokenType.ACCESS_TOKEN);
 
-            if (username.length() > 0 && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (!username.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
-                if (jwtService.isValid(token, TokenType.ACCESS_TOKEN, username)) {
+                if (jwtService.isValid(token, TokenType.ACCESS_TOKEN, userDetails.getUsername())) {
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -86,7 +85,7 @@ public class CustomizePreFilter extends OncePerRequestFilter {
             "status": %d,
             "path": "%s",
             "error": "%s",
-            "message": "%s",
+            "message": "%s"
         }
         """,
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMM d, yyyy, h:mm:ss a", Locale.ENGLISH)),

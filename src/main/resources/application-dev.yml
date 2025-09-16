@@ -55,10 +55,10 @@ openapi:
 
 #Security Endpoint
 security:
-  public-endpoints: /oauth2/**, /auth/**
-  user-endpoints: /user/**
-  admin-endpoints: /admin/**
-  swagger-endpoints: /swagger-ui/**,/v3/api-docs/**,/swagger-ui.html
+  public-endpoints: /oauth2/**, /auth/**, /api/v1/auth/**
+  user-endpoints: /api/v1/user/**
+  admin-endpoints: /api/v1/admin/**, /api/v1/promotion/**, /api/v1/category/**
+  swagger-endpoints: /swagger-ui/**, /v3/api-docs/**, /swagger-ui.html
 
 #endpoint:
 #  confirmUser: http://localhost:${server.port}/user/confirm

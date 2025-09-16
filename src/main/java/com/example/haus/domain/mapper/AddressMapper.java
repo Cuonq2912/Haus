@@ -1,7 +1,7 @@
 package com.example.haus.domain.mapper;
 
 import com.example.haus.domain.entity.address.Address;
-import com.example.haus.domain.request.user.profile.UpdateAddressRequestDto;
+import com.example.haus.domain.dto.request.user.profile.UpdateAddressRequestDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.NullValuePropertyMappingStrategy;
