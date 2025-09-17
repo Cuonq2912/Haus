@@ -1,0 +1,50 @@
+[
+  {
+    "categoryName": "Phòng ngủ",
+    "description": "",
+    "parentId": null,
+    "promotionId": null
+  },
+  {
+    "categoryName": "Ngoài trời",
+    "description": "",
+    "parentId": null,
+    "promotionId": null
+  },
+  {
+    "categoryName": "Phòng khách",
+    "description": "",
+    "parentId": null,
+    "promotionId": null
+  },
+  {
+    "categoryName": "Nhà bếp và thiết bị",
+    "description": "",
+    "parentId": null,
+    "promotionId": null
+  },
+  {
+    "categoryName": "Văn phòng tại nhà̉",
+    "description": "",
+    "parentId": null,
+    "promotionId": null
+  },
+  {
+    "categoryName": "Phòng ăn",
+    "description": "",
+    "parentId": null,
+    "promotionId": null
+  },
+  {
+    "categoryName": "Phòng trẻ em",
+    "description": "",
+    "parentId": null,
+    "promotionId": null
+  },
+  {
+    "categoryName": "Phòng tắm",
+    "description": "",
+    "parentId": null,
+    "promotionId": null
+  }
+]
