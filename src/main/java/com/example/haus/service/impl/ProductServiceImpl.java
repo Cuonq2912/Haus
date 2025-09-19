@@ -72,21 +72,11 @@ public class ProductServiceImpl implements ProductService {
         do {
             productCode = ProductCodeUtil.generateProductCode();
         } while (productRepository.existsByProductCode(productCode));
-
         product.setProductCode(productCode);
 
-        Date now = new Date();
-        product.setCreatedAt(now);
-        product.setUpdatedAt(now);
-
-        if (product.getInventoryQuantity() == null) {
-            product.setInventoryQuantity(0);
-        }
-
-        if (request.getCategory() != null && !request.getCategory().isEmpty()) {
-            Category category = categoryRepository.findByCategoryNameIgnoreCase(request.getCategory())
+        if (request.getCategoryId() != null) {
+            Category category = categoryRepository.findById(request.getCategoryId())
                     .orElseThrow(() -> new InvalidDataException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
-
             product.addCategory(category);
         }
 
@@ -94,6 +84,7 @@ public class ProductServiceImpl implements ProductService {
 
         return productMapper.toProductResponseDto(savedProduct);
     }
+
 
     @Override
     public ProductResponseDto updateProduct(Long productId, UpdateProductRequestDto request) {

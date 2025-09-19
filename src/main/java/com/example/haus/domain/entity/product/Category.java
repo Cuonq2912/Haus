@@ -4,8 +4,12 @@ import com.example.haus.domain.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.checkerframework.checker.units.qual.A;
+
+import java.util.ArrayList;
 
 import java.util.List;
+
 
 @Entity
 @Table(name = "categories")
@@ -34,13 +38,9 @@ public class Category extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     String description;
 
-    @ManyToMany
-    @JoinTable(
-        name = "product_categories",
-        joinColumns = @JoinColumn(name = "category_id"),
-        inverseJoinColumns = @JoinColumn(name = "product_id")
-    )
-    List<Product> products;
+    @ManyToMany(mappedBy = "categories")
+    @Builder.Default
+    List<Product> products = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "promotion_id")

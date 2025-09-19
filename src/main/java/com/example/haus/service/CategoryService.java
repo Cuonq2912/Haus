@@ -1,5 +1,7 @@
 package com.example.haus.service;
 
+import com.example.haus.domain.dto.pagination.PaginationRequestDto;
+import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.category.CategoryRequestDto;
 import com.example.haus.domain.dto.response.category.CategoryResponseDto;
 
@@ -13,12 +15,13 @@ public interface CategoryService {
 
     CategoryResponseDto getCategoryById(Long id);
 
-    List<CategoryResponseDto> getAllCategories();
+//    PaginationResponseDto<CategoryResponseDto> getAllCategories(PaginationRequestDto requestDto);
 
     List<CategoryResponseDto> getAllSubCategories();
 
     void deleteCategory(Long id);
 
     CategoryResponseDto getCategoryByCategoryName(String categoryName);
+
 
 }

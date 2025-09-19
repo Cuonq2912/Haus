@@ -38,9 +38,9 @@ public class CustomProductRepositoryImpl implements CustomProductRepository {
     if (filterRequest.getKeyword() != null && !filterRequest.getKeyword().trim().isEmpty()) {
       String keyword = "%" + filterRequest.getKeyword().toLowerCase().trim() + "%";
       Predicate keywordPredicate = cb.or(
-          cb.like(cb.lower(product.get("productName")), keyword),
-          cb.like(cb.lower(product.get("productDescription")), keyword),
-          cb.like(cb.lower(product.get("productDetailDescription")), keyword));
+          cb.like(cb.lower(product.get("productName")), keyword.toLowerCase()),
+          cb.like(cb.lower(product.get("productDescription")), keyword.toLowerCase()),
+          cb.like(cb.lower(product.get("productDetailDescription")), keyword.toLowerCase()));
       predicates.add(keywordPredicate);
     }
 

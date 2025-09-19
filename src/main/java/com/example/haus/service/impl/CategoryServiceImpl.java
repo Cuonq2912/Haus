@@ -1,6 +1,8 @@
 package com.example.haus.service.impl;
 
 import com.example.haus.constant.ErrorMessage;
+import com.example.haus.domain.dto.pagination.PaginationRequestDto;
+import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.category.CategoryRequestDto;
 import com.example.haus.domain.dto.response.category.CategoryResponseDto;
 import com.example.haus.domain.entity.product.Category;
@@ -75,33 +77,11 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryMapper.categoryToCategoryResponseDto(category);
     }
 
-    @Override
-    public List<CategoryResponseDto> getAllCategories() {
-        List<Category> allCategories = categoryRepository.findAll();
-
-        Map<Long, CategoryResponseDto> categoryMap = new HashMap<>();
-        for (Category category : allCategories) {
-            categoryMap.put(category.getId(), categoryMapper.categoryToCategoryResponseDto(category));
-        }
-
-        List<CategoryResponseDto> topLevelCategories = new ArrayList<>();
-
-        for (Category category : allCategories) {
-            CategoryResponseDto currentDto = categoryMap.get(category.getId());
-            if (category.getParentCategory() != null) {
-                CategoryResponseDto parentDto = categoryMap.get(category.getParentCategory().getId());
-                if (parentDto != null) {
-                    if (parentDto.getSubCategories() == null) {
-                        parentDto.setSubCategories(new ArrayList<>());
-                    }
-                    parentDto.getSubCategories().add(currentDto);
-                }
-            } else {
-                topLevelCategories.add(currentDto);
-            }
-        }
-        return topLevelCategories;
-    }
+//    @Override
+//    public PaginationResponseDto<CategoryResponseDto> getAllCategories(PaginationRequestDto requestDto) {
+//
+//
+//    }
 
     @Override
     public List<CategoryResponseDto> getAllSubCategories() {

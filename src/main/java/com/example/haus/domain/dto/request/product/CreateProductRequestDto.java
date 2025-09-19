@@ -3,6 +3,7 @@ package com.example.haus.domain.dto.request.product;
 import com.example.haus.constant.ErrorMessage;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -39,7 +40,17 @@ public class CreateProductRequestDto {
     @NotBlank(message = ErrorMessage.NOT_BLANK_FIELD)
     String detailDescription;
 
-    @NotBlank(message = ErrorMessage.NOT_BLANK_FIELD)
-    String category;
+    @NotNull(message = ErrorMessage.NOT_NULL_FIELD)
+    @Min(value = 0, message = ErrorMessage.Product.ERR_PRICE_INVALID)
+    Double price;
+
+    @NotNull(message = ErrorMessage.NOT_NULL_FIELD)
+    @Schema(description = "Category Id", example = "1")
+    Long categoryId;
+
+    @NotNull(message = ErrorMessage.NOT_NULL_FIELD)
+    @Schema(description = "Inventory quantity", example = "500")
+            @Min(value = 1, message = ErrorMessage.Product.ERR_PRODUCT_INVENTORY_QUANTITY_LESS_THAN_1)
+    Integer inventoryQuantity;
 
 }

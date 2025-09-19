@@ -67,6 +67,8 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/api/v1/category").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/category/sub").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/promotion").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/product/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/product/filter/**").permitAll()
                                 .requestMatchers(userEndpoints).hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
                                 .requestMatchers(adminEndpoints).hasAnyAuthority(RoleConstant.ADMIN)
                                 .anyRequest().authenticated())

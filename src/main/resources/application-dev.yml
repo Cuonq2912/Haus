@@ -57,7 +57,7 @@ openapi:
 security:
   public-endpoints: /oauth2/**, /auth/**, /api/v1/auth/**
   user-endpoints: /api/v1/user/**
-  admin-endpoints: /api/v1/admin/**, /api/v1/promotion/**, /api/v1/category/**
+  admin-endpoints: /api/v1/admin/**, /api/v1/promotion/**, /api/v1/category/**, /api/v1/product/**
   swagger-endpoints: /swagger-ui/**, /v3/api-docs/**, /swagger-ui.html
 
 #endpoint:

@@ -15,6 +15,7 @@ public class ErrorMessage {
     public static final String INVALID_FORMAT_SOME_THING_FIELD = "invalid.general.format";
     public static final String INVALID_SOME_THING_FIELD_IS_REQUIRED = "invalid.general.required";
     public static final String NOT_BLANK_FIELD = "invalid.general.not-blank";
+    public static final String NOT_NULL_FIELD = "invalid.general.not-null";
     public static final String INVALID_FORMAT_PASSWORD = "invalid.password-format";
     public static final String INVALID_DATE = "invalid.date-format";
     public static final String INVALID_DATE_FEATURE = "invalid.date-future";
@@ -112,5 +113,6 @@ public class ErrorMessage {
         public static final String ERR_PRODUCT_ALREADY_DELETED = "exception.product.already.deleted";
         public static final String ERR_PRODUCT_VARIATION_NOT_EXISTED = "exception.product.variation.not.existed";
         public static final String ERR_PRODUCT_VARIATION_ALREADY_DELETED = "exception.product.variation.already.deleted";
+        public static final String ERR_PRODUCT_INVENTORY_QUANTITY_LESS_THAN_1 = "exception.product.inventory.quantity.less.than.1";
     }
 }

@@ -25,5 +25,5 @@ public class ProductResponseDto {
 
     Date updatedAt;
 
-    String categoryName;
+    Long categoryId;
 }

@@ -53,17 +53,17 @@ public class CategoryController {
         );
     }
 
-    @Operation(
-            summary = "Lấy tất cả danh mục",
-            description = "Dùng để front end lấy ra tất cả danh mục render ra UI"
-    )
-    @GetMapping(UrlConstant.Category.GET_ALL_CATEGORY)
-    public ResponseEntity<?> getAllCategories(){
-        return ResponseUtil.success(
-                SuccessMessage.Category.GET_ALL_CATEGORY_SUCCESS,
-                categoryService.getAllCategories()
-        );
-    }
+//    @Operation(
+//            summary = "Lấy tất cả danh mục",
+//            description = "Dùng để front end lấy ra tất cả danh mục render ra UI"
+//    )
+//    @GetMapping(UrlConstant.Category.GET_ALL_CATEGORY)
+//    public ResponseEntity<?> getAllCategories(){
+//        return ResponseUtil.success(
+//                SuccessMessage.Category.GET_ALL_CATEGORY_SUCCESS,
+//                categoryService.getAllCategories()
+//        );
+//    }
 
     @Operation(
             summary = "Lấy tất cả danh mục con để hiện trong lúc tạo ",
