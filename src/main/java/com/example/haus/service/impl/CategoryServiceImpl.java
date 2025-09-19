@@ -50,9 +50,22 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
+
         categoryMapper.updateCategoryFromDto(categoryRequest, category);
-        return categoryMapper.categoryToCategoryResponseDto(categoryRepository.save(category));
+
+        if (categoryRequest.getParentId() != null) {
+            Category parent = categoryRepository.findById(categoryRequest.getParentId())
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
+            category.setParentCategory(parent);
+        } else {
+            category.setParentCategory(null);
+        }
+
+        Category saved = categoryRepository.save(category);
+        return categoryMapper.categoryToCategoryResponseDto(saved);
     }
+
 
     @Override
     public CategoryResponseDto getCategoryById(Long id) {
