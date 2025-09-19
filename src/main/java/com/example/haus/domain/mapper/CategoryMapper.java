@@ -16,5 +16,6 @@ public interface CategoryMapper {
 
     void updateCategoryFromDto(CategoryRequestDto requestDto, @MappingTarget Category category);
 
+    @Mapping(target = "parentId", source = "parentCategory.id")
     CategoryResponseDto categoryToCategoryResponseDto(Category category);
 }
