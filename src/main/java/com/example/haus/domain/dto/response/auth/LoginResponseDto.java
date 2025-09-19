@@ -15,6 +15,8 @@ public class LoginResponseDto {
 
     String userId;
 
+    String role;
+
     String accessToken;
 
     String refreshToken;

@@ -99,6 +99,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return LoginResponseDto.builder()
                 .tokenType(CommonConstant.BEARER_TOKEN)
                 .userId(user.getId())
+                .role(user.getRole().toString())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();

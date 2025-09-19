@@ -14,12 +14,12 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LoginRequestDto {
 
-    @Schema(description = "Email người dùng", example = "user@gmail.com")
+    @Schema(description = "Email người dùng", example = "quanducbui2017@gmail.com")
     @NotBlank(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
     @Email
     String email;
 
-    @Schema(description = "Mật khẩu", example = "User123@")
+    @Schema(description = "Mật khẩu", example = "Quankane1905@@")
     @NotBlank(message = ErrorMessage.NOT_BLANK_FIELD)
     String password;
 
