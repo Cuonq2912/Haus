@@ -5,8 +5,7 @@ import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
-import com.example.haus.domain.dto.request.product.CreateProductRequestDto;
-import com.example.haus.domain.dto.request.product.UpdateProductRequestDto;
+import com.example.haus.domain.dto.request.product.ProductRequestDto;
 import com.example.haus.domain.dto.request.product.ProductFilterRequestDto;
 import com.example.haus.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,7 +48,7 @@ public class ProductController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PostMapping(UrlConstant.Product.CREATE_PRODUCT)
-    public ResponseEntity<?> createProduct(@Valid @RequestBody CreateProductRequestDto request) {
+    public ResponseEntity<?> createProduct(@Valid @RequestBody ProductRequestDto request) {
         return ResponseUtil.success(
                 HttpStatus.CREATED,
                 SuccessMessage.Product.CREATE_PRODUCT_SUCCESS,
@@ -65,7 +64,7 @@ public class ProductController {
     @PutMapping(UrlConstant.Product.UPDATE_PRODUCT)
     public ResponseEntity<?> updateProduct(
             @PathVariable Long id,
-            @Valid @RequestBody UpdateProductRequestDto request) {
+            @Valid @RequestBody ProductRequestDto request) {
         return ResponseUtil.success(
                 SuccessMessage.Product.UPDATE_PRODUCT_SUCCESS,
                 productService.updateProduct(id, request));

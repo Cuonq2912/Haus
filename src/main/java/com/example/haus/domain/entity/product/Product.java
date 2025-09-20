@@ -1,10 +1,12 @@
 package com.example.haus.domain.entity.product;
 
+import com.example.haus.constant.CommonConstant;
 import com.example.haus.domain.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -42,7 +44,7 @@ public class Product extends BaseEntity {
     Integer inventoryQuantity;
 
     @Column()
-    Boolean isDeleted;
+    Boolean isDeleted = CommonConstant.FALSE;
 
     @ManyToMany
     @JoinTable(
@@ -50,7 +52,8 @@ public class Product extends BaseEntity {
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    List<Category> categories;
+    @Builder.Default
+    List<Category> categories = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     List<Review> reviews;
@@ -70,7 +73,7 @@ public class Product extends BaseEntity {
     public void addCategory(Category category) {
         if (!categories.contains(category)) {
             categories.add(category);
-            category.getProducts().add(this);
+//            category.getProducts().add(this);
         }
     }
 

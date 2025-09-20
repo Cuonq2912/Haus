@@ -1,10 +1,13 @@
 package com.example.haus.domain.dto.response.product;
 
 
+import com.example.haus.domain.dto.response.category.CategoryResponseDto;
+import jakarta.persistence.Column;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,6 +20,8 @@ public class ProductResponseDto {
 
     String productName;
 
+    Double price;
+
     String description;
 
     String detailDescription;
@@ -25,5 +30,7 @@ public class ProductResponseDto {
 
     Date updatedAt;
 
-    String categoryName;
+    Boolean isDeleted;
+
+    List<CategoryResponseDto> categories;
 }

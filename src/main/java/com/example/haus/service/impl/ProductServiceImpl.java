@@ -8,8 +8,7 @@ import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.entity.product.Category;
 import com.example.haus.domain.entity.product.Product;
 import com.example.haus.domain.mapper.ProductMapper;
-import com.example.haus.domain.dto.request.product.CreateProductRequestDto;
-import com.example.haus.domain.dto.request.product.UpdateProductRequestDto;
+import com.example.haus.domain.dto.request.product.ProductRequestDto;
 import com.example.haus.domain.dto.response.product.ProductResponseDto;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
@@ -52,15 +51,15 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED));
 
-        if (product.getIsDeleted())
+        if (product.getIsDeleted() == CommonConstant.TRUE)
             throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_ALREADY_DELETED);
 
-        return productMapper.toProductResponseDto(product);
+        return productMapper.productToProductResponse(product);
     }
 
     @Override
     @Transactional
-    public ProductResponseDto createProduct(CreateProductRequestDto request) {
+    public ProductResponseDto createProduct(ProductRequestDto request) {
 
         if (productRepository.existsByProductNameAndIsDeletedFalse(request.getProductName())) {
             throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_NAME_EXISTED);
@@ -83,20 +82,22 @@ public class ProductServiceImpl implements ProductService {
             product.setInventoryQuantity(0);
         }
 
-        if (request.getCategory() != null && !request.getCategory().isEmpty()) {
-            Category category = categoryRepository.findByCategoryNameIgnoreCase(request.getCategory())
-                    .orElseThrow(() -> new InvalidDataException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
+        if (request.getCategories() != null && !request.getCategories().isEmpty()) {
+            for (String categoryName : request.getCategories()) {
+                Category category = categoryRepository.findByCategoryNameIgnoreCase(categoryName)
+                        .orElseThrow(() -> new InvalidDataException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
 
-            product.addCategory(category);
+                product.addCategory(category);
+            }
         }
 
         Product savedProduct = productRepository.save(product);
 
-        return productMapper.toProductResponseDto(savedProduct);
+        return productMapper.productToProductResponse(savedProduct);
     }
 
     @Override
-    public ProductResponseDto updateProduct(Long productId, UpdateProductRequestDto request) {
+    public ProductResponseDto updateProduct(Long productId, ProductRequestDto request) {
         if (productId == null || productId <= 0) {
             throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
         }
@@ -112,18 +113,21 @@ public class ProductServiceImpl implements ProductService {
 
         productMapper.updateProductFromDto(request, product);
 
-        if (request.getCategory() != null && !request.getCategory().isEmpty()) {
-            Category category = categoryRepository.findByCategoryNameIgnoreCase(request.getCategory())
-                    .orElseThrow(() -> new InvalidDataException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
+        if (request.getCategories() != null && !request.getCategories().isEmpty()) {
+            product.getCategories().clear();
+            for (String categoryName : request.getCategories()) {
+                Category category = categoryRepository.findByCategoryNameIgnoreCase(categoryName)
+                        .orElseThrow(() -> new InvalidDataException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
 
-            product.getCategories().add(category);
+                product.addCategory(category);
+            }
         }
 
         product.setUpdatedAt(new Date());
 
         Product updatedProduct = productRepository.save(product);
 
-        return productMapper.toProductResponseDto(updatedProduct);
+        return productMapper.productToProductResponse(updatedProduct);
     }
 
     @Override
@@ -151,7 +155,7 @@ public class ProductServiceImpl implements ProductService {
         Page<Product> productsPage = productRepository.findProductsByCategoryName(categoryName.trim(), pageable);
 
         List<ProductResponseDto> productResponseList = productsPage.getContent().stream()
-                .map(productMapper::toProductResponseDto)
+                .map(productMapper::productToProductResponse)
                 .toList();
 
         PaginationCustom paginationCustom = PaginationCustom.builder()
@@ -177,7 +181,7 @@ public class ProductServiceImpl implements ProductService {
         Page<Product> productsPage = productRepository.findProductsByCategoryId(categoryId, pageable);
 
         List<ProductResponseDto> productResponseList = productsPage.getContent().stream()
-                .map(productMapper::toProductResponseDto)
+                .map(productMapper::productToProductResponse)
                 .toList();
 
         PaginationCustom paginationCustom = PaginationCustom.builder()
@@ -209,7 +213,7 @@ public class ProductServiceImpl implements ProductService {
         Page<Product> productsPage = productRepository.searchProductsByKeyword(keyword.trim(), pageable);
 
         List<ProductResponseDto> productResponseList = productsPage.getContent().stream()
-                .map(productMapper::toProductResponseDto)
+                .map(productMapper::productToProductResponse)
                 .toList();
 
         PaginationCustom paginationCustom = PaginationCustom.builder()
@@ -241,7 +245,7 @@ public class ProductServiceImpl implements ProductService {
         Page<Product> productsPage = productRepository.filterProducts(filterRequest, pageable);
 
         List<ProductResponseDto> productResponseList = productsPage.getContent().stream()
-                .map(productMapper::toProductResponseDto)
+                .map(productMapper::productToProductResponse)
                 .toList();
 
         PaginationCustom paginationCustom = PaginationCustom.builder()
