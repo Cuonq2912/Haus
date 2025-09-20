@@ -54,7 +54,7 @@ public class UrlConstant {
         public static final String GET_ALL_CATEGORY = PRE_FIX;
         public static final String GET_ALL_SUB_CATEGORY = PRE_FIX + "/sub";
         public static final String GET_CATEGORY_BY_NAME = PRE_FIX + "/name/{categoryName}";
-
+        public static final String SEARCH_CATEGORY_BY_NAME_AND_SORT_BY_KEYWORD = PRE_FIX + "/search";
     }
 
     public static class Promotion {

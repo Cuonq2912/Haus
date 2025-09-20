@@ -1,7 +1,12 @@
 package com.example.haus.repository;
 
 import com.example.haus.domain.entity.product.Category;
+import com.example.haus.domain.entity.product.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,4 +18,11 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     Optional<Category> findByCategoryNameIgnoreCase(String categoryName);
 
     List<Category> findByParentCategoryIsNotNull();
+
+    @Query("""
+        SELECT p FROM Category p
+        WHERE (LOWER(CAST(p.description AS string)) LIKE LOWER(CONCAT('%', :keyword, '%'))
+              OR LOWER(p.categoryName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+    """)
+    Page<Category> searchCategoryByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }

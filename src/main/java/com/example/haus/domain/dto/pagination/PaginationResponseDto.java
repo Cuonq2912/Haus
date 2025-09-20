@@ -17,8 +17,8 @@ public class PaginationResponseDto<T> {
     PaginationCustom pageCustom;
     List<T> items;
 
-    public PaginationResponseDto(PaginationCustom meta, List<T> items) {
-        this.pageCustom = meta;
+    public PaginationResponseDto(PaginationCustom pageCustom, List<T> items) {
+        this.pageCustom = pageCustom;
 
         if (items == null) {
             this.items = null;

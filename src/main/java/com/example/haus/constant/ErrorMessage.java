@@ -83,7 +83,7 @@ public class ErrorMessage {
 
         public static final String ERR_CATEGORY_EXISTED = "exception.category.existed";
         public static final String ERR_CATEGORY_NOT_EXISTED = "exception.category.not.existed";
-        public static final String ERR_CATEGORY_BEING_USED = "exception.category.being.used.cannot.delete";
+        public static final String ERR_CATEGORY_BEING_USED = "exception.category.being.used.cannot.delete.because.include.product";
     }
 
     public static class Promotion {

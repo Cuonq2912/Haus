@@ -4,6 +4,7 @@ import com.example.haus.base.ResponseUtil;
 import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
+import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.request.category.CategoryRequestDto;
 import com.example.haus.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,17 +54,19 @@ public class CategoryController {
         );
     }
 
-//    @Operation(
-//            summary = "Lấy tất cả danh mục",
-//            description = "Dùng để front end lấy ra tất cả danh mục render ra UI"
-//    )
-//    @GetMapping(UrlConstant.Category.GET_ALL_CATEGORY)
-//    public ResponseEntity<?> getAllCategories(){
-//        return ResponseUtil.success(
-//                SuccessMessage.Category.GET_ALL_CATEGORY_SUCCESS,
-//                categoryService.getAllCategories()
-//        );
-//    }
+    @Operation(
+            summary = "Lấy tất cả danh mục (phân trang)",
+            description = "Dùng để lấy danh sách danh mục có phân trang"
+    )
+    @GetMapping(UrlConstant.Category.GET_ALL_CATEGORY)
+    public ResponseEntity<?> getAllCategories(
+                    @RequestParam(defaultValue = "1") Integer pageNum,
+                    @RequestParam(defaultValue = "10") Integer pageSize) {
+            PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
+            return ResponseUtil.success(
+                            SuccessMessage.Category.GET_CATEGORY_SUCCESS,
+                            categoryService.getAllCategories(paginationRequest));
+    }
 
     @Operation(
             summary = "Lấy tất cả danh mục con để hiện trong lúc tạo ",
@@ -115,5 +118,21 @@ public class CategoryController {
                 SuccessMessage.Category.GET_CATEGORY_SUCCESS,
                 categoryService.getCategoryByCategoryName(categoryName)
         );
+    }
+
+    @Operation(
+            summary = "Tìm kiếm danh mục theo từ khóa",
+            description = "Tìm kiếm danh mục trong tên, mô tả, hoặc mô tả chi tiết có phân trang"
+    )
+    @GetMapping(UrlConstant.Category.SEARCH_CATEGORY_BY_NAME_AND_SORT_BY_KEYWORD)
+    public ResponseEntity<?> searchCategoryByKeyword(
+            @RequestParam(defaultValue = "Phòng") String keyword,
+            @RequestParam(defaultValue = "categoryName:asc") String search,
+            @RequestParam(defaultValue = "1") Integer pageNum,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
+        return ResponseUtil.success(
+                SuccessMessage.Category.GET_CATEGORY_SUCCESS,
+                categoryService.searchCategoryByKeywordAndSortByKeyword(keyword, search, paginationRequest));
     }
 }
