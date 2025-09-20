@@ -16,16 +16,10 @@ public interface CategoryService {
 
     CategoryResponseDto getCategoryById(Long id);
 
-    PaginationResponseDto<CategoryResponseDto> getAllCategories(PaginationRequestDto requestDto);
-
     List<CategoryResponseDto> getAllSubCategories();
 
     void deleteCategory(Long id);
 
-    CategoryResponseDto getCategoryByCategoryName(String categoryName);
-
-    PaginationResponseDto<CategoryResponseDto> searchCategoryByKeywordAndSortByKeyword(String keyword, String search,
-                                                                      PaginationRequestDto paginationRequest);
-
+    PaginationResponseDto<CategoryResponseDto> searchCategoryByKeywordAndSortByKeyword(String keyword, String search, PaginationRequestDto paginationRequest);
 
 }

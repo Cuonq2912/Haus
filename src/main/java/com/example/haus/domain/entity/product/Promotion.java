@@ -24,20 +24,20 @@ public class Promotion extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(name = "promotion_code", unique = true, nullable = false)
+    @Column(name = "promotion_code", unique = true)
     String promotionCode;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
+    @Column(name = "type")
     PromotionType type; //Order, Category
 
     @Column(name = "description", nullable = false)
     String description;
 
-    @Column(name = "min_price_order")
+    @Column(name = "min_price_order", nullable = false)
     Float minPriceOrder;
 
-    @Column(name = "max_price_order")
+    @Column(name = "max_price_order", nullable = false)
     Float maxPriceOrder;
 
     @Column(name = "start_date")
@@ -45,6 +45,9 @@ public class Promotion extends BaseEntity {
 
     @Column(name = "end_date")
     LocalDate endDate;
+
+    @Column(name = "discount_percent")
+    Float discountPercent;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)

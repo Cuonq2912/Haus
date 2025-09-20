@@ -25,4 +25,5 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
               OR LOWER(p.categoryName) LIKE LOWER(CONCAT('%', :keyword, '%')))
     """)
     Page<Category> searchCategoryByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
 }

@@ -95,12 +95,12 @@ public class ErrorMessage {
         public static final String ERR_PROMOTION_NOT_EXISTED = "exception.promotion.not.existed";
         public static final String ERR_PROMOTION_CODE_NOT_BLANK = "exception.promotion.code.not.blank";
         public static final String ERR_PROMOTION_DESCRIPTION_NOT_NULL = "exception.promotion.description.not.null";
-        public static final String ERR_PROMOTION_TYPE_NOT_BLANK = "exception.promotion.type.not.null";
-        public static final String ERR_PROMOTION_STATUS_NOT_BLANK = "exception.promotion.status.not.null";
-        public static final String ERR_PROMOTION_START_DATE_NOT_EMPTY = "exception.promotion.start.date.not.empty";
-        public static final String ERR_PROMOTION_END_DATE_NOT_EMPTY = "exception.promotion.end.date.not.empty";
-        public static final String ERR_PROMOTION_CODE_LENGTH = "exception.promotion.code.length.must.be.exactly.6.digits.long";
-        public static final String ERR_PROMOTION_DISCOUNT_PERCENT_NOT_BLANK = "exception.promotion.discount.percent.must.be.not.blank";
+        public static final String ERR_PROMOTION_TYPE_NOT_NULL = "exception.promotion.type.not.null";
+        public static final String ERR_PROMOTION_STATUS_NOT_NULL = "exception.promotion.status.not.null";
+        public static final String ERR_PROMOTION_START_DATE_NOT_NULL = "exception.promotion.start.date.not.empty";
+        public static final String ERR_PROMOTION_END_DATE_NOT_NULL = "exception.promotion.end.date.not.empty";
+        public static final String ERR_PROMOTION_CODE_LENGTH = "exception.promotion.code.length.must.be.exactly.in.6.to.15";
+        public static final String ERR_PROMOTION_DISCOUNT_PERCENT_NOT_NULL = "exception.promotion.discount.percent.must.be.not.blank";
         public static final String ERR_PROMOTION_DISCOUNT_PERCENT_MIN_VALIDATE = "exception.promotion.discount.percent.must.be.greater.than.or.equal.to.0";
         public static final String ERR_PROMOTION_DISCOUNT_PERCENT_MAX_VALIDATE = "exception.promotion.discount.percent.must.be.less.than.or.equal.to.110";
     }

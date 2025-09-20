@@ -4,6 +4,9 @@ import com.example.haus.base.ResponseUtil;
 import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
+import com.example.haus.constant.promotion.PromotionStatus;
+import com.example.haus.constant.promotion.PromotionType;
+import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.request.promotion.PromotionRequestDto;
 import com.example.haus.service.PromotionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
 
 @RestApiV1
 @Validated
@@ -50,18 +55,6 @@ public class PromotionController {
         return ResponseUtil.success(
                 SuccessMessage.Promotion.GET_PROMOTION_SUCCESS,
                 promotionService.getPromotionById(promotionId)
-        );
-    }
-
-    @Operation(
-            summary = "Lấy tất cả khuyến mãi",
-            description = "Dùng để front end lấy ra tất cả khuyến mãi render ra UI"
-    )
-    @GetMapping(UrlConstant.Promotion.GET_ALL_PROMOTION)
-    public ResponseEntity<?> getAllPromotion(){
-        return ResponseUtil.success(
-                SuccessMessage.Promotion.GET_ALL_PROMOTION_SUCCESS,
-                promotionService.getAllPromotion()
         );
     }
 
@@ -105,4 +98,19 @@ public class PromotionController {
         );
     }
 
+    @Operation(
+            summary = "Lọc khuyến mãi theo nhiều tiêu chí",
+            description = "Lọc khuyến mãi theo kiểu, ngày bđ, ngày kt, sort by percent với phân trang"
+    )
+    @PostMapping(UrlConstant.Promotion.FILTER_PROMOTION)
+    public ResponseEntity<?> filterProducts(
+            @RequestParam(defaultValue = "1", required = false) Integer pageNum,
+            @RequestParam(defaultValue = "10", required = false) Integer pageSize,
+            @RequestParam(defaultValue = "asc", required = false) String sortByPrice,
+            @RequestParam(defaultValue = "type:active,startDate:2020-01-01,endDate:2025-12-31,status:active", required = false) String ... search) {
+        PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
+        return ResponseUtil.success(
+                SuccessMessage.Product.GET_PRODUCT_SUCCESS,
+                promotionService.filterPromotions(paginationRequest, sortByPrice, search));
+    }
 }

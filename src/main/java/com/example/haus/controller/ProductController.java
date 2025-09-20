@@ -7,7 +7,6 @@ import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.request.product.CreateProductRequestDto;
 import com.example.haus.domain.dto.request.product.UpdateProductRequestDto;
-import com.example.haus.domain.dto.request.product.ProductFilterRequestDto;
 import com.example.haus.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -29,7 +28,6 @@ public class ProductController {
 
     ProductService productService;
 
-    @Tag(name = "admin-product-controller", description = "Admin Product Management APIs")
     @Operation(
             summary = "Lấy sản phẩm theo id",
             description = "Dùng để lấy ra sản phẩm theo id",
@@ -42,7 +40,6 @@ public class ProductController {
                 productService.getProductById(id));
     }
 
-    @Tag(name = "admin-product-controller", description = "Admin Product Management APIs")
     @Operation(
             summary = "Tạo sản phẩm mới",
             description = "Dùng để tạo sản phẩm mới",
@@ -56,7 +53,6 @@ public class ProductController {
                 productService.createProduct(request));
     }
 
-    @Tag(name = "admin-product-controller", description = "Admin Product Management APIs")
     @Operation(
             summary = "Cập nhật sản phẩm",
             description = "Dùng để cập nhật thông tin sản phẩm theo id",
@@ -71,7 +67,6 @@ public class ProductController {
                 productService.updateProduct(id, request));
     }
 
-    @Tag(name = "admin-product-controller", description = "Admin Product Management APIs")
     @Operation(
             summary = "Xóa sản phẩm",
             description = "Dùng để xóa sản phẩm theo id",
@@ -86,23 +81,7 @@ public class ProductController {
         );
     }
 
-    @Tag(name = "public-product-controller", description = "Public Product APIs")
-    @Operation(
-            summary = "Lấy sản phẩm theo tên category",
-            description = "Dùng để lấy danh sách sản phẩm thuộc category có phân trang"
-    )
-    @GetMapping(UrlConstant.Product.GET_PRODUCTS_BY_CATEGORY)
-    public ResponseEntity<?> getProductsByCategory(
-                    @PathVariable String categoryName,
-                    @RequestParam(defaultValue = "1") Integer pageNum,
-                    @RequestParam(defaultValue = "10") Integer pageSize) {
-            PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
-            return ResponseUtil.success(
-                            SuccessMessage.Product.GET_PRODUCT_SUCCESS,
-                            productService.getProductsByCategory(categoryName, paginationRequest));
-    }
 
-    @Tag(name = "public-product-controller", description = "Public Product APIs")
     @Operation(
             summary = "Lấy sản phẩm theo ID category",
             description = "Dùng để lấy danh sách sản phẩm thuộc category có phân trang"
@@ -118,36 +97,20 @@ public class ProductController {
                             productService.getProductsByCategoryId(categoryId, paginationRequest));
     }
 
-    @Tag(name = "public-product-controller", description = "Public Product APIs")
-    @Operation(
-            summary = "Tìm kiếm sản phẩm theo từ khóa",
-            description = "Tìm kiếm sản phẩm trong tên, mô tả, hoặc mô tả chi tiết có phân trang"
-    )
-    @GetMapping(UrlConstant.Product.SEARCH_PRODUCTS_BY_KEYWORD)
-    public ResponseEntity<?> searchProductsByKeyword(
-                    @RequestParam String keyword,
-                    @RequestParam(defaultValue = "1") Integer pageNum,
-                    @RequestParam(defaultValue = "10") Integer pageSize) {
-            PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
-            return ResponseUtil.success(
-                            SuccessMessage.Product.GET_PRODUCT_SUCCESS,
-                            productService.searchProductsByKeyword(keyword, paginationRequest));
-    }
-
-    @Tag(name = "admin-product-controller", description = "Admin Product Management APIs")
     @Operation(
             summary = "Lọc sản phẩm theo nhiều tiêu chí",
             description = "Lọc sản phẩm theo khoảng giá, màu sắc, kiểu dáng với phân trang"
     )
     @PostMapping(UrlConstant.Product.FILTER_PRODUCTS)
     public ResponseEntity<?> filterProducts(
-                    @RequestBody @Valid ProductFilterRequestDto filterRequest,
-                    @RequestParam(defaultValue = "1") Integer pageNum,
-                    @RequestParam(defaultValue = "10") Integer pageSize) {
+            @RequestParam(defaultValue = "1", required = false) Integer pageNum,
+            @RequestParam(defaultValue = "10", required = false) Integer pageSize,
+            @RequestParam(defaultValue = "asc", required = false) String sortByPrice,
+            @RequestParam(defaultValue = "priceRange:under_1m,colors:[red,blue,green],categoryId:1,keyword:a", required = false) String ... search) {
             PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
             return ResponseUtil.success(
                             SuccessMessage.Product.GET_PRODUCT_SUCCESS,
-                            productService.filterProducts(filterRequest, paginationRequest));
+                            productService.filterProducts(paginationRequest, sortByPrice, search));
     }
 
 }

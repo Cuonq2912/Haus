@@ -70,6 +70,7 @@ public class UrlConstant {
         public static final String GET_PROMOTION_BY_ID = PRE_FIX + "/{promotionId}";
         public static final String GET_ALL_PROMOTION = PRE_FIX;
         public static final String GET_PROMOTION_BY_CODE = PRE_FIX + "/code/{promotionCode}";
+        public static final String FILTER_PROMOTION = PRE_FIX + "/filter";
     }
 
     public static class Product {

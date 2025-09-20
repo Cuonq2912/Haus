@@ -101,26 +101,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public PaginationResponseDto<CategoryResponseDto> getAllCategories(PaginationRequestDto requestDto) {
-        Pageable pageable = PageRequest.of(requestDto.getPageNum(), requestDto.getPageSize());
-
-        Page<Category> categoryPage = categoryRepository.findAll(pageable);
-
-        List<CategoryResponseDto> categoryResponseDtoList = categoryPage.getContent().stream()
-                .map(categoryMapper::categoryToCategoryResponseDto)
-                .toList();
-
-        PaginationCustom paginationCustom = PaginationCustom.builder()
-                .pageNum(requestDto.getPageNum() + 1)
-                .pageSize(requestDto.getPageSize())
-                .totalElement(categoryPage.getTotalElements())
-                .totalPages(categoryPage.getTotalPages())
-                .build();
-
-        return new PaginationResponseDto<>(paginationCustom, categoryResponseDtoList);
-    }
-
-    @Override
     public List<CategoryResponseDto> getAllSubCategories() {
         List<Category> categories = categoryRepository.findByParentCategoryIsNotNull();
         return categories.stream().map(category -> categoryMapper.categoryToCategoryResponseDto(category)).toList();
@@ -136,13 +116,6 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         categoryRepository.delete(category);
-    }
-
-    @Override
-    public CategoryResponseDto getCategoryByCategoryName(String categoryName) {
-        Category category = categoryRepository.findByCategoryNameIgnoreCase(categoryName).orElseThrow(() ->
-                new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
-        return categoryMapper.categoryToCategoryResponseDto(category);
     }
 
     @Override
