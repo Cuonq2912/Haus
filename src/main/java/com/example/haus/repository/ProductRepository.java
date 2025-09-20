@@ -14,9 +14,10 @@ public interface ProductRepository extends JpaRepository<Product, Long>, CustomP
 
     Boolean existsByProductNameAndIsDeletedFalse(String name);
 
-    Boolean existsByProductNameAndIsDeletedTrue(String name);
-
     Boolean existsByProductCode(String productCode);
+
+    @Query("SELECT p FROM Product p WHERE (p.isDeleted IS NULL OR p.isDeleted = false)")
+    Page<Product> findAllActiveProducts(Pageable pageable);
 
     @Query("SELECT DISTINCT p FROM Product p " +
             "JOIN p.categories c " +

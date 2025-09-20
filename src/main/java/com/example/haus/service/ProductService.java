@@ -10,7 +10,7 @@ public interface ProductService {
 
     ProductResponseDto getProductById(Long id);
 
-    // get all
+    PaginationResponseDto<ProductResponseDto> getAllProducts(PaginationRequestDto paginationRequest);
 
     ProductResponseDto createProduct(ProductRequestDto request);
 

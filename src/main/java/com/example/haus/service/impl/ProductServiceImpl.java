@@ -2,7 +2,6 @@ package com.example.haus.service.impl;
 
 import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
-import com.example.haus.domain.dto.pagination.PaginationCustom;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.entity.product.Category;
@@ -16,12 +15,14 @@ import com.example.haus.repository.CategoryRepository;
 import com.example.haus.repository.ProductRepository;
 import com.example.haus.service.ProductService;
 import com.example.haus.util.ProductCodeUtil;
+import com.example.haus.util.PaginationUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +56,33 @@ public class ProductServiceImpl implements ProductService {
             throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_ALREADY_DELETED);
 
         return productMapper.productToProductResponse(product);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaginationResponseDto<ProductResponseDto> getAllProducts(PaginationRequestDto paginationRequest) {
+        if (paginationRequest == null) {
+            throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
+        }
+
+        Sort sort = Sort.by(
+                paginationRequest.getSortType().equalsIgnoreCase("DESC")
+                        ? Sort.Direction.DESC
+                        : Sort.Direction.ASC,
+                paginationRequest.getSortBy());
+
+        Pageable pageable = PageRequest.of(
+                paginationRequest.getPageNum(),
+                paginationRequest.getPageSize(),
+                sort);
+
+        Page<Product> productsPage = productRepository.findAllActiveProducts(pageable);
+
+        List<ProductResponseDto> productResponseList = productsPage.getContent().stream()
+                .map(productMapper::productToProductResponse)
+                .toList();
+
+        return PaginationUtil.createPaginationResponse(productsPage, paginationRequest, productResponseList);
     }
 
     @Override
@@ -158,14 +186,7 @@ public class ProductServiceImpl implements ProductService {
                 .map(productMapper::productToProductResponse)
                 .toList();
 
-        PaginationCustom paginationCustom = PaginationCustom.builder()
-                .pageNum(paginationRequest.getPageNum() + 1)
-                .pageSize(paginationRequest.getPageSize())
-                .totalElement(productsPage.getTotalElements())
-                .totalPages(productsPage.getTotalPages())
-                .build();
-
-        return new PaginationResponseDto<>(paginationCustom, productResponseList);
+        return PaginationUtil.createPaginationResponse(productsPage, paginationRequest, productResponseList);
     }
 
     @Override
@@ -184,14 +205,7 @@ public class ProductServiceImpl implements ProductService {
                 .map(productMapper::productToProductResponse)
                 .toList();
 
-        PaginationCustom paginationCustom = PaginationCustom.builder()
-                .pageNum(paginationRequest.getPageNum() + 1)
-                .pageSize(paginationRequest.getPageSize())
-                .totalElement(productsPage.getTotalElements())
-                .totalPages(productsPage.getTotalPages())
-                .build();
-
-        return new PaginationResponseDto<>(paginationCustom, productResponseList);
+        return PaginationUtil.createPaginationResponse(productsPage, paginationRequest, productResponseList);
     }
 
     @Override
@@ -216,14 +230,7 @@ public class ProductServiceImpl implements ProductService {
                 .map(productMapper::productToProductResponse)
                 .toList();
 
-        PaginationCustom paginationCustom = PaginationCustom.builder()
-                .pageNum(paginationRequest.getPageNum() + 1)
-                .pageSize(paginationRequest.getPageSize())
-                .totalElement(productsPage.getTotalElements())
-                .totalPages(productsPage.getTotalPages())
-                .build();
-
-        return new PaginationResponseDto<>(paginationCustom, productResponseList);
+        return PaginationUtil.createPaginationResponse(productsPage, paginationRequest, productResponseList);
     }
 
     @Override
@@ -248,14 +255,7 @@ public class ProductServiceImpl implements ProductService {
                 .map(productMapper::productToProductResponse)
                 .toList();
 
-        PaginationCustom paginationCustom = PaginationCustom.builder()
-                .pageNum(paginationRequest.getPageNum() + 1)
-                .pageSize(paginationRequest.getPageSize())
-                .totalElement(productsPage.getTotalElements())
-                .totalPages(productsPage.getTotalPages())
-                .build();
-
-        return new PaginationResponseDto<>(paginationCustom, productResponseList);
+        return PaginationUtil.createPaginationResponse(productsPage, paginationRequest, productResponseList);
     }
 
 }
