@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -122,60 +123,64 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     public PaginationResponseDto<CategoryResponseDto> searchCategoryByKeywordAndSortByKeyword(
             String keyword,
-            String sort,
             PaginationRequestDto paginationRequest) {
 
-        int page = paginationRequest.getPageNum();
+        // Pageable của Spring bắt đầu từ 0
+        int page = paginationRequest.getPageNum() == 0 ? paginationRequest.getPageNum() : paginationRequest.getPageNum() - 1;
         int size = paginationRequest.getPageSize();
 
-        StringBuilder jpql = new StringBuilder("SELECT c FROM Category c WHERE TRUE");
+        // 1. Query category cha (parentCategory IS NULL)
+        String jpqlParent = "SELECT c FROM Category c WHERE c.parentCategory IS NULL";
+        TypedQuery<Category> queryParent = entityManager.createQuery(jpqlParent, Category.class);
+        queryParent.setFirstResult(page * size);
+        queryParent.setMaxResults(size);
+        List<Category> parentCategories = queryParent.getResultList();
 
+        // 2. Query category con (parentCategory NOT NULL, theo keyword)
+        StringBuilder jpqlChild = new StringBuilder("SELECT c FROM Category c WHERE c.parentCategory IS NOT NULL");
         if (StringUtils.hasLength(keyword)) {
-            jpql.append(" AND ( lower(c.categoryName) LIKE lower(:keyword) ");
-            jpql.append(" OR lower(c.description) LIKE lower(:keyword) )");
+            jpqlChild.append(" AND ( lower(c.categoryName) LIKE lower(:keyword) ");
+            jpqlChild.append(" OR lower(c.description) LIKE lower(:keyword) )");
         }
+        TypedQuery<Category> queryChild = entityManager.createQuery(jpqlChild.toString(), Category.class);
+        if (StringUtils.hasLength(keyword)) {
+            queryChild.setParameter("keyword", "%" + keyword + "%");
+        }
+        List<Category> childCategories = queryChild.getResultList();
 
-        // xử lý sort (validate trước)
-        if (StringUtils.hasLength(sort)) {
-            Pattern pattern = Pattern.compile(AppConstants.SORT_BY); // ví dụ sort=name:asc
-            Matcher matcher = pattern.matcher(sort);
-            if (matcher.matches()) {
-                jpql.append(String.format(" ORDER BY c.%s %s", matcher.group(1), matcher.group(3)));
+        // 3. Map parentCategories sang DTO
+        List<CategoryResponseDto> categoryDtos = parentCategories.stream()
+                .map(categoryMapper::categoryToCategoryResponseDto)
+                .toList();
+
+        // Tạo map parentId -> DTO
+        Map<Long, CategoryResponseDto> parentMap = categoryDtos.stream()
+                .collect(Collectors.toMap(CategoryResponseDto::getId, dto -> {
+                    dto.getSubCategories().clear();
+                    return dto;
+                }));
+
+        // 4. Gán con vào parent
+        for (Category child : childCategories) {
+            if (child.getParentCategory() != null) {
+                Long parentId = child.getParentCategory().getId();
+                CategoryResponseDto parentDto = parentMap.get(parentId);
+                if (parentDto != null) {
+                    parentDto.getSubCategories().add(categoryMapper.categoryToCategoryResponseDto(child));
+                }
             }
         }
 
-        TypedQuery<Category> query = entityManager.createQuery(jpql.toString(), Category.class);
-        if (StringUtils.hasLength(keyword)) {
-            query.setParameter("keyword", "%" + keyword + "%");
-        }
-
-        query.setFirstResult(page * size);
-        query.setMaxResults(size);
-        List<Category> categories = query.getResultList();
-
-        // đếm total
-        StringBuilder jpqlCount = new StringBuilder("SELECT COUNT(c) FROM Category c WHERE TRUE");
-        if (StringUtils.hasLength(keyword)) {
-            jpqlCount.append(" AND ( lower(c.categoryName) LIKE lower(:keyword) ");
-            jpqlCount.append(" OR lower(c.description) LIKE lower(:keyword) )");
-        }
-        TypedQuery<Long> countQuery = entityManager.createQuery(jpqlCount.toString(), Long.class);
-        if (StringUtils.hasLength(keyword)) {
-            countQuery.setParameter("keyword", "%" + keyword + "%");
-        }
-        long totalElements = countQuery.getSingleResult();
-
-        // phân trang
+        // 5. Build pagination
         Pageable pageable = PageRequest.of(page, size);
-        List<CategoryResponseDto> categoryDtos = categories.stream()
-                .map(categoryMapper::categoryToCategoryResponseDto)
-                .toList();
+        long totalElements = parentCategories.size();
+        int totalPages = (int) Math.ceil((double) totalElements / size);
 
         PaginationCustom paginationCustom = PaginationCustom.builder()
                 .pageNum(pageable.getPageNumber() + 1)
                 .pageSize(pageable.getPageSize())
                 .totalElement(totalElements)
-                .totalPages((int) Math.ceil((double) totalElements / size))
+                .totalPages(totalPages)
                 .build();
 
         return new PaginationResponseDto<>(paginationCustom, categoryDtos);

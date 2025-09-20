@@ -99,14 +99,13 @@ public class CategoryController {
     )
     @GetMapping(UrlConstant.Category.SEARCH_CATEGORY_BY_NAME_AND_SORT_BY_KEYWORD)
     public ResponseEntity<?> searchCategoryByKeyword(
-            @RequestParam(defaultValue = "Phòng") String keyword,
-            @RequestParam(defaultValue = "categoryName:asc") String sortByName,
+            @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "1") Integer pageNum,
             @RequestParam(defaultValue = "10") Integer pageSize) {
         PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
         return ResponseUtil.success(
                 SuccessMessage.Category.GET_CATEGORY_SUCCESS,
-                categoryService.searchCategoryByKeywordAndSortByKeyword(keyword, sortByName, paginationRequest));
+                categoryService.searchCategoryByKeywordAndSortByKeyword(keyword, paginationRequest));
     }
 
 }

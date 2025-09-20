@@ -9,6 +9,7 @@ import com.example.haus.domain.dto.request.product.CreateProductRequestDto;
 import com.example.haus.domain.dto.request.product.UpdateProductRequestDto;
 import com.example.haus.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -101,12 +102,12 @@ public class ProductController {
             summary = "Lọc sản phẩm theo nhiều tiêu chí",
             description = "Lọc sản phẩm theo khoảng giá, màu sắc, kiểu dáng với phân trang"
     )
-    @PostMapping(UrlConstant.Product.FILTER_PRODUCTS)
+    @GetMapping(UrlConstant.Product.FILTER_PRODUCTS)
     public ResponseEntity<?> filterProducts(
             @RequestParam(defaultValue = "1", required = false) Integer pageNum,
             @RequestParam(defaultValue = "10", required = false) Integer pageSize,
-            @RequestParam(defaultValue = "asc", required = false) String sortByPrice,
-            @RequestParam(defaultValue = "priceRange:under_1m,colors:[red,blue,green],categoryId:1,keyword:a", required = false) String ... search) {
+            @RequestParam(required = false) @Schema(example = "asc") String sortByPrice,
+            @RequestParam(required = false) @Schema(example = "priceRange:under_1m,colors:[red],categoryId:1,keyword:a") String ... search) {
             PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
             return ResponseUtil.success(
                             SuccessMessage.Product.GET_PRODUCT_SUCCESS,

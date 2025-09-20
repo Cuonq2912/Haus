@@ -10,6 +10,7 @@ import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.request.promotion.PromotionRequestDto;
 import com.example.haus.service.PromotionService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -102,12 +103,14 @@ public class PromotionController {
             summary = "Lọc khuyến mãi theo nhiều tiêu chí",
             description = "Lọc khuyến mãi theo kiểu, ngày bđ, ngày kt, sort by percent với phân trang"
     )
-    @PostMapping(UrlConstant.Promotion.FILTER_PROMOTION)
+    @GetMapping(UrlConstant.Promotion.FILTER_PROMOTION)
     public ResponseEntity<?> filterProducts(
             @RequestParam(defaultValue = "1", required = false) Integer pageNum,
             @RequestParam(defaultValue = "10", required = false) Integer pageSize,
-            @RequestParam(defaultValue = "asc", required = false) String sortByPrice,
-            @RequestParam(defaultValue = "type:active,startDate:2020-01-01,endDate:2025-12-31,status:active", required = false) String ... search) {
+            @RequestParam(required = false) @Schema(example = "asc") String sortByPrice,
+            @RequestParam(required = false)
+            @Schema(example = "type:active,startDate:2020-01-01,endDate:2025-12-31,status:active")
+            String ... search) {
         PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
         return ResponseUtil.success(
                 SuccessMessage.Product.GET_PRODUCT_SUCCESS,
