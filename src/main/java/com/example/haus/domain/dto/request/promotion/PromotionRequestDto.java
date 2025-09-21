@@ -21,8 +21,7 @@ import java.time.LocalDate;
 public class PromotionRequestDto {
 
     @NotBlank(message = ErrorMessage.Promotion.ERR_PROMOTION_CODE_NOT_BLANK)
-    @Min(value = 6, message = ErrorMessage.Promotion.ERR_PROMOTION_CODE_LENGTH)
-    @Max(value = 15, message = ErrorMessage.Promotion.ERR_PROMOTION_CODE_LENGTH)
+    @Size(min = 6, max = 15, message = ErrorMessage.Promotion.ERR_PROMOTION_CODE_LENGTH)
     String promotionCode;
     @NotNull(message = ErrorMessage.Promotion.ERR_PROMOTION_DESCRIPTION_NOT_NULL)
     String description;
