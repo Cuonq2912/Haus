@@ -173,7 +173,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         // 5. Build pagination
         Pageable pageable = PageRequest.of(page, size);
-        long totalElements = parentCategories.size();
+        long totalElements = childCategories.size();
         int totalPages = (int) Math.ceil((double) totalElements / size);
 
         PaginationCustom paginationCustom = PaginationCustom.builder()
