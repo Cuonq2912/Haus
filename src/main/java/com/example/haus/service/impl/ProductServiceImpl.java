@@ -176,12 +176,14 @@ public class ProductServiceImpl implements ProductService {
                                                                     String sortByPrice,
                                                                     String... search) {
         List<SearchCriteria> searchCriteriaList = new ArrayList<>();
-        if(search.length > 0) {
-            Pattern pattern = Pattern.compile(AppConstants.SEARCH_OPERATOR);
-            for (String s : search) {
-                Matcher matcher = pattern.matcher(s);
-                if (matcher.find()) {
-                    searchCriteriaList.add(new SearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3)));
+        if (search != null) {
+            if(search.length > 0) {
+                Pattern pattern = Pattern.compile(AppConstants.SEARCH_OPERATOR);
+                for (String s : search) {
+                    Matcher matcher = pattern.matcher(s);
+                    if (matcher.find()) {
+                        searchCriteriaList.add(new SearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3)));
+                    }
                 }
             }
         }
@@ -195,7 +197,7 @@ public class ProductServiceImpl implements ProductService {
         Page<Product> pages = new PageImpl<>(products, pageable, totalElements);
 
         PaginationCustom paginationCustom = PaginationCustom.builder()
-                .pageNum(paginationRequest.getPageNum())
+                .pageNum(paginationRequest.getPageNum() + 1)
                 .pageSize(paginationRequest.getPageSize())
                 .totalElement(pages.getTotalElements())
                 .totalPages(pages.getTotalPages())
@@ -228,10 +230,12 @@ public class ProductServiceImpl implements ProductService {
         query.where(predicate);
 
         // Sort theo giá
-        if ("asc".equalsIgnoreCase(sortByPrice)) {
-            query.orderBy(cb.asc(root.get("price")));
-        } else if ("desc".equalsIgnoreCase(sortByPrice)) {
-            query.orderBy(cb.desc(root.get("price")));
+        if (sortByPrice != null) {
+            if ("asc".equalsIgnoreCase(sortByPrice)) {
+                query.orderBy(cb.asc(root.get("price")));
+            } else if ("desc".equalsIgnoreCase(sortByPrice)) {
+                query.orderBy(cb.desc(root.get("price")));
+            }
         }
 
         return entityManager.createQuery(query)
