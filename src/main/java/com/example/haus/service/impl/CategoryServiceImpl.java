@@ -126,13 +126,13 @@ public class CategoryServiceImpl implements CategoryService {
             PaginationRequestDto paginationRequest) {
 
         // Pageable của Spring bắt đầu từ 0
-        int page = paginationRequest.getPageNum() == 0 ? paginationRequest.getPageNum() : paginationRequest.getPageNum() - 1;
+        int page = paginationRequest.getPageNum();
         int size = paginationRequest.getPageSize();
 
         // 1. Query category cha (parentCategory IS NULL)
         String jpqlParent = "SELECT c FROM Category c WHERE c.parentCategory IS NULL";
         TypedQuery<Category> queryParent = entityManager.createQuery(jpqlParent, Category.class);
-        queryParent.setFirstResult(page * size);
+        queryParent.setFirstResult(0);
         queryParent.setMaxResults(size);
         List<Category> parentCategories = queryParent.getResultList();
 
@@ -189,9 +189,11 @@ public class CategoryServiceImpl implements CategoryService {
         Pageable pageable = PageRequest.of(page, size);
         int totalPages = (int) Math.ceil((double) totalElements / size);
 
+        log.info("page = {}; size = {}", page, size);
+
         PaginationCustom paginationCustom = PaginationCustom.builder()
-                .pageNum(pageable.getPageNumber() + 1)
-                .pageSize(pageable.getPageSize())
+                .pageNum(page + 1)
+                .pageSize(size)
                 .totalElement(totalElements)
                 .totalPages(totalPages)
                 .build();
