@@ -136,6 +136,18 @@ public class CategoryServiceImpl implements CategoryService {
         queryParent.setMaxResults(size);
         List<Category> parentCategories = queryParent.getResultList();
 
+        // 1.1. Query count của category con (parentCategory NOT NULL, theo keyword)
+        StringBuilder jpqlChildCount = new StringBuilder("SELECT COUNT(c) FROM Category c WHERE c.parentCategory IS NOT NULL");
+        if (StringUtils.hasLength(keyword)) {
+            jpqlChildCount.append(" AND ( lower(c.categoryName) LIKE lower(:keyword) ");
+            jpqlChildCount.append(" OR lower(c.description) LIKE lower(:keyword) ");
+        }
+        TypedQuery<Long> countQuery = entityManager.createQuery(jpqlChildCount.toString(), Long.class);
+        if (StringUtils.hasLength(keyword)) {
+            countQuery.setParameter("keyword", "%" + keyword + "%");
+        }
+        long totalElements = countQuery.getSingleResult();
+
         // 2. Query category con (parentCategory NOT NULL, theo keyword)
         StringBuilder jpqlChild = new StringBuilder("SELECT c FROM Category c WHERE c.parentCategory IS NOT NULL");
         if (StringUtils.hasLength(keyword)) {
@@ -146,6 +158,8 @@ public class CategoryServiceImpl implements CategoryService {
         if (StringUtils.hasLength(keyword)) {
             queryChild.setParameter("keyword", "%" + keyword + "%");
         }
+        queryChild.setFirstResult(page * size);
+        queryChild.setMaxResults(size);
         List<Category> childCategories = queryChild.getResultList();
 
         // 3. Map parentCategories sang DTO
@@ -173,7 +187,6 @@ public class CategoryServiceImpl implements CategoryService {
 
         // 5. Build pagination
         Pageable pageable = PageRequest.of(page, size);
-        long totalElements = childCategories.size();
         int totalPages = (int) Math.ceil((double) totalElements / size);
 
         PaginationCustom paginationCustom = PaginationCustom.builder()
