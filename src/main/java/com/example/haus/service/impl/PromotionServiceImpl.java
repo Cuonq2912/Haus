@@ -20,6 +20,7 @@ import jakarta.persistence.criteria.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.PackagePrivate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -92,12 +93,14 @@ public class PromotionServiceImpl implements PromotionService {
     @Override
     public PaginationResponseDto<PromotionResponseDto> filterPromotions(PaginationRequestDto paginationRequest, String sortByPrice, String... search) {
         List<SearchCriteria> searchCriteriaList = new ArrayList<>();
-        if(search.length > 0) {
-            Pattern pattern = Pattern.compile(AppConstants.SEARCH_OPERATOR);
-            for (String s : search) {
-                Matcher matcher = pattern.matcher(s);
-                if (matcher.find()) {
-                    searchCriteriaList.add(new SearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3)));
+        if (search != null) {
+            if(search.length > 0) {
+                Pattern pattern = Pattern.compile(AppConstants.SEARCH_OPERATOR);
+                for (String s : search) {
+                    Matcher matcher = pattern.matcher(s);
+                    if (matcher.find()) {
+                        searchCriteriaList.add(new SearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3)));
+                    }
                 }
             }
         }
@@ -106,12 +109,14 @@ public class PromotionServiceImpl implements PromotionService {
 
         Long totalElements = getTotalElements(searchCriteriaList);
 
+        log.info("total Element = {}", totalElements);
+
         Pageable pageable = PageRequest.of(paginationRequest.getPageNum(), paginationRequest.getPageSize());
 
         Page<Promotion> pages = new PageImpl<>(promotions, pageable, totalElements);
 
         PaginationCustom paginationCustom = PaginationCustom.builder()
-                .pageNum(paginationRequest.getPageNum())
+                .pageNum(paginationRequest.getPageNum() + 1)
                 .pageSize(paginationRequest.getPageSize())
                 .totalElement(pages.getTotalElements())
                 .totalPages(pages.getTotalPages())
@@ -142,14 +147,16 @@ public class PromotionServiceImpl implements PromotionService {
 
         userCriteriaQuery.where(promotionPredicate);
 
-        if(sortByPrice.equalsIgnoreCase("asc")) {
-            userCriteriaQuery.orderBy(criteriaBuilder.asc(userRoot.get("discountPercent")));
-        } else {
-            userCriteriaQuery.orderBy(criteriaBuilder.desc(userRoot.get("discountPercent")));
+        if (sortByPrice != null) {
+            if(sortByPrice.equalsIgnoreCase("asc")) {
+                userCriteriaQuery.orderBy(criteriaBuilder.asc(userRoot.get("discountPercent")));
+            } else {
+                userCriteriaQuery.orderBy(criteriaBuilder.desc(userRoot.get("discountPercent")));
+            }
         }
 
         return entityManager.createQuery(userCriteriaQuery)
-                .setFirstResult(page)
+                .setFirstResult(page * size)
                 .setMaxResults(size)
                 .getResultList();
     }
