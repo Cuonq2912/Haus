@@ -3,10 +3,7 @@ package com.example.haus.domain.mapper;
 import com.example.haus.domain.dto.request.promotion.PromotionRequestDto;
 import com.example.haus.domain.dto.response.promotion.PromotionResponseDto;
 import com.example.haus.domain.entity.product.Promotion;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValueCheckStrategy;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL,
@@ -14,10 +11,13 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 )
 public interface PromotionMapper {
 
+    @Mapping(target = "category.id", source = "categoryId")
     Promotion promotionRequestDtoToPromotion (PromotionRequestDto requestDto);
 
+    @Mapping(target = "category.id", source = "categoryId")
     void updatePromotionFromDto(PromotionRequestDto requestDto, @MappingTarget Promotion promotion);
 
+    @Mapping(target = "categoryId", source = "category.id")
     PromotionResponseDto promotionToPromotionResponseDto(Promotion promotion);
 
 }

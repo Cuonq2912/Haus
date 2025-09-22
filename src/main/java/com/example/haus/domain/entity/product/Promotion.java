@@ -56,8 +56,9 @@ public class Promotion extends BaseEntity {
     @OneToMany(mappedBy = "promotion")
     List<Order> orders;
 
-    @OneToMany(mappedBy = "promotion")
-    List<Category> categories;
+    @OneToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
 
     // ---------------- Helper methods ----------------
@@ -77,18 +78,4 @@ public class Promotion extends BaseEntity {
         }
     }
 
-    // CategoryPromotion
-    public void addCategory(Category category) {
-        if (!categories.contains(category)) {
-            categories.add(category);
-            category.setPromotion(this);
-        }
-    }
-
-    public void removeCategory(Category category) {
-        if (categories.contains(category)) {
-            categories.remove(category);
-            category.setPromotion(null);
-        }
-    }
 }

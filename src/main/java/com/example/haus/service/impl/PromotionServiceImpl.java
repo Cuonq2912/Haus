@@ -10,6 +10,7 @@ import com.example.haus.domain.dto.response.promotion.PromotionResponseDto;
 import com.example.haus.domain.entity.product.Promotion;
 import com.example.haus.domain.mapper.PromotionMapper;
 import com.example.haus.exception.ResourceNotFoundException;
+import com.example.haus.repository.CategoryRepository;
 import com.example.haus.repository.PromotionRepository;
 import com.example.haus.repository.criteria.SearchCriteria;
 import com.example.haus.repository.criteria.SearchQueryCriteriaConsumer;
@@ -44,6 +45,8 @@ public class PromotionServiceImpl implements PromotionService {
 
     PromotionMapper promotionMapper;
 
+    CategoryRepository categoryRepository;
+
     @PersistenceContext
     EntityManager entityManager;
 
@@ -52,6 +55,9 @@ public class PromotionServiceImpl implements PromotionService {
     public PromotionResponseDto addPromotion(PromotionRequestDto requestDto) {
         if (promotionRepository.existsByPromotionCode(requestDto.getPromotionCode())) {
             throw new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_EXISTED);
+        }
+        if (!categoryRepository.existsById(requestDto.getCategoryId())) {
+            throw new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED);
         }
         Promotion promotion = promotionMapper.promotionRequestDtoToPromotion(requestDto);
         return promotionMapper.promotionToPromotionResponseDto(promotionRepository.save(promotion));
