@@ -133,13 +133,13 @@ public class CategoryServiceImpl implements CategoryService {
         String jpqlParent = "SELECT c FROM Category c WHERE c.parentCategory IS NULL";
         TypedQuery<Category> queryParent = entityManager.createQuery(jpqlParent, Category.class);
         queryParent.setFirstResult(0);
-        queryParent.setMaxResults(size);
+        queryParent.setMaxResults(8);
         List<Category> parentCategories = queryParent.getResultList();
 
         // 1.1. Query count của category con (parentCategory NOT NULL, theo keyword)
         StringBuilder jpqlChildCount = new StringBuilder("SELECT COUNT(c) FROM Category c WHERE c.parentCategory IS NOT NULL");
         if (StringUtils.hasLength(keyword)) {
-            jpqlChildCount.append(" AND ( lower(c.categoryName) LIKE lower(:keyword) ");
+            jpqlChildCount.append(" AND lower(c.categoryName) LIKE lower(:keyword) ");
             jpqlChildCount.append(" OR lower(c.description) LIKE lower(:keyword) ");
         }
         TypedQuery<Long> countQuery = entityManager.createQuery(jpqlChildCount.toString(), Long.class);
@@ -151,8 +151,8 @@ public class CategoryServiceImpl implements CategoryService {
         // 2. Query category con (parentCategory NOT NULL, theo keyword)
         StringBuilder jpqlChild = new StringBuilder("SELECT c FROM Category c WHERE c.parentCategory IS NOT NULL");
         if (StringUtils.hasLength(keyword)) {
-            jpqlChild.append(" AND ( lower(c.categoryName) LIKE lower(:keyword) ");
-            jpqlChild.append(" OR lower(c.description) LIKE lower(:keyword) )");
+            jpqlChild.append(" AND lower(c.categoryName) LIKE lower(:keyword) ");
+            jpqlChild.append(" OR lower(c.description) LIKE lower(:keyword) ");
         }
         TypedQuery<Category> queryChild = entityManager.createQuery(jpqlChild.toString(), Category.class);
         if (StringUtils.hasLength(keyword)) {
