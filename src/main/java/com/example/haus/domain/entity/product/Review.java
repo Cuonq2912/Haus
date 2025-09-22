@@ -36,3 +36,4 @@ public class Review extends BaseEntity {
     Product product;
 
 }
+
