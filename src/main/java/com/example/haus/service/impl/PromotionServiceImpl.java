@@ -2,6 +2,7 @@ package com.example.haus.service.impl;
 
 import com.example.haus.constant.AppConstants;
 import com.example.haus.constant.ErrorMessage;
+import com.example.haus.constant.promotion.PromotionStatus;
 import com.example.haus.domain.dto.pagination.PaginationCustom;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
@@ -10,6 +11,7 @@ import com.example.haus.domain.dto.response.promotion.PromotionResponseDto;
 import com.example.haus.domain.entity.product.Category;
 import com.example.haus.domain.entity.product.Promotion;
 import com.example.haus.domain.mapper.PromotionMapper;
+import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.CategoryRepository;
 import com.example.haus.repository.PromotionRepository;
@@ -32,7 +34,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.chrono.ChronoLocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,7 +58,7 @@ public class PromotionServiceImpl implements PromotionService {
     @Override
     public PromotionResponseDto addPromotion(PromotionRequestDto requestDto) {
         // Kiểm tra code đã tồn tại chưa
-        if (promotionRepository.existsByPromotionCode(requestDto.getPromotionCode())) {
+        if (promotionRepository.existsByPromotionCodeAndIsDeletedFalse(requestDto.getPromotionCode())) {
             throw new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_EXISTED);
         }
 
@@ -74,6 +79,11 @@ public class PromotionServiceImpl implements PromotionService {
 
     @Override
     public PromotionResponseDto updatePromotion(Long id, PromotionRequestDto requestDto) {
+
+        if (promotionRepository.existsByPromotionCodeAndIsDeletedTrue(requestDto.getPromotionCode())) {
+            throw new InvalidDataException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED);
+        }
+
         Promotion promotion = promotionRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
@@ -91,12 +101,14 @@ public class PromotionServiceImpl implements PromotionService {
         }
 
         Promotion saved = promotionRepository.save(promotion);
+        checkIsExpired(saved);
         return promotionMapper.promotionToPromotionResponseDto(saved);
     }
 
     @Override
     public PromotionResponseDto getPromotionById(Long id) {
-        Promotion promotion = promotionRepository.findById(id)
+
+        Promotion promotion = promotionRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
         return promotionMapper.promotionToPromotionResponseDto(promotion);
@@ -104,17 +116,18 @@ public class PromotionServiceImpl implements PromotionService {
 
     @Override
     public void deletePromotion(Long id) {
-        Promotion promotion = promotionRepository.findById(id)
+        Promotion promotion = promotionRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
-        promotionRepository.delete(promotion);
+        deleteSoft(promotion);
     }
 
     @Override
     public PromotionResponseDto getPromotionByPromotionCode(String promotionCode) {
-        Promotion promotion = promotionRepository.findByPromotionCode(promotionCode)
+        Promotion promotion = promotionRepository.findByPromotionCodeAndIsDeletedFalse(promotionCode)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
+        checkIsExpired(promotion);
         return promotionMapper.promotionToPromotionResponseDto(promotion);
     }
 
@@ -155,7 +168,10 @@ public class PromotionServiceImpl implements PromotionService {
                 .build();
 
         List<PromotionResponseDto> promotionResponseDtoList = pages.getContent().stream()
-                .map(promotionMapper::promotionToPromotionResponseDto)
+                .map(promotion -> {
+                    checkIsExpired(promotion);
+                    return promotionMapper.promotionToPromotionResponseDto(promotion);
+                })
                 .toList();
 
         return PaginationResponseDto.<PromotionResponseDto>builder()
@@ -176,6 +192,7 @@ public class PromotionServiceImpl implements PromotionService {
                 new SearchQueryCriteriaConsumer<>(predicate, cb, root);
         searchCriteriaList.forEach(consumer);
         predicate = consumer.getPredicate();
+        predicate = cb.and(predicate, cb.isFalse(root.get("isDeleted")));
 
         cq.where(predicate);
 
@@ -203,10 +220,23 @@ public class PromotionServiceImpl implements PromotionService {
                 new SearchQueryCriteriaConsumer<>(predicate, cb, root);
         searchCriteriaList.forEach(consumer);
         predicate = consumer.getPredicate();
+        predicate = cb.and(predicate, cb.isFalse(root.get("isDeleted")));
 
         countQuery.select(cb.count(root));
         countQuery.where(predicate);
 
         return entityManager.createQuery(countQuery).getSingleResult();
+    }
+
+    private void checkIsExpired(Promotion promotion) {
+        if (promotion.getEndDate().isBefore(LocalDate.now())) {
+            promotion.setStatus(PromotionStatus.EXPIRED);
+        }
+    }
+
+    private void deleteSoft(Promotion promotion) {
+        if (promotion != null) {
+            promotion.setIsDeleted(true);
+        }
     }
 }

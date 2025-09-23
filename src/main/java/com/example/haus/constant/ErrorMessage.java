@@ -103,6 +103,8 @@ public class ErrorMessage {
         public static final String ERR_PROMOTION_DISCOUNT_PERCENT_NOT_NULL = "exception.promotion.discount.percent.must.be.not.blank";
         public static final String ERR_PROMOTION_DISCOUNT_PERCENT_MIN_VALIDATE = "exception.promotion.discount.percent.must.be.greater.than.or.equal.to.0";
         public static final String ERR_PROMOTION_DISCOUNT_PERCENT_MAX_VALIDATE = "exception.promotion.discount.percent.must.be.less.than.or.equal.to.110";
+        public static final String ERR_PROMOTION_EXPIRED = "exception.promotion.expired";
+        public static final String ERR_PROMOTION_INACTIVE = "exception.promotion.expired";
     }
 
     public static class Product {
