@@ -11,10 +11,8 @@ import org.mapstruct.*;
 )
 public interface PromotionMapper {
 
-    @Mapping(target = "category.id", source = "categoryId")
     Promotion promotionRequestDtoToPromotion (PromotionRequestDto requestDto);
 
-    @Mapping(target = "category.id", source = "categoryId")
     void updatePromotionFromDto(PromotionRequestDto requestDto, @MappingTarget Promotion promotion);
 
     @Mapping(target = "categoryId", source = "category.id")
