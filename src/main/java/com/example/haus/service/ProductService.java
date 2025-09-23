@@ -5,7 +5,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.product.ProductRequestDto;
-import com.example.haus.domain.dto.request.product.ProductFilterRequestDto;
 import com.example.haus.domain.dto.response.product.ProductResponseDto;
 
 public interface ProductService {
@@ -26,10 +25,7 @@ public interface ProductService {
     PaginationResponseDto<ProductResponseDto> getProductsByCategoryId(Long categoryId,
             PaginationRequestDto paginationRequest);
 
-    PaginationResponseDto<ProductResponseDto> searchProductsByKeyword(String keyword,
-            PaginationRequestDto paginationRequest);
-
-    PaginationResponseDto<ProductResponseDto> filterProducts(ProductFilterRequestDto filterRequest,
-            PaginationRequestDto paginationRequest);
+    PaginationResponseDto<ProductResponseDto> filterProducts(
+            PaginationRequestDto paginationRequest, String sortByPrice, String... search);
 
 }

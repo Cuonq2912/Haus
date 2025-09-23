@@ -1,7 +1,6 @@
 package com.example.haus.repository;
 
 import com.example.haus.domain.entity.product.Product;
-import com.example.haus.repository.custom.CustomProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product, Long>, CustomProductRepository {
+public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Boolean existsByProductNameAndIsDeletedFalse(String name);
 

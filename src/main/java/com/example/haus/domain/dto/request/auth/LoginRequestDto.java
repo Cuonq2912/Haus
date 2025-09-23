@@ -19,7 +19,7 @@ public class LoginRequestDto {
     @Email
     String email;
 
-    @Schema(description = "Mật khẩu", example = "Quankane1905@@")
+    @Schema(description = "Mật khẩu", example = "Quankane1905@")
     @NotBlank(message = ErrorMessage.NOT_BLANK_FIELD)
     String password;
 

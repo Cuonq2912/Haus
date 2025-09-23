@@ -5,6 +5,7 @@ import com.example.haus.constant.promotion.PromotionStatus;
 import com.example.haus.constant.promotion.PromotionType;
 import com.example.haus.domain.entity.product.Promotion;
 import com.example.haus.domain.validator.PositiveOrNull;
+import com.example.haus.domain.validator.ValidPromotionDates;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -18,22 +19,23 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@ValidPromotionDates
 public class PromotionRequestDto {
 
     @NotBlank(message = ErrorMessage.Promotion.ERR_PROMOTION_CODE_NOT_BLANK)
-    @Length(min = 6, max = 6, message = ErrorMessage.Promotion.ERR_PROMOTION_CODE_LENGTH)
+    @Size(min = 6, max = 15, message = ErrorMessage.Promotion.ERR_PROMOTION_CODE_LENGTH)
     String promotionCode;
     @NotNull(message = ErrorMessage.Promotion.ERR_PROMOTION_DESCRIPTION_NOT_NULL)
     String description;
 
-    @NotBlank(message = ErrorMessage.Promotion.ERR_PROMOTION_TYPE_NOT_BLANK)
+    @NotNull(message = ErrorMessage.Promotion.ERR_PROMOTION_TYPE_NOT_NULL)
     PromotionType type;
 
-    @NotBlank(message = ErrorMessage.Promotion.ERR_PROMOTION_STATUS_NOT_BLANK)
+    @NotNull(message = ErrorMessage.Promotion.ERR_PROMOTION_STATUS_NOT_NULL)
     PromotionStatus status;
-    @NotEmpty(message = ErrorMessage.Promotion.ERR_PROMOTION_START_DATE_NOT_EMPTY)
+    @NotNull(message = ErrorMessage.Promotion.ERR_PROMOTION_START_DATE_NOT_NULL)
     LocalDate startDate;
-    @NotEmpty(message = ErrorMessage.Promotion.ERR_PROMOTION_END_DATE_NOT_EMPTY)
+    @NotNull(message = ErrorMessage.Promotion.ERR_PROMOTION_END_DATE_NOT_NULL)
     LocalDate endDate;
 
     @PositiveOrNull
@@ -41,9 +43,9 @@ public class PromotionRequestDto {
     @PositiveOrNull
     Float maxPriceOrder;
 
-    @NotBlank(message = ErrorMessage.Promotion.ERR_PROMOTION_DISCOUNT_PERCENT_NOT_BLANK)
-    @Min(value = 0, message = ErrorMessage.Promotion.ERR_PROMOTION_DISCOUNT_PERCENT_MIN_VALIDATE)
-    @Max(value = 100, message = ErrorMessage.Promotion.ERR_PROMOTION_DISCOUNT_PERCENT_MAX_VALIDATE)
+    @NotNull(message = ErrorMessage.Promotion.ERR_PROMOTION_DISCOUNT_PERCENT_NOT_NULL)
+    @Min(value = 0, message = ErrorMessage.Promotion.ERR_PROMOTION_DISCOUNT_PERCENT_INVALID)
+    @Max(value = 100, message = ErrorMessage.Promotion.ERR_PROMOTION_DISCOUNT_PERCENT_INVALID)
     Float discountPercent;
 
     Long categoryId;

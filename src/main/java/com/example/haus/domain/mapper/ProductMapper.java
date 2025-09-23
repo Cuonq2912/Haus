@@ -13,6 +13,7 @@ import org.mapstruct.*;
 )
 public interface ProductMapper {
 
+    @Mapping(target = "categoryId", expression = "java(product.getCategories() != null && !product.getCategories().isEmpty() ? product.getCategories().get(0).getId() : null)")
     ProductResponseDto productToProductResponse(Product product);
 
     @Mapping(target = "categories", ignore = true)

@@ -16,6 +16,7 @@ public class ErrorMessage {
     public static final String INVALID_SOME_THING_FIELD_IS_REQUIRED = "invalid.general.required";
     public static final String NOT_BLANK_FIELD = "invalid.general.not-blank";
     public static final String NOT_EMPTY_FIELD = "invalid.general.not-empty";
+    public static final String NOT_NULL_FIELD = "invalid.general.not-null";
     public static final String INVALID_FORMAT_PASSWORD = "invalid.password-format";
     public static final String INVALID_DATE = "invalid.date-format";
     public static final String INVALID_DATE_FEATURE = "invalid.date-future";
@@ -27,7 +28,7 @@ public class ErrorMessage {
         private Validator() {
         }
 
-        public static final String ERR_INPUT_CONSTRAINT_VALIDATE = "exception.input.value.must.be.greater.than.or.equal.to.0.if.entry.data";
+        public static final String ERR_INPUT_CONSTRAINT_VALIDATE = "exception.input.value.must.be.greater.than.or.equal.to.0.if.entry.data.AND.min.less.than.max.price";
         public static final String ERR_PHONE_VALIDATOR = "exception.phone.not.matches.pattern";
         public static final String ERR_GENDER_VALIDATOR = "exception.gender.must.be.not.any.of.array.['male', 'female', 'other']";
         public static final String ERR_ENUM_VALUE_VALIDATOR = "exception.{name}.must.be.not.any.of.enum.{enumClass}";
@@ -84,7 +85,7 @@ public class ErrorMessage {
 
         public static final String ERR_CATEGORY_EXISTED = "exception.category.existed";
         public static final String ERR_CATEGORY_NOT_EXISTED = "exception.category.not.existed";
-        public static final String ERR_CATEGORY_BEING_USED = "exception.category.being.used.cannot.delete";
+        public static final String ERR_CATEGORY_BEING_USED = "exception.category.being.used.cannot.delete.because.include.product";
     }
 
     public static class Promotion {
@@ -96,14 +97,15 @@ public class ErrorMessage {
         public static final String ERR_PROMOTION_NOT_EXISTED = "exception.promotion.not.existed";
         public static final String ERR_PROMOTION_CODE_NOT_BLANK = "exception.promotion.code.not.blank";
         public static final String ERR_PROMOTION_DESCRIPTION_NOT_NULL = "exception.promotion.description.not.null";
-        public static final String ERR_PROMOTION_TYPE_NOT_BLANK = "exception.promotion.type.not.null";
-        public static final String ERR_PROMOTION_STATUS_NOT_BLANK = "exception.promotion.status.not.null";
-        public static final String ERR_PROMOTION_START_DATE_NOT_EMPTY = "exception.promotion.start.date.not.empty";
-        public static final String ERR_PROMOTION_END_DATE_NOT_EMPTY = "exception.promotion.end.date.not.empty";
-        public static final String ERR_PROMOTION_CODE_LENGTH = "exception.promotion.code.length.must.be.exactly.6.digits.long";
-        public static final String ERR_PROMOTION_DISCOUNT_PERCENT_NOT_BLANK = "exception.promotion.discount.percent.must.be.not.blank";
-        public static final String ERR_PROMOTION_DISCOUNT_PERCENT_MIN_VALIDATE = "exception.promotion.discount.percent.must.be.greater.than.or.equal.to.0";
-        public static final String ERR_PROMOTION_DISCOUNT_PERCENT_MAX_VALIDATE = "exception.promotion.discount.percent.must.be.less.than.or.equal.to.110";
+        public static final String ERR_PROMOTION_TYPE_NOT_NULL = "exception.promotion.type.not.null";
+        public static final String ERR_PROMOTION_STATUS_NOT_NULL = "exception.promotion.status.not.null";
+        public static final String ERR_PROMOTION_START_DATE_NOT_NULL = "exception.promotion.start.date.not.empty";
+        public static final String ERR_PROMOTION_END_DATE_NOT_NULL = "exception.promotion.end.date.not.empty";
+        public static final String ERR_PROMOTION_CODE_LENGTH = "exception.promotion.code.length.must.be.exactly.in.6.to.15";
+        public static final String ERR_PROMOTION_DISCOUNT_PERCENT_NOT_NULL = "exception.promotion.discount.percent.must.be.not.blank";
+        public static final String ERR_PROMOTION_DISCOUNT_PERCENT_INVALID = "exception.promotion.discount.percent.must.be.in.1..100";
+        public static final String ERR_PROMOTION_EXPIRED = "exception.promotion.expired";
+        public static final String ERR_PROMOTION_INACTIVE = "exception.promotion.expired";
     }
 
     public static class Product {
@@ -114,5 +116,6 @@ public class ErrorMessage {
         public static final String ERR_PRODUCT_ALREADY_DELETED = "exception.product.already.deleted";
         public static final String ERR_PRODUCT_VARIATION_NOT_EXISTED = "exception.product.variation.not.existed";
         public static final String ERR_PRODUCT_VARIATION_ALREADY_DELETED = "exception.product.variation.already.deleted";
+        public static final String ERR_PRODUCT_INVENTORY_QUANTITY_LESS_THAN_1 = "exception.product.inventory.quantity.less.than.1";
     }
 }

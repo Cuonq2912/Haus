@@ -73,9 +73,12 @@ public class Product extends BaseEntity {
     // ---------------- Helper methods ----------------
     //Category
     public void addCategory(Category category) {
+        if (categories == null) {
+            categories = new ArrayList<>();
+        }
         if (!categories.contains(category)) {
             categories.add(category);
-//            category.getProducts().add(this);
+            category.getProducts().add(this);
         }
     }
 

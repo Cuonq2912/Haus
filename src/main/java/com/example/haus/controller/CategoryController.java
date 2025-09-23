@@ -4,6 +4,7 @@ import com.example.haus.base.ResponseUtil;
 import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
+import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.request.category.CategoryRequestDto;
 import com.example.haus.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,18 +55,6 @@ public class CategoryController {
     }
 
     @Operation(
-            summary = "Lấy tất cả danh mục",
-            description = "Dùng để front end lấy ra tất cả danh mục render ra UI"
-    )
-    @GetMapping(UrlConstant.Category.GET_ALL_CATEGORY)
-    public ResponseEntity<?> getAllCategories(){
-        return ResponseUtil.success(
-                SuccessMessage.Category.GET_ALL_CATEGORY_SUCCESS,
-                categoryService.getAllCategories()
-        );
-    }
-
-    @Operation(
             summary = "Lấy tất cả danh mục con để hiện trong lúc tạo ",
             description = "Dùng để front end lấy ra tất cả danh mục render ra UI"
     )
@@ -105,15 +94,18 @@ public class CategoryController {
     }
 
     @Operation(
-            summary = "Lấy danh mục theo tên",
-            description = "Dùng để admin lấy danh mục theo tên với role Admin",
-            security = @SecurityRequirement(name = "Bearer Token")
+            summary = "Lấy tất cả danh mục",
+            description = "Tùy chọn search theo keyword and sort theo name"
     )
-    @GetMapping(UrlConstant.Category.GET_CATEGORY_BY_NAME)
-    public ResponseEntity<?> getCategoryByCategoryName(@PathVariable String categoryName){
+    @GetMapping(UrlConstant.Category.SEARCH_CATEGORY_BY_NAME_AND_SORT_BY_KEYWORD)
+    public ResponseEntity<?> searchCategoryByKeyword(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "1") Integer pageNum,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
         return ResponseUtil.success(
                 SuccessMessage.Category.GET_CATEGORY_SUCCESS,
-                categoryService.getCategoryByCategoryName(categoryName)
-        );
+                categoryService.searchCategoryByKeywordAndSortByKeyword(keyword, paginationRequest));
     }
+
 }
