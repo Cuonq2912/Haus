@@ -5,6 +5,7 @@ import com.example.haus.constant.promotion.PromotionStatus;
 import com.example.haus.constant.promotion.PromotionType;
 import com.example.haus.domain.entity.product.Promotion;
 import com.example.haus.domain.validator.PositiveOrNull;
+import com.example.haus.domain.validator.ValidPromotionDates;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@ValidPromotionDates
 public class PromotionRequestDto {
 
     @NotBlank(message = ErrorMessage.Promotion.ERR_PROMOTION_CODE_NOT_BLANK)
@@ -42,8 +44,8 @@ public class PromotionRequestDto {
     Float maxPriceOrder;
 
     @NotNull(message = ErrorMessage.Promotion.ERR_PROMOTION_DISCOUNT_PERCENT_NOT_NULL)
-    @Min(value = 0, message = ErrorMessage.Promotion.ERR_PROMOTION_DISCOUNT_PERCENT_MIN_VALIDATE)
-    @Max(value = 100, message = ErrorMessage.Promotion.ERR_PROMOTION_DISCOUNT_PERCENT_MAX_VALIDATE)
+    @Min(value = 0, message = ErrorMessage.Promotion.ERR_PROMOTION_DISCOUNT_PERCENT_INVALID)
+    @Max(value = 100, message = ErrorMessage.Promotion.ERR_PROMOTION_DISCOUNT_PERCENT_INVALID)
     Float discountPercent;
 
     Long categoryId;

@@ -46,7 +46,7 @@ public class Promotion extends BaseEntity {
     @Column(name = "end_date")
     LocalDate endDate;
 
-    @Column(name = "discount_percent")
+    @Column(name = "discount_percent", nullable = false)
     Float discountPercent;
 
     @Enumerated(EnumType.STRING)

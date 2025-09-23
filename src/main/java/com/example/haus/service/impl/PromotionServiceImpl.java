@@ -229,7 +229,8 @@ public class PromotionServiceImpl implements PromotionService {
     }
 
     private void checkIsExpired(Promotion promotion) {
-        if (promotion.getEndDate().isBefore(LocalDate.now())) {
+        if (promotion != null && promotion.getEndDate() != null
+                && promotion.getEndDate().isBefore(LocalDate.now())) {
             promotion.setStatus(PromotionStatus.EXPIRED);
         }
     }
@@ -237,6 +238,7 @@ public class PromotionServiceImpl implements PromotionService {
     private void deleteSoft(Promotion promotion) {
         if (promotion != null) {
             promotion.setIsDeleted(true);
+            promotionRepository.save(promotion);
         }
     }
 }
