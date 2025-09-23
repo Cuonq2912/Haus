@@ -6,10 +6,8 @@ import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.request.product.ProductRequestDto;
-import com.example.haus.domain.dto.request.product.ProductFilterRequestDto;
 import com.example.haus.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -111,21 +109,21 @@ public class ProductController {
                             productService.getProductsByCategoryId(categoryId, paginationRequest));
     }
 
-    @Tag(name = "public-product-controller", description = "Public Product APIs")
-    @Operation(
-            summary = "Tìm kiếm sản phẩm theo từ khóa",
-            description = "Tìm kiếm sản phẩm trong tên, mô tả, hoặc mô tả chi tiết có phân trang"
-    )
-    @GetMapping(UrlConstant.Product.SEARCH_PRODUCTS_BY_KEYWORD)
-    public ResponseEntity<?> searchProductsByKeyword(
-                    @RequestParam String keyword,
-                    @RequestParam(defaultValue = "1") Integer pageNum,
-                    @RequestParam(defaultValue = "10") Integer pageSize) {
-            PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
-            return ResponseUtil.success(
-                            SuccessMessage.Product.GET_PRODUCT_SUCCESS,
-                            productService.searchProductsByKeyword(keyword, paginationRequest));
-    }
+//    @Tag(name = "public-product-controller", description = "Public Product APIs")
+//    @Operation(
+//            summary = "Tìm kiếm sản phẩm theo từ khóa",
+//            description = "Tìm kiếm sản phẩm trong tên, mô tả, hoặc mô tả chi tiết có phân trang"
+//    )
+//    @GetMapping(UrlConstant.Product.SEARCH_PRODUCTS_BY_KEYWORD)
+//    public ResponseEntity<?> searchProductsByKeyword(
+//                    @RequestParam String keyword,
+//                    @RequestParam(defaultValue = "1") Integer pageNum,
+//                    @RequestParam(defaultValue = "10") Integer pageSize) {
+//            PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
+//            return ResponseUtil.success(
+//                            SuccessMessage.Product.GET_PRODUCT_SUCCESS,
+//                            productService.searchProductsByKeyword(keyword, paginationRequest));
+//    }
 
     @Tag(name = "public-product-controller", description = "Public Product APIs")
     @Operation(

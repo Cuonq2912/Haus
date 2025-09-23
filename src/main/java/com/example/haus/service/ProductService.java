@@ -25,6 +25,9 @@ public interface ProductService {
     PaginationResponseDto<ProductResponseDto> getProductsByCategoryId(Long categoryId,
             PaginationRequestDto paginationRequest);
 
+    PaginationResponseDto<ProductResponseDto> searchProductsByKeyword(String keyword,
+            PaginationRequestDto paginationRequest);
+
     PaginationResponseDto<ProductResponseDto> filterProducts(
             PaginationRequestDto paginationRequest, String sortByPrice, String... search);
 

@@ -1,15 +1,16 @@
 package com.example.haus.service.impl;
 
+import com.example.haus.constant.AppConstants;
 import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.MediaType;
+import com.example.haus.domain.dto.pagination.PaginationCustom;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.entity.product.Category;
 import com.example.haus.domain.entity.product.Media;
 import com.example.haus.domain.entity.product.Product;
 import com.example.haus.domain.entity.product.ProductVariation;
-import com.example.haus.domain.entity.product.Promotion;
 import com.example.haus.domain.mapper.ProductMapper;
 import com.example.haus.domain.dto.request.product.ProductRequestDto;
 import com.example.haus.domain.dto.response.product.ProductResponseDto;
@@ -17,6 +18,8 @@ import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.CategoryRepository;
 import com.example.haus.repository.ProductRepository;
+import com.example.haus.repository.criteria.SearchCriteria;
+import com.example.haus.repository.criteria.SearchQueryCriteriaConsumer;
 import com.example.haus.service.ProductService;
 import com.example.haus.util.ProductCodeUtil;
 import jakarta.persistence.EntityManager;
@@ -38,8 +41,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
-import com.example.haus.domain.dto.request.product.ProductFilterRequestDto;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,6 +78,33 @@ public class ProductServiceImpl implements ProductService {
             throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_ALREADY_DELETED);
 
         return productMapper.productToProductResponse(product);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaginationResponseDto<ProductResponseDto> getAllProducts(PaginationRequestDto paginationRequest) {
+        if (paginationRequest == null) {
+            throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
+        }
+
+        Sort sort = Sort.by(
+                paginationRequest.getSortType().equalsIgnoreCase("DESC")
+                        ? Sort.Direction.DESC
+                        : Sort.Direction.ASC,
+                paginationRequest.getSortBy());
+
+        Pageable pageable = PageRequest.of(
+                paginationRequest.getPageNum(),
+                paginationRequest.getPageSize(),
+                sort);
+
+        Page<Product> productsPage = productRepository.findAllActiveProducts(pageable);
+
+        List<ProductResponseDto> productResponseList = productsPage.getContent().stream()
+                .map(productMapper::productToProductResponse)
+                .toList();
+
+        return PaginationUtil.createPaginationResponse(productsPage, paginationRequest, productResponseList);
     }
 
     @Override
@@ -248,6 +276,30 @@ public class ProductServiceImpl implements ProductService {
         Pageable pageable = PageRequest.of(paginationRequest.getPageNum(), paginationRequest.getPageSize());
 
         Page<Product> productsPage = productRepository.findProductsByCategoryId(categoryId, pageable);
+
+        List<ProductResponseDto> productResponseList = productsPage.getContent().stream()
+                .map(productMapper::productToProductResponse)
+                .toList();
+
+        return PaginationUtil.createPaginationResponse(productsPage, paginationRequest, productResponseList);
+    }
+
+    @Override
+    public PaginationResponseDto<ProductResponseDto> searchProductsByKeyword(String keyword,
+                                                                             PaginationRequestDto paginationRequest) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
+        }
+
+        if (paginationRequest == null) {
+            throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
+        }
+
+        Pageable pageable = PageRequest.of(
+                paginationRequest.getPageNum(),
+                paginationRequest.getPageSize());
+
+        Page<Product> productsPage = productRepository.searchProductsByKeyword(keyword.trim(), pageable);
 
         List<ProductResponseDto> productResponseList = productsPage.getContent().stream()
                 .map(productMapper::productToProductResponse)
