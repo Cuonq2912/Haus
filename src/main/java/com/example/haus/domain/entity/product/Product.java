@@ -1,15 +1,13 @@
 package com.example.haus.domain.entity.product;
 
+import com.example.haus.constant.CommonConstant;
 import com.example.haus.domain.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "products")
@@ -46,7 +44,7 @@ public class Product extends BaseEntity {
     Integer inventoryQuantity;
 
     @Column()
-    Boolean isDeleted;
+    Boolean isDeleted = CommonConstant.FALSE;
 
     @ManyToMany
     @JoinTable(
@@ -69,6 +67,8 @@ public class Product extends BaseEntity {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     List<ProductVariation> productVariations;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    List<Media> medias;
 
     // ---------------- Helper methods ----------------
     //Category

@@ -5,8 +5,7 @@ import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
-import com.example.haus.domain.dto.request.product.CreateProductRequestDto;
-import com.example.haus.domain.dto.request.product.UpdateProductRequestDto;
+import com.example.haus.domain.dto.request.product.ProductRequestDto;
 import com.example.haus.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestApiV1
 @RequiredArgsConstructor
@@ -41,33 +41,44 @@ public class ProductController {
                 productService.getProductById(id));
     }
 
+    @Tag(name = "admin-product-controller", description = "Admin Product Management APIs")
     @Operation(
             summary = "Tạo sản phẩm mới",
             description = "Dùng để tạo sản phẩm mới",
             security = @SecurityRequirement(name = "Bearer Token")
     )
-    @PostMapping(UrlConstant.Product.CREATE_PRODUCT)
-    public ResponseEntity<?> createProduct(@Valid @RequestBody CreateProductRequestDto request) {
+    @PostMapping(value = UrlConstant.Product.CREATE_PRODUCT, consumes = "multipart/form-data")
+    public ResponseEntity<?> createProduct(
+
+            @Valid @RequestPart("request") ProductRequestDto request,
+            @RequestPart(value = "images", required = false) MultipartFile[] images
+    ) {
         return ResponseUtil.success(
                 HttpStatus.CREATED,
                 SuccessMessage.Product.CREATE_PRODUCT_SUCCESS,
-                productService.createProduct(request));
+                productService.createProduct(request, images)
+        );
     }
 
+    @Tag(name = "admin-product-controller", description = "Admin Product Management APIs")
     @Operation(
             summary = "Cập nhật sản phẩm",
             description = "Dùng để cập nhật thông tin sản phẩm theo id",
             security = @SecurityRequirement(name = "Bearer Token")
     )
-    @PutMapping(UrlConstant.Product.UPDATE_PRODUCT)
+    @PutMapping(value = UrlConstant.Product.UPDATE_PRODUCT, consumes = "multipart/form-data")
     public ResponseEntity<?> updateProduct(
             @PathVariable Long id,
-            @Valid @RequestBody UpdateProductRequestDto request) {
+            @Valid @RequestPart("request") ProductRequestDto request,
+            @RequestPart(value = "images", required = false) MultipartFile[] images
+    ) {
         return ResponseUtil.success(
                 SuccessMessage.Product.UPDATE_PRODUCT_SUCCESS,
-                productService.updateProduct(id, request));
+                productService.updateProduct(id, request, images)
+        );
     }
 
+    @Tag(name = "admin-product-controller", description = "Admin Product Management APIs")
     @Operation(
             summary = "Xóa sản phẩm",
             description = "Dùng để xóa sản phẩm theo id",
@@ -98,6 +109,23 @@ public class ProductController {
                             productService.getProductsByCategoryId(categoryId, paginationRequest));
     }
 
+//    @Tag(name = "public-product-controller", description = "Public Product APIs")
+//    @Operation(
+//            summary = "Tìm kiếm sản phẩm theo từ khóa",
+//            description = "Tìm kiếm sản phẩm trong tên, mô tả, hoặc mô tả chi tiết có phân trang"
+//    )
+//    @GetMapping(UrlConstant.Product.SEARCH_PRODUCTS_BY_KEYWORD)
+//    public ResponseEntity<?> searchProductsByKeyword(
+//                    @RequestParam String keyword,
+//                    @RequestParam(defaultValue = "1") Integer pageNum,
+//                    @RequestParam(defaultValue = "10") Integer pageSize) {
+//            PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
+//            return ResponseUtil.success(
+//                            SuccessMessage.Product.GET_PRODUCT_SUCCESS,
+//                            productService.searchProductsByKeyword(keyword, paginationRequest));
+//    }
+
+    @Tag(name = "public-product-controller", description = "Public Product APIs")
     @Operation(
             summary = "Lọc sản phẩm theo nhiều tiêu chí",
             description = "Lọc sản phẩm theo khoảng giá, màu sắc, kiểu dáng với phân trang"
@@ -112,6 +140,24 @@ public class ProductController {
             return ResponseUtil.success(
                             SuccessMessage.Product.GET_PRODUCT_SUCCESS,
                             productService.filterProducts(paginationRequest, sortByPrice, search));
+    }
+
+    @Tag(name = "public-product-controller", description = "Public Product APIs")
+    @Operation(
+            summary = "Lấy tất cả sản phẩm với phân trang",
+            description = "Lấy danh sách tất cả sản phẩm với phân trang và các tùy chọn sắp xếp productName, createdAt, price"
+    )
+    @GetMapping(UrlConstant.Product.GET_ALL_PRODUCTS)
+    public ResponseEntity<?> getAllProducts(
+                    @RequestParam(defaultValue = "1") Integer pageNum,
+                    @RequestParam(defaultValue = "10") Integer pageSize,
+                    @RequestParam(defaultValue = "productName") String sortBy,
+                    @RequestParam(defaultValue = "ASC") String sortType) {
+
+            PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize, sortBy, sortType);
+            return ResponseUtil.success(
+                            SuccessMessage.Product.GET_PRODUCT_SUCCESS,
+                            productService.getAllProducts(paginationRequest));
     }
 
 }
