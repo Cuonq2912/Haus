@@ -1,6 +1,5 @@
 package com.example.haus.domain.dto.response.product;
 
-
 import com.example.haus.domain.dto.response.category.CategoryResponseDto;
 import jakarta.persistence.Column;
 import lombok.*;
@@ -15,6 +14,8 @@ import java.util.List;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductResponseDto {
+
+    Long id;
 
     String productCode;
 
@@ -32,5 +33,7 @@ public class ProductResponseDto {
 
     Boolean isDeleted;
 
-    List<CategoryResponseDto> categories;
+    List<MediaResponseDto> medias;
+
+    List<String> categoriesName;
 }

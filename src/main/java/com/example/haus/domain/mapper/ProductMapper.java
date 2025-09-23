@@ -9,7 +9,7 @@ import org.mapstruct.*;
         componentModel = "spring",
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-        uses = {CategoryMapper.class}
+        uses = {CategoryMapper.class, MediaMapper.class}
 )
 public interface ProductMapper {
 

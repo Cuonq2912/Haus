@@ -2,9 +2,11 @@ package com.example.haus.service.impl;
 
 import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
+import com.example.haus.constant.MediaType;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.entity.product.Category;
+import com.example.haus.domain.entity.product.Media;
 import com.example.haus.domain.entity.product.Product;
 import com.example.haus.domain.mapper.ProductMapper;
 import com.example.haus.domain.dto.request.product.ProductRequestDto;
@@ -16,9 +18,11 @@ import com.example.haus.repository.ProductRepository;
 import com.example.haus.service.ProductService;
 import com.example.haus.util.ProductCodeUtil;
 import com.example.haus.util.PaginationUtil;
+import com.example.haus.util.UploadFileUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,8 +32,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import com.example.haus.domain.dto.request.product.ProductFilterRequestDto;
+import java.util.ArrayList;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -41,6 +48,8 @@ public class ProductServiceImpl implements ProductService {
     ProductMapper productMapper;
 
     CategoryRepository categoryRepository;
+
+    UploadFileUtil uploadFileUtil;
 
     @Override
     @Transactional(readOnly = true)
@@ -87,7 +96,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ProductResponseDto createProduct(ProductRequestDto request) {
+    public ProductResponseDto createProduct(ProductRequestDto request, MultipartFile[] images) {
 
         if (productRepository.existsByProductNameAndIsDeletedFalse(request.getProductName())) {
             throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_NAME_EXISTED);
@@ -121,11 +130,33 @@ public class ProductServiceImpl implements ProductService {
 
         Product savedProduct = productRepository.save(product);
 
+        if (images != null && images.length > 0) {
+            List<MultipartFile> imageList = List.of(images);
+            List<String> imageUrls = uploadFileUtil.uploadMultipleFiles(imageList);
+
+            for (String imageUrl : imageUrls) {
+                Media media = Media.builder()
+                        .url(imageUrl)
+                        .type(MediaType.Image)
+                        .product(savedProduct)
+                        .build();
+                media.setCreatedAt(now);
+                media.setUpdatedAt(now);
+
+                if (savedProduct.getMedias() == null) {
+                    savedProduct.setMedias(new ArrayList<>());
+                }
+                savedProduct.getMedias().add(media);
+            }
+
+            savedProduct = productRepository.save(savedProduct);
+        }
+
         return productMapper.productToProductResponse(savedProduct);
     }
 
     @Override
-    public ProductResponseDto updateProduct(Long productId, ProductRequestDto request) {
+    public ProductResponseDto updateProduct(Long productId, ProductRequestDto request, MultipartFile[] images) {
         if (productId == null || productId <= 0) {
             throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
         }
@@ -148,6 +179,38 @@ public class ProductServiceImpl implements ProductService {
                         .orElseThrow(() -> new InvalidDataException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
 
                 product.addCategory(category);
+            }
+        }
+
+        if (images != null && images.length > 0) {
+            if (product.getMedias() != null && !product.getMedias().isEmpty()) {
+                for (Media oldMedia : product.getMedias()) {
+                    try {
+                        uploadFileUtil.destroyFileWithUrl(oldMedia.getUrl());
+                    } catch (Exception e) {
+                        log.warn("Failed to delete old image from Cloudinary: {}", oldMedia.getUrl(), e);
+                    }
+                }
+                product.getMedias().clear();
+            }
+
+            List<MultipartFile> imageList = List.of(images);
+            List<String> newImageUrls = uploadFileUtil.uploadMultipleFiles(imageList);
+            Date now = new Date();
+
+            for (String imageUrl : newImageUrls) {
+                Media media = Media.builder()
+                        .url(imageUrl)
+                        .type(MediaType.Image)
+                        .product(product)
+                        .build();
+                media.setCreatedAt(now);
+                media.setUpdatedAt(now);
+
+                if (product.getMedias() == null) {
+                    product.setMedias(new ArrayList<>());
+                }
+                product.getMedias().add(media);
             }
         }
 

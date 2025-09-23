@@ -32,7 +32,6 @@ public class ProductVariation extends BaseEntity {
     @Column(nullable = false)
     Integer inventoryQuantity;
 
-
     @Column()
     Boolean isDeleted;
 

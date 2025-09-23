@@ -1,5 +1,7 @@
 package com.example.haus.service;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.product.ProductRequestDto;
@@ -12,9 +14,9 @@ public interface ProductService {
 
     PaginationResponseDto<ProductResponseDto> getAllProducts(PaginationRequestDto paginationRequest);
 
-    ProductResponseDto createProduct(ProductRequestDto request);
+    ProductResponseDto createProduct(ProductRequestDto request, MultipartFile[] images);
 
-    ProductResponseDto updateProduct(Long productId, ProductRequestDto request);
+    ProductResponseDto updateProduct(Long productId, ProductRequestDto request, MultipartFile[] images);
 
     void deleteProduct(Long productId);
 

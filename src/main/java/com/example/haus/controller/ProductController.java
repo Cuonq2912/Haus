@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestApiV1
 @RequiredArgsConstructor
@@ -47,12 +48,17 @@ public class ProductController {
             description = "Dùng để tạo sản phẩm mới",
             security = @SecurityRequirement(name = "Bearer Token")
     )
-    @PostMapping(UrlConstant.Product.CREATE_PRODUCT)
-    public ResponseEntity<?> createProduct(@Valid @RequestBody ProductRequestDto request) {
+    @PostMapping(value = UrlConstant.Product.CREATE_PRODUCT, consumes = "multipart/form-data")
+    public ResponseEntity<?> createProduct(
+
+            @Valid @RequestPart("request") ProductRequestDto request,
+            @RequestPart(value = "images", required = false) MultipartFile[] images
+    ) {
         return ResponseUtil.success(
                 HttpStatus.CREATED,
                 SuccessMessage.Product.CREATE_PRODUCT_SUCCESS,
-                productService.createProduct(request));
+                productService.createProduct(request, images)
+        );
     }
 
     @Tag(name = "admin-product-controller", description = "Admin Product Management APIs")
@@ -61,13 +67,16 @@ public class ProductController {
             description = "Dùng để cập nhật thông tin sản phẩm theo id",
             security = @SecurityRequirement(name = "Bearer Token")
     )
-    @PutMapping(UrlConstant.Product.UPDATE_PRODUCT)
+    @PutMapping(value = UrlConstant.Product.UPDATE_PRODUCT, consumes = "multipart/form-data")
     public ResponseEntity<?> updateProduct(
             @PathVariable Long id,
-            @Valid @RequestBody ProductRequestDto request) {
+            @Valid @RequestPart("request") ProductRequestDto request,
+            @RequestPart(value = "images", required = false) MultipartFile[] images
+    ) {
         return ResponseUtil.success(
                 SuccessMessage.Product.UPDATE_PRODUCT_SUCCESS,
-                productService.updateProduct(id, request));
+                productService.updateProduct(id, request, images)
+        );
     }
 
     @Tag(name = "admin-product-controller", description = "Admin Product Management APIs")

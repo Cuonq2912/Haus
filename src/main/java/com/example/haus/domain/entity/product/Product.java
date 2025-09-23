@@ -67,6 +67,8 @@ public class Product extends BaseEntity {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     List<ProductVariation> productVariations;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    List<Media> medias;
 
     // ---------------- Helper methods ----------------
     //Category
