@@ -11,5 +11,12 @@ public interface PromotionRepository extends JpaRepository<Promotion, Long> {
 
     boolean existsByPromotionCode(String promotionCode);
 
-    Optional<Promotion> findByPromotionCode(String promotionCode);
+    Optional<Promotion> findByPromotionCodeAndIsDeletedFalse(String promotionCode);
+
+    Boolean existsByPromotionCodeAndIsDeletedFalse(String promotionCode);
+
+    Boolean existsByPromotionCodeAndIsDeletedTrue(String promotionCode);
+
+    Optional<Promotion> findByIdAndIsDeletedFalse(Long id);
+
 }

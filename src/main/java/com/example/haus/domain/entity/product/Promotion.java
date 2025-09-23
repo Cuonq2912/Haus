@@ -53,6 +53,10 @@ public class Promotion extends BaseEntity {
     @Column(name = "status", nullable = false)
     PromotionStatus status;
 
+    @Column(name = "is_deleted")
+    @Builder.Default
+    Boolean isDeleted = false;
+
     @OneToMany(mappedBy = "promotion")
     List<Order> orders;
 
