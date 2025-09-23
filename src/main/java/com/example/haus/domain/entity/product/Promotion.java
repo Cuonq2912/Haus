@@ -34,10 +34,10 @@ public class Promotion extends BaseEntity {
     @Column(name = "description", nullable = false)
     String description;
 
-    @Column(name = "min_price_order", nullable = false)
+    @Column(name = "min_price_order")
     Float minPriceOrder;
 
-    @Column(name = "max_price_order", nullable = false)
+    @Column(name = "max_price_order")
     Float maxPriceOrder;
 
     @Column(name = "start_date")

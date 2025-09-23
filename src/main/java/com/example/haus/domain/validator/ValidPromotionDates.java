@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = PromotionDateValidator.class)
 @Documented
 public @interface ValidPromotionDates {
-    String message() default "Start date must be before end date || Min price order < Max price order";
+    String message() default "Start date must be before end date";
 
     Class<?>[] groups() default {};
 
