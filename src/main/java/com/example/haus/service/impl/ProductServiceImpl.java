@@ -248,25 +248,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public PaginationResponseDto<ProductResponseDto> getProductsByCategory(String categoryName,
-            PaginationRequestDto paginationRequest) {
-        if (categoryName == null || categoryName.isEmpty()) {
-            throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
-        }
-
-        Pageable pageable = PageRequest.of(paginationRequest.getPageNum(), paginationRequest.getPageSize());
-
-        Page<Product> productsPage = productRepository.findProductsByCategoryName(categoryName.trim(), pageable);
-
-        List<ProductResponseDto> productResponseList = productsPage.getContent().stream()
-                .map(productMapper::productToProductResponse)
-                .toList();
-
-        return PaginationUtil.createPaginationResponse(productsPage, paginationRequest, productResponseList);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public PaginationResponseDto<ProductResponseDto> getProductsByCategoryId(Long categoryId,
             PaginationRequestDto paginationRequest) {
         if (categoryId == null || categoryId <= 0) {
@@ -284,29 +265,6 @@ public class ProductServiceImpl implements ProductService {
         return PaginationUtil.createPaginationResponse(productsPage, paginationRequest, productResponseList);
     }
 
-    @Override
-    public PaginationResponseDto<ProductResponseDto> searchProductsByKeyword(String keyword,
-                                                                             PaginationRequestDto paginationRequest) {
-        if (keyword == null || keyword.trim().isEmpty()) {
-            throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
-        }
-
-        if (paginationRequest == null) {
-            throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
-        }
-
-        Pageable pageable = PageRequest.of(
-                paginationRequest.getPageNum(),
-                paginationRequest.getPageSize());
-
-        Page<Product> productsPage = productRepository.searchProductsByKeyword(keyword.trim(), pageable);
-
-        List<ProductResponseDto> productResponseList = productsPage.getContent().stream()
-                .map(productMapper::productToProductResponse)
-                .toList();
-
-        return PaginationUtil.createPaginationResponse(productsPage, paginationRequest, productResponseList);
-    }
 
     @Override
     @Transactional(readOnly = true)
