@@ -19,13 +19,7 @@ public interface ProductService {
 
     void deleteProduct(Long productId);
 
-    PaginationResponseDto<ProductResponseDto> getProductsByCategory(String categoryName,
-            PaginationRequestDto paginationRequest);
-
     PaginationResponseDto<ProductResponseDto> getProductsByCategoryId(Long categoryId,
-            PaginationRequestDto paginationRequest);
-
-    PaginationResponseDto<ProductResponseDto> searchProductsByKeyword(String keyword,
             PaginationRequestDto paginationRequest);
 
     PaginationResponseDto<ProductResponseDto> filterProducts(
