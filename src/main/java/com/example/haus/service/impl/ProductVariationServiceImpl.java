@@ -110,6 +110,8 @@ public class ProductVariationServiceImpl implements ProductVariationService {
 
         ProductVariation savedVariation = productVariationRepository.save(productVariation);
 
+        updateProductTotalInventory(product.getId());
+
         return productVariationMapper.toProductVariationResponseDto(savedVariation);
     }
 
@@ -160,6 +162,8 @@ public class ProductVariationServiceImpl implements ProductVariationService {
 
         ProductVariation updatedVariation = productVariationRepository.save(existingVariation);
 
+        updateProductTotalInventory(product.getId());
+
         return productVariationMapper.toProductVariationResponseDto(updatedVariation);
     }
 
@@ -169,22 +173,21 @@ public class ProductVariationServiceImpl implements ProductVariationService {
             throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
         }
 
-        ProductVariation productVariation = productVariationRepository.findById(productVariationId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
+        ProductVariation productVariation = productVariationRepository
+                .findByIdAndIsDeletedFalse(productVariationId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
+
+        Product product = productVariation.getProduct();
 
         if (productVariation.getMedia() != null && StringUtils.isNotBlank(productVariation.getMedia().getUrl())) {
             uploadFileUtil.destroyFileWithUrl(productVariation.getMedia().getUrl());
         }
 
-        Product product = productVariation.getProduct();
-        int totalQuantity = calculateTotalInventoryQuantity(product.getId(), productVariationId, null, null);
-        product.setInventoryQuantity(totalQuantity);
-        productRepository.save(product);
-
         productVariation.setIsDeleted(CommonConstant.TRUE);
-
+        productVariation.setDeletedAt(new Date());
         productVariationRepository.save(productVariation);
+
+        updateProductTotalInventory(product.getId());
     }
 
     private int calculateTotalInventoryQuantity(Long productId, Long excludeVariationId, Integer overrideQuantity,
@@ -207,5 +210,20 @@ public class ProductVariationServiceImpl implements ProductVariationService {
         }
 
         return totalQuantity;
+    }
+    private void updateProductTotalInventory(Long productId) {
+        List<ProductVariation> activeVariations = productVariationRepository
+                .findByProductIdAndIsDeletedFalse(productId);
+
+        int totalQuantity = activeVariations.stream()
+                .mapToInt(ProductVariation::getInventoryQuantity)
+                .sum();
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED));
+
+        product.setInventoryQuantity(totalQuantity);
+        product.setUpdatedAt(new Date());
+        productRepository.save(product);
     }
 }

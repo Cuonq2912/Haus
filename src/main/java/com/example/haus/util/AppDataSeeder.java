@@ -2,8 +2,10 @@ package com.example.haus.util;
 
 import com.example.haus.domain.entity.product.Category;
 import com.example.haus.domain.entity.product.Product;
+import com.example.haus.domain.entity.product.ProductVariation;
 import com.example.haus.repository.CategoryRepository;
 import com.example.haus.repository.ProductRepository;
+import com.example.haus.repository.ProductVariationRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
@@ -30,12 +32,15 @@ public class AppDataSeeder implements ApplicationRunner {
 
     ProductRepository productRepository;
 
+    ProductVariationRepository productVariationRepository;
+
     ObjectMapper objectMapper;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         seedCategory();
         seedProduct();
+        seedProductVariation();
     }
 
     void seedCategory() {
@@ -128,5 +133,82 @@ public class AppDataSeeder implements ApplicationRunner {
         public String detailDescription;
         public Integer inventoryQuantity;
         public List<String> categories;
+    }
+
+    void seedProductVariation() {
+        try (InputStream is = getClass().getResourceAsStream("/data/ProductVariation.json")) {
+            log.info("Start seeding product variation from JSON...");
+
+            List<ProductVariation> variationsFromDB = productVariationRepository.findAll();
+
+            List<ProductVariationJsonDto> variationDtosFromJson =
+                    objectMapper.readValue(is, new TypeReference<>() {});
+
+            if (variationsFromDB.isEmpty()) {
+                for (ProductVariationJsonDto dto : variationDtosFromJson) {
+                    ProductVariation variation = convertToProductVariation(dto);
+                    if (variation != null) {
+                        productVariationRepository.save(variation);
+                    }
+                }
+            } else {
+                for (ProductVariationJsonDto dto : variationDtosFromJson) {
+                    boolean exists = variationsFromDB
+                            .stream()
+                            .anyMatch(
+                                    v ->
+                                            v.getProduct().getId().equals(dto.productId) &&
+                                                    v.getColor().equals(dto.color) &&
+                                                    v.getSize().equals(dto.size)
+                            );
+
+
+                    if (!exists) {
+                        ProductVariation variation = convertToProductVariation(dto);
+                        if (variation != null) {
+                            productVariationRepository.save(variation);
+                        }
+                    }
+                }
+            }
+
+            log.info("Seeding product variation from JSON completed!");
+        } catch (IOException e) {
+            log.warn("Seeding product variation from JSON fail: " + e.getMessage());
+        }
+    }
+
+    private ProductVariation convertToProductVariation(ProductVariationJsonDto dto) {
+        try {
+            Optional<Product> productOpt = productRepository.findById(dto.productId);
+            if (productOpt.isEmpty()) {
+                log.warn("Product with ID {} not found for ProductVariation", dto.productId);
+                return null;
+            }
+
+            ProductVariation variation = ProductVariation.builder()
+                    .color(dto.color)
+                    .size(dto.size)
+                    .price(dto.price)
+                    .inventoryQuantity(dto.inventoryQuantity)
+                    .isDeleted(dto.isDeleted != null ? dto.isDeleted : false)
+                    .product(productOpt.get())
+                    .build();
+
+            return variation;
+        } catch (Exception e) {
+            log.warn("Failed to convert ProductVariationJsonDto to ProductVariation for productId: " + dto.productId);
+            return null;
+        }
+    }
+
+    static class ProductVariationJsonDto {
+
+        public String color;
+        public String size;
+        public Double price;
+        public Integer inventoryQuantity;
+        public Boolean isDeleted;
+        public Long productId;
     }
 }

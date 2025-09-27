@@ -1,0 +1,570 @@
+[
+  {
+    "color": "Nâu gỗ tự nhiên",
+    "size": "200x180x90cm",
+    "price": 8500000.0,
+    "inventoryQuantity": 15,
+    "isDeleted": false,
+    "productId": 1
+  },
+  {
+    "color": "Nâu đậm",
+    "size": "200x180x90cm",
+    "price": 8800000.0,
+    "inventoryQuantity": 10,
+    "isDeleted": false,
+    "productId": 1
+  },
+  {
+    "color": "Trắng",
+    "size": "200x180x90cm",
+    "price": 9200000.0,
+    "inventoryQuantity": 8,
+    "isDeleted": false,
+    "productId": 1
+  },
+  {
+    "color": "Trắng",
+    "size": "200x220x60cm",
+    "price": 12000000.0,
+    "inventoryQuantity": 8,
+    "isDeleted": false,
+    "productId": 2
+  },
+  {
+    "color": "Nâu",
+    "size": "200x220x60cm",
+    "price": 12500000.0,
+    "inventoryQuantity": 7,
+    "isDeleted": false,
+    "productId": 2
+  },
+  {
+    "color": "Xám",
+    "size": "200x220x60cm",
+    "price": 12300000.0,
+    "inventoryQuantity": 5,
+    "isDeleted": false,
+    "productId": 2
+  },
+  {
+    "color": "Trắng tinh khôi",
+    "size": "100x40x150cm",
+    "price": 3500000.0,
+    "inventoryQuantity": 20,
+    "isDeleted": false,
+    "productId": 3
+  },
+  {
+    "color": "Xám nhạt",
+    "size": "100x40x150cm",
+    "price": 3600000.0,
+    "inventoryQuantity": 10,
+    "isDeleted": false,
+    "productId": 3
+  },
+  {
+    "color": "Nâu đậm",
+    "size": "280x200x85cm",
+    "price": 18000000.0,
+    "inventoryQuantity": 5,
+    "isDeleted": false,
+    "productId": 4
+  },
+  {
+    "color": "Đen",
+    "size": "280x200x85cm",
+    "price": 18500000.0,
+    "inventoryQuantity": 3,
+    "isDeleted": false,
+    "productId": 4
+  },
+  {
+    "color": "Trắng kem",
+    "size": "280x200x85cm",
+    "price": 18200000.0,
+    "inventoryQuantity": 2,
+    "isDeleted": false,
+    "productId": 4
+  },
+  {
+    "color": "Trong suốt",
+    "size": "120x60x45cm",
+    "price": 4200000.0,
+    "inventoryQuantity": 15,
+    "isDeleted": false,
+    "productId": 5
+  },
+  {
+    "color": "Trong suốt",
+    "size": "100x50x40cm",
+    "price": 3800000.0,
+    "inventoryQuantity": 5,
+    "isDeleted": false,
+    "productId": 5
+  },
+  {
+    "color": "Nâu walnut tự nhiên",
+    "size": "180x40x55cm",
+    "price": 6800000.0,
+    "inventoryQuantity": 12,
+    "isDeleted": false,
+    "productId": 6
+  },
+  {
+    "color": "Nâu walnut đậm",
+    "size": "180x40x55cm",
+    "price": 7000000.0,
+    "inventoryQuantity": 6,
+    "isDeleted": false,
+    "productId": 6
+  },
+  {
+    "color": "Xám",
+    "size": "80x85x95cm",
+    "price": 5500000.0,
+    "inventoryQuantity": 10,
+    "isDeleted": false,
+    "productId": 7
+  },
+  {
+    "color": "Be",
+    "size": "80x85x95cm",
+    "price": 5600000.0,
+    "inventoryQuantity": 8,
+    "isDeleted": false,
+    "productId": 7
+  },
+  {
+    "color": "Xanh navy",
+    "size": "80x85x95cm",
+    "price": 5700000.0,
+    "inventoryQuantity": 7,
+    "isDeleted": false,
+    "productId": 7
+  },
+  {
+    "color": "Nâu rattan",
+    "size": "Bàn: 120x70x75cm, Ghế: 60x60x85cm",
+    "price": 9200000.0,
+    "inventoryQuantity": 8,
+    "isDeleted": false,
+    "productId": 8
+  },
+  {
+    "color": "Nâu rattan đậm",
+    "size": "Bàn: 120x70x75cm, Ghế: 60x60x85cm",
+    "price": 9500000.0,
+    "inventoryQuantity": 4,
+    "isDeleted": false,
+    "productId": 8
+  },
+  {
+    "color": "Xanh navy",
+    "size": "170x110x165cm",
+    "price": 7500000.0,
+    "inventoryQuantity": 5,
+    "isDeleted": false,
+    "productId": 9
+  },
+  {
+    "color": "Xám",
+    "size": "170x110x165cm",
+    "price": 7600000.0,
+    "inventoryQuantity": 3,
+    "isDeleted": false,
+    "productId": 9
+  },
+  {
+    "color": "Xanh navy",
+    "size": "3m",
+    "price": 3200000.0,
+    "inventoryQuantity": 8,
+    "isDeleted": false,
+    "productId": 10
+  },
+  {
+    "color": "Be",
+    "size": "3m",
+    "price": 3200000.0,
+    "inventoryQuantity": 4,
+    "isDeleted": false,
+    "productId": 10
+  },
+  {
+    "color": "Xám",
+    "size": "3m",
+    "price": 3200000.0,
+    "inventoryQuantity": 3,
+    "isDeleted": false,
+    "productId": 10
+  },
+  {
+    "color": "Nâu gỗ tự nhiên",
+    "size": "Φ150x75cm",
+    "price": 15000000.0,
+    "inventoryQuantity": 5,
+    "isDeleted": false,
+    "productId": 11
+  },
+  {
+    "color": "Nâu gỗ đậm",
+    "size": "Φ150x75cm",
+    "price": 15500000.0,
+    "inventoryQuantity": 3,
+    "isDeleted": false,
+    "productId": 11
+  },
+  {
+    "color": "Nâu walnut tự nhiên",
+    "size": "120x40x180cm",
+    "price": 8800000.0,
+    "inventoryQuantity": 4,
+    "isDeleted": false,
+    "productId": 12
+  },
+  {
+    "color": "Nâu walnut đậm",
+    "size": "120x40x180cm",
+    "price": 9000000.0,
+    "inventoryQuantity": 2,
+    "isDeleted": false,
+    "productId": 12
+  },
+  {
+    "color": "Xanh navy",
+    "size": "45x50x82cm",
+    "price": 2200000.0,
+    "inventoryQuantity": 15,
+    "isDeleted": false,
+    "productId": 13
+  },
+  {
+    "color": "Hồng",
+    "size": "45x50x82cm",
+    "price": 2250000.0,
+    "inventoryQuantity": 12,
+    "isDeleted": false,
+    "productId": 13
+  },
+  {
+    "color": "Xám",
+    "size": "45x50x82cm",
+    "price": 2200000.0,
+    "inventoryQuantity": 13,
+    "isDeleted": false,
+    "productId": 13
+  },
+  {
+    "color": "Nâu gỗ sồi",
+    "size": "3.5x2.2x0.6m",
+    "price": 35000000.0,
+    "inventoryQuantity": 2,
+    "isDeleted": false,
+    "productId": 14
+  },
+  {
+    "color": "Nâu gỗ sồi đậm",
+    "size": "3.5x2.2x0.6m",
+    "price": 36000000.0,
+    "inventoryQuantity": 1,
+    "isDeleted": false,
+    "productId": 14
+  },
+  {
+    "color": "Trắng marble",
+    "size": "200x90x95cm",
+    "price": 18000000.0,
+    "inventoryQuantity": 3,
+    "isDeleted": false,
+    "productId": 15
+  },
+  {
+    "color": "Trắng marble Ý",
+    "size": "200x90x95cm",
+    "price": 18500000.0,
+    "inventoryQuantity": 2,
+    "isDeleted": false,
+    "productId": 15
+  },
+  {
+    "color": "Bạc",
+    "size": "Bộ 7 món",
+    "price": 3500000.0,
+    "inventoryQuantity": 15,
+    "isDeleted": false,
+    "productId": 16
+  },
+  {
+    "color": "Đen",
+    "size": "Bộ 7 món",
+    "price": 3600000.0,
+    "inventoryQuantity": 10,
+    "isDeleted": false,
+    "productId": 16
+  },
+  {
+    "color": "Trắng",
+    "size": "140x70x75cm",
+    "price": 4500000.0,
+    "inventoryQuantity": 12,
+    "isDeleted": false,
+    "productId": 17
+  },
+  {
+    "color": "Nâu",
+    "size": "140x70x75cm",
+    "price": 4600000.0,
+    "inventoryQuantity": 6,
+    "isDeleted": false,
+    "productId": 17
+  },
+  {
+    "color": "Xám",
+    "size": "140x70x75cm",
+    "price": 4550000.0,
+    "inventoryQuantity": 4,
+    "isDeleted": false,
+    "productId": 17
+  },
+  {
+    "color": "Đen",
+    "size": "Tiêu chuẩn",
+    "price": 6200000.0,
+    "inventoryQuantity": 10,
+    "isDeleted": false,
+    "productId": 18
+  },
+  {
+    "color": "Xám",
+    "size": "Tiêu chuẩn",
+    "price": 6250000.0,
+    "inventoryQuantity": 8,
+    "isDeleted": false,
+    "productId": 18
+  },
+  {
+    "color": "Xám",
+    "size": "46x71x132cm",
+    "price": 3800000.0,
+    "inventoryQuantity": 8,
+    "isDeleted": false,
+    "productId": 19
+  },
+  {
+    "color": "Trắng",
+    "size": "46x71x132cm",
+    "price": 3850000.0,
+    "inventoryQuantity": 4,
+    "isDeleted": false,
+    "productId": 19
+  },
+  {
+    "color": "Đen",
+    "size": "46x71x132cm",
+    "price": 3820000.0,
+    "inventoryQuantity": 3,
+    "isDeleted": false,
+    "productId": 19
+  },
+  {
+    "color": "Nâu gỗ thông",
+    "size": "200x100x170cm",
+    "price": 12000000.0,
+    "inventoryQuantity": 6,
+    "isDeleted": false,
+    "productId": 20
+  },
+  {
+    "color": "Trắng",
+    "size": "200x100x170cm",
+    "price": 12500000.0,
+    "inventoryQuantity": 4,
+    "isDeleted": false,
+    "productId": 20
+  },
+  {
+    "color": "Trắng",
+    "size": "100x60cm (cao 54-76cm)",
+    "price": 3200000.0,
+    "inventoryQuantity": 18,
+    "isDeleted": false,
+    "productId": 21
+  },
+  {
+    "color": "Xanh",
+    "size": "100x60cm (cao 54-76cm)",
+    "price": 3250000.0,
+    "inventoryQuantity": 10,
+    "isDeleted": false,
+    "productId": 21
+  },
+  {
+    "color": "Đa màu tươi sáng",
+    "size": "120x40x90cm",
+    "price": 2800000.0,
+    "inventoryQuantity": 15,
+    "isDeleted": false,
+    "productId": 22
+  },
+  {
+    "color": "Đa màu pastel",
+    "size": "120x40x90cm",
+    "price": 2850000.0,
+    "inventoryQuantity": 5,
+    "isDeleted": false,
+    "productId": 22
+  },
+  {
+    "color": "Trắng",
+    "size": "150x50x85cm",
+    "price": 8500000.0,
+    "inventoryQuantity": 8,
+    "isDeleted": false,
+    "productId": 23
+  },
+  {
+    "color": "Xám",
+    "size": "150x50x85cm",
+    "price": 8600000.0,
+    "inventoryQuantity": 4,
+    "isDeleted": false,
+    "productId": 23
+  },
+  {
+    "color": "Bạc",
+    "size": "Tiêu chuẩn",
+    "price": 4200000.0,
+    "inventoryQuantity": 10,
+    "isDeleted": false,
+    "productId": 24
+  },
+  {
+    "color": "Vàng gold",
+    "size": "Tiêu chuẩn",
+    "price": 4500000.0,
+    "inventoryQuantity": 6,
+    "isDeleted": false,
+    "productId": 24
+  },
+  {
+    "color": "Bạc",
+    "size": "80x60cm",
+    "price": 1800000.0,
+    "inventoryQuantity": 20,
+    "isDeleted": false,
+    "productId": 25
+  },
+  {
+    "color": "Đen",
+    "size": "80x60cm",
+    "price": 1850000.0,
+    "inventoryQuantity": 10,
+    "isDeleted": false,
+    "productId": 25
+  },
+  {
+    "color": "Xám",
+    "size": "200x150cm",
+    "price": 2500000.0,
+    "inventoryQuantity": 20,
+    "isDeleted": false,
+    "productId": 26
+  },
+  {
+    "color": "Be",
+    "size": "200x150cm",
+    "price": 2550000.0,
+    "inventoryQuantity": 10,
+    "isDeleted": false,
+    "productId": 26
+  },
+  {
+    "color": "Xanh mint",
+    "size": "200x150cm",
+    "price": 2600000.0,
+    "inventoryQuantity": 5,
+    "isDeleted": false,
+    "productId": 26
+  },
+  {
+    "color": "Trắng",
+    "size": "15x15x25cm",
+    "price": 850000.0,
+    "inventoryQuantity": 30,
+    "isDeleted": false,
+    "productId": 27
+  },
+  {
+    "color": "Đen",
+    "size": "15x15x25cm",
+    "price": 900000.0,
+    "inventoryQuantity": 20,
+    "isDeleted": false,
+    "productId": 27
+  },
+  {
+    "color": "Đen",
+    "size": "Tiêu chuẩn",
+    "price": 15000000.0,
+    "inventoryQuantity": 5,
+    "isDeleted": false,
+    "productId": 28
+  },
+  {
+    "color": "Bạc",
+    "size": "Tiêu chuẩn",
+    "price": 15200000.0,
+    "inventoryQuantity": 3,
+    "isDeleted": false,
+    "productId": 28
+  },
+  {
+    "color": "Trắng",
+    "size": "80x30x180cm",
+    "price": 3200000.0,
+    "inventoryQuantity": 15,
+    "isDeleted": false,
+    "productId": 29
+  },
+  {
+    "color": "Đen",
+    "size": "80x30x180cm",
+    "price": 3250000.0,
+    "inventoryQuantity": 6,
+    "isDeleted": false,
+    "productId": 29
+  },
+  {
+    "color": "Xám",
+    "size": "80x30x180cm",
+    "price": 3220000.0,
+    "inventoryQuantity": 4,
+    "isDeleted": false,
+    "productId": 29
+  },
+  {
+    "color": "Xanh navy",
+    "size": "50x50cm (ngồi), 50x40cm (lưng)",
+    "price": 1200000.0,
+    "inventoryQuantity": 25,
+    "isDeleted": false,
+    "productId": 30
+  },
+  {
+    "color": "Đỏ gạch",
+    "size": "50x50cm (ngồi), 50x40cm (lưng)",
+    "price": 1250000.0,
+    "inventoryQuantity": 10,
+    "isDeleted": false,
+    "productId": 30
+  },
+  {
+    "color": "Xám",
+    "size": "50x50cm (ngồi), 50x40cm (lưng)",
+    "price": 1220000.0,
+    "inventoryQuantity": 5,
+    "isDeleted": false,
+    "productId": 30
+  }
+]
