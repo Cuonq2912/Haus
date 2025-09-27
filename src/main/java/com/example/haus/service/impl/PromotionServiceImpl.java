@@ -238,6 +238,8 @@ public class PromotionServiceImpl implements PromotionService {
     private void deleteSoft(Promotion promotion) {
         if (promotion != null) {
             promotion.setIsDeleted(true);
+            promotion.getCategory().setPromotion(null);
+            promotion.setCategory(null);
             promotionRepository.save(promotion);
         }
     }

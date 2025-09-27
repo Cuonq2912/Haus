@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -35,5 +36,7 @@ public class ProductResponseDto {
 
     List<MediaResponseDto> medias;
 
-    List<String> categoriesName;
+    List<String> categories = new ArrayList<>();
+
+    List<ProductVariationResponseDto> productVariations = new ArrayList<>();
 }

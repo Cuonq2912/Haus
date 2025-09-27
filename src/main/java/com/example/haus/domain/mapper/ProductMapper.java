@@ -12,7 +12,6 @@ import org.mapstruct.*;
         uses = {CategoryMapper.class, MediaMapper.class}
 )
 public interface ProductMapper {
-
     ProductResponseDto productToProductResponse(Product product);
 
     @Mapping(target = "categories", ignore = true)
