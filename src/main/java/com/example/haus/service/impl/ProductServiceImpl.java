@@ -80,7 +80,7 @@ public class ProductServiceImpl implements ProductService {
         ProductResponseDto productResponseDto = productMapper.productToProductResponse(product);
         if (product.getCategories() != null || product.getCategories().size() > 0) {
             for(int i = 0; i < product.getCategories().size(); i++) {
-                productResponseDto.getCategories().add(product.getCategories().get(i).getCategoryName());
+                productResponseDto.getCategoriesName().add(product.getCategories().get(i).getCategoryName());
             }
         }
 

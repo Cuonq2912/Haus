@@ -1,6 +1,5 @@
 package com.example.haus.domain.dto.response.product;
 
-import com.example.haus.domain.dto.response.category.CategoryResponseDto;
 import jakarta.persistence.Column;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -36,7 +35,7 @@ public class ProductResponseDto {
 
     List<MediaResponseDto> medias;
 
-    List<String> categories = new ArrayList<>();
+    List<String> categoriesName = new ArrayList<>();
 
     List<ProductVariationResponseDto> productVariations = new ArrayList<>();
 }
