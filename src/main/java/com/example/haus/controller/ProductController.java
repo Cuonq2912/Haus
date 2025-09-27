@@ -6,6 +6,7 @@ import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.request.product.ProductRequestDto;
+import com.example.haus.domain.dto.request.product.UpdateProductRequestDto;
 import com.example.haus.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -60,6 +61,24 @@ public class ProductController {
         );
     }
 
+//    @Tag(name = "admin-product-controller", description = "Admin Product Management APIs")
+//    @Operation(
+//            summary = "Cập nhật sản phẩm",
+//            description = "Dùng để cập nhật thông tin sản phẩm theo id",
+//            security = @SecurityRequirement(name = "Bearer Token")
+//    )
+//    @PutMapping(value = UrlConstant.Product.UPDATE_PRODUCT, consumes = "multipart/form-data")
+//    public ResponseEntity<?> updateProduct(
+//            @PathVariable Long id,
+//            @Valid @RequestPart("request") ProductRequestDto request,
+//            @RequestPart(value = "images", required = false) MultipartFile[] images
+//    ) {
+//        return ResponseUtil.success(
+//                SuccessMessage.Product.UPDATE_PRODUCT_SUCCESS,
+//                productService.updateProduct(id, request, images)
+//        );
+//    }
+
     @Tag(name = "admin-product-controller", description = "Admin Product Management APIs")
     @Operation(
             summary = "Cập nhật sản phẩm",
@@ -69,7 +88,7 @@ public class ProductController {
     @PutMapping(value = UrlConstant.Product.UPDATE_PRODUCT, consumes = "multipart/form-data")
     public ResponseEntity<?> updateProduct(
             @PathVariable Long id,
-            @Valid @RequestPart("request") ProductRequestDto request,
+            @Valid @RequestPart("request") UpdateProductRequestDto request,
             @RequestPart(value = "images", required = false) MultipartFile[] images
     ) {
         return ResponseUtil.success(

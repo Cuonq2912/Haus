@@ -2,6 +2,7 @@ package com.example.haus.domain.mapper;
 
 import com.example.haus.domain.entity.product.Product;
 import com.example.haus.domain.dto.request.product.ProductRequestDto;
+import com.example.haus.domain.dto.request.product.UpdateProductRequestDto;
 import com.example.haus.domain.dto.response.product.ProductResponseDto;
 import org.mapstruct.*;
 
@@ -18,6 +19,7 @@ public interface ProductMapper {
     Product createProductRequestDtoToProduct(ProductRequestDto request);
 
     @Mapping(target = "categories", ignore = true)
-    void updateProductFromDto(ProductRequestDto request, @MappingTarget Product product);
+    @Mapping(target = "isDeleted", ignore = true)
+    void updateProductFromUpdateDto(UpdateProductRequestDto request, @MappingTarget Product product);
 
 }

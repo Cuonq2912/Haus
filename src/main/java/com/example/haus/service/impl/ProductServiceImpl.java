@@ -7,6 +7,7 @@ import com.example.haus.constant.MediaType;
 import com.example.haus.domain.dto.pagination.PaginationCustom;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
+import com.example.haus.domain.dto.request.product.UpdateProductRequestDto;
 import com.example.haus.domain.entity.product.Category;
 import com.example.haus.domain.entity.product.Media;
 import com.example.haus.domain.entity.product.Product;
@@ -17,6 +18,7 @@ import com.example.haus.domain.dto.response.product.ProductResponseDto;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.CategoryRepository;
+import com.example.haus.repository.MediaRepository;
 import com.example.haus.repository.ProductRepository;
 import com.example.haus.repository.criteria.SearchCriteria;
 import com.example.haus.repository.criteria.SearchQueryCriteriaConsumer;
@@ -42,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.web.multipart.MultipartFile;
@@ -61,6 +64,8 @@ public class ProductServiceImpl implements ProductService {
 
     UploadFileUtil uploadFileUtil;
 
+    MediaRepository mediaRepository;
+
     @PersistenceContext
     EntityManager entityManager;
 
@@ -71,8 +76,10 @@ public class ProductServiceImpl implements ProductService {
             throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
         }
 
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED));
+        Product product = productRepository.findByIdWithActiveVariations(id);
+
+        if(product == null)
+            throw new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED);
 
         if (product.getIsDeleted() == CommonConstant.TRUE)
             throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_ALREADY_DELETED);
@@ -176,7 +183,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponseDto updateProduct(Long productId, ProductRequestDto request, MultipartFile[] images) {
+    public ProductResponseDto updateProduct(Long productId, UpdateProductRequestDto request, MultipartFile[] images) {
         if (productId == null || productId <= 0) {
             throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
         }
@@ -184,13 +191,17 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED));
 
+        if (product.getIsDeleted() == CommonConstant.TRUE) {
+            throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_ALREADY_DELETED);
+        }
+
         if (request.getProductName() != null &&
                 !product.getProductName().equals(request.getProductName()) &&
                 productRepository.existsByProductNameAndIsDeletedFalse(request.getProductName())) {
             throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_NAME_EXISTED);
         }
 
-        productMapper.updateProductFromDto(request, product);
+        productMapper.updateProductFromUpdateDto(request, product);
 
         if (request.getCategories() != null && !request.getCategories().isEmpty()) {
             product.getCategories().clear();
@@ -202,18 +213,23 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
-        if (images != null && images.length > 0) {
-            if (product.getMedias() != null && !product.getMedias().isEmpty()) {
-                for (Media oldMedia : product.getMedias()) {
-                    try {
-                        uploadFileUtil.destroyFileWithUrl(oldMedia.getUrl());
-                    } catch (Exception e) {
-                        log.warn("Failed to delete old image from Cloudinary: {}", oldMedia.getUrl(), e);
-                    }
-                }
-                product.getMedias().clear();
-            }
+        if (request.getImageIdsToDelete() != null && !request.getImageIdsToDelete().isEmpty()) {
+            List<Media> mediasToDelete = mediaRepository.findByIdsAndProductId(
+                    request.getImageIdsToDelete(), productId);
 
+            for (Media mediaToDelete : mediasToDelete) {
+                try {
+                    uploadFileUtil.destroyFileWithUrl(mediaToDelete.getUrl());
+                    product.getMedias().remove(mediaToDelete);
+                    mediaRepository.delete(mediaToDelete);
+                } catch (Exception e) {
+                    log.warn("Failed to delete media with ID {} from cloud storage: {}",
+                            mediaToDelete.getId(), e.getMessage(), e);
+                }
+            }
+        }
+
+        if (images != null && images.length > 0) {
             List<MultipartFile> imageList = List.of(images);
             List<String> newImageUrls = uploadFileUtil.uploadMultipleFiles(imageList);
             Date now = new Date();
