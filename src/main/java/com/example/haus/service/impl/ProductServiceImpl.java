@@ -41,10 +41,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.web.multipart.MultipartFile;
@@ -85,10 +82,10 @@ public class ProductServiceImpl implements ProductService {
             throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_ALREADY_DELETED);
 
         ProductResponseDto productResponseDto = productMapper.productToProductResponse(product);
-        if (product.getCategories() != null || product.getCategories().size() > 0) {
-            for(int i = 0; i < product.getCategories().size(); i++) {
-                productResponseDto.getCategoriesName().add(product.getCategories().get(i).getCategoryName());
-            }
+        if (product.getCategories() != null && !product.getCategories().isEmpty()) {
+            product.getCategories().forEach(
+                    c -> productResponseDto.getCategoriesName().add(c.getCategoryName())
+            );
         }
 
         return productResponseDto;
@@ -171,7 +168,7 @@ public class ProductServiceImpl implements ProductService {
                 media.setUpdatedAt(now);
 
                 if (savedProduct.getMedias() == null) {
-                    savedProduct.setMedias(new ArrayList<>());
+                    savedProduct.setMedias(new HashSet<>());
                 }
                 savedProduct.getMedias().add(media);
             }
@@ -244,7 +241,7 @@ public class ProductServiceImpl implements ProductService {
                 media.setUpdatedAt(now);
 
                 if (product.getMedias() == null) {
-                    product.setMedias(new ArrayList<>());
+                    product.setMedias(new HashSet<>());
                 }
                 product.getMedias().add(media);
             }

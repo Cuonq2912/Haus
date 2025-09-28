@@ -7,7 +7,9 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "products")
@@ -46,14 +48,14 @@ public class Product extends BaseEntity {
     @Column()
     Boolean isDeleted = CommonConstant.FALSE;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "product_categories",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     @Builder.Default
-    List<Category> categories = new ArrayList<>();
+    Set<Category> categories = new HashSet<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     List<Review> reviews;
@@ -64,17 +66,17 @@ public class Product extends BaseEntity {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     List<OrderItem> orderItems;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    List<ProductVariation> productVariations;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    Set<ProductVariation> productVariations = new HashSet<>();
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    List<Media> medias;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    Set<Media> medias = new HashSet<>();
 
     // ---------------- Helper methods ----------------
     //Category
     public void addCategory(Category category) {
         if (categories == null) {
-            categories = new ArrayList<>();
+            categories = new HashSet<>();
         }
         if (!categories.contains(category)) {
             categories.add(category);
