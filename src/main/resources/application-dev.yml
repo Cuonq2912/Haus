@@ -60,9 +60,6 @@ security:
   admin-endpoints: /api/v1/admin/**, /api/v1/promotion/**, /api/v1/category/**, /api/v1/product/**
   swagger-endpoints: /swagger-ui/**, /v3/api-docs/**, /swagger-ui.html
 
-#endpoint:
-#  confirmUser: http://localhost:${server.port}/user/confirm
-
 #JWT
 jwt:
   expiryHour: 1
@@ -73,6 +70,6 @@ jwt:
 #Cloudinary
 cloudinary:
   cloud_name: ${CLOUDINARY_NAME:dgwnoquie}
-  api_key: ${CLOUDINARY_API_KEY:671838345639772
+  api_key: ${CLOUDINARY_API_KEY:671838345639772}
   secret_key: ${CLOUDINARY_SECRET_KEY:-xdwjAMbATWoIvkpbT_-6K5TuIg}
 

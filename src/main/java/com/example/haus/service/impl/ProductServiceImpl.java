@@ -33,6 +33,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -294,8 +295,9 @@ public class ProductServiceImpl implements ProductService {
         List<SearchCriteria> searchCriteriaList = new ArrayList<>();
         if (search != null) {
             if(search.length > 0) {
+                String[] newSearch = StringUtils.split("&", search.toString());
                 Pattern pattern = Pattern.compile(AppConstants.SEARCH_OPERATOR);
-                for (String s : search) {
+                for (String s : newSearch) {
                     Matcher matcher = pattern.matcher(s);
                     if (matcher.find()) {
                         searchCriteriaList.add(new SearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3)));

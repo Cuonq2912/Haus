@@ -13,4 +13,5 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
 
     @Query("SELECT m FROM medias m WHERE m.id IN :ids AND m.product.id = :productId")
     List<Media> findByIdsAndProductId(@Param("ids") List<Long> ids, @Param("productId") Long productId);
+
 }

@@ -21,5 +21,4 @@ public interface ProductMapper {
     @Mapping(target = "categories", ignore = true)
     @Mapping(target = "isDeleted", ignore = true)
     void updateProductFromUpdateDto(UpdateProductRequestDto request, @MappingTarget Product product);
-
 }

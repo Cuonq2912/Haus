@@ -20,7 +20,7 @@ import java.util.Date;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class BaseEntity {
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
     Date createdAt;

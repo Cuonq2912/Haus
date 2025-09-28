@@ -4,8 +4,6 @@ import com.example.haus.base.ResponseUtil;
 import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
-import com.example.haus.constant.promotion.PromotionStatus;
-import com.example.haus.constant.promotion.PromotionType;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.request.promotion.PromotionRequestDto;
 import com.example.haus.service.PromotionService;

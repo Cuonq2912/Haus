@@ -1,10 +1,10 @@
 package com.example.haus.util;
 
-import java.util.Random;
+import java.security.SecureRandom;
 
 public final class OtpUtil {
 
-    private static final Random random = new Random();
+    private static final SecureRandom random = new SecureRandom();
 
     public static String generateOtp() {
         int otp = 100000 + random.nextInt(900000);

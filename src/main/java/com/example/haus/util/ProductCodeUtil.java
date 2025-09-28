@@ -6,6 +6,8 @@ import java.time.format.DateTimeFormatter;
 
 public class ProductCodeUtil {
 
+    private ProductCodeUtil() {}
+
     private static final String PREFIX = "SKU";
     private static final SecureRandom random = new SecureRandom();
 
@@ -17,9 +19,9 @@ public class ProductCodeUtil {
         return PREFIX + digits.toString();
     }
 
-    public static String generateUniqueProductCode() {
-        LocalDateTime now = LocalDateTime.now();
-        String timestamp = now.format(DateTimeFormatter.ofPattern("yyMMddHHmm"));
-        return PREFIX + timestamp;
-    }
+//    public static String generateUniqueProductCode() {
+//        LocalDateTime now = LocalDateTime.now();
+//        String timestamp = now.format(DateTimeFormatter.ofPattern("yyMMddHHmm"));
+//        return PREFIX + timestamp;
+//    }
 }

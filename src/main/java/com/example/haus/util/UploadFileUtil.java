@@ -42,15 +42,15 @@ public class UploadFileUtil {
         }
     }
 
-    public String uploadImage(byte[] bytes) {
-        try{
-            Map result = cloudinary.uploader().upload(
-                    bytes, ObjectUtils.asMap("resource_type", "image"));
-            return result.get("secure_url").toString();
-        } catch (IOException e) {
-            throw new UploadFileException("Upload image failed!", e.getCause());
-        }
-    }
+//    public String uploadImage(byte[] bytes) {
+//        try{
+//            Map result = cloudinary.uploader().upload(
+//                    bytes, ObjectUtils.asMap("resource_type", "image"));
+//            return result.get("secure_url").toString();
+//        } catch (IOException e) {
+//            throw new UploadFileException("Upload image failed!", e.getCause());
+//        }
+//    }
 
     public List<String> uploadMultipleFiles(List<MultipartFile> multipartFiles) {
         List<String> imageUrls = new ArrayList<>();
