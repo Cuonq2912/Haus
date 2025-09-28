@@ -13,6 +13,8 @@ import org.mapstruct.*;
         uses = {CategoryMapper.class, MediaMapper.class}
 )
 public interface ProductMapper {
+    @Mapping(target = "categoriesName",
+            expression = "java(product.getCategories().stream().map(com.example.haus.domain.entity.product.Category::getCategoryName).collect(java.util.stream.Collectors.toList()))")
     ProductResponseDto productToProductResponse(Product product);
 
     @Mapping(target = "categories", ignore = true)

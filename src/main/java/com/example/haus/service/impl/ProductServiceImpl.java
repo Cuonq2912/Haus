@@ -82,14 +82,7 @@ public class ProductServiceImpl implements ProductService {
         if (product.getIsDeleted() == CommonConstant.TRUE)
             throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_ALREADY_DELETED);
 
-        ProductResponseDto productResponseDto = productMapper.productToProductResponse(product);
-        if (product.getCategories() != null && !product.getCategories().isEmpty()) {
-            product.getCategories().forEach(
-                    c -> productResponseDto.getCategoriesName().add(c.getCategoryName())
-            );
-        }
-
-        return productResponseDto;
+        return productMapper.productToProductResponse(product);
     }
 
     @Override
