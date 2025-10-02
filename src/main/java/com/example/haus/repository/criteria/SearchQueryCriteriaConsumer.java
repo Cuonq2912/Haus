@@ -41,14 +41,11 @@ public class SearchQueryCriteriaConsumer<T> implements Consumer<SearchCriteria> 
         }
 
         // --- Filter colors ---
-        if ("colors".equals(searchCriteria.getKey()) && typedValue != null) {
+        if ("color".equals(searchCriteria.getKey()) && typedValue != null) {
             log.info("Consumer colors");
+
             Join<Product, ProductVariation> variationJoin = root.join("productVariations", JoinType.INNER);
-            if (typedValue.getClass().isArray()) {
-                predicate = criteriaBuilder.and(predicate, variationJoin.get("color").in((Object[]) typedValue));
-            } else {
-                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(variationJoin.get("color"), typedValue));
-            }
+            predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(variationJoin.get("color"), typedValue));
             return;
         }
 
