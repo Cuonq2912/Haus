@@ -13,6 +13,6 @@ public interface VNPayService {
 
     public String createVNPayUrl(Long orderId, HttpServletRequest request);
 
-    public boolean checkVNPayReturn(Map<String, String> params);
+    public boolean checkVNPayCallback(Map<String, String> params);
 
 }

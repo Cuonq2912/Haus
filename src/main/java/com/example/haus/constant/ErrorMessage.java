@@ -134,4 +134,13 @@ public class ErrorMessage {
         public static final String ERR_PAYMENT_STATUS_INVALID = "exception.order.payment.status.invalid";
     }
 
+    public static class Payment {
+
+        private Payment() {}
+
+        public static final String CALLBACK_VNPAY_FAIL = "exception.vnpay.callback.verification.failed";
+
+
+    }
+
 }

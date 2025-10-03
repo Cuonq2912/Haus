@@ -20,7 +20,7 @@ public class VNPayUtil {
 
     @Getter
     @Value("${payment.vnPay.hashSecret}")
-    String vnp_HashSecret;
+    static String vnp_HashSecret;
 
     @Value("${spring.profiles.active}")
     static String activeProfile;
@@ -84,6 +84,26 @@ public class VNPayUtil {
             ipAddress = "Invalid IP: " + e.getMessage();
         }
         return ipAddress;
+    }
+
+
+    public static String hashAllFields(Map<String, String> fields) {
+        List<String> fieldNames = new ArrayList<>(fields.keySet());
+        Collections.sort(fieldNames);
+
+        StringBuilder hashData = new StringBuilder();
+        for (Iterator<String> itr = fieldNames.iterator(); itr.hasNext();) {
+            String fieldName = itr.next();
+            String fieldValue = fields.get(fieldName);
+            if ((fieldValue != null) && (!fieldValue.isEmpty())) {
+                hashData.append(fieldName).append("=").append(fieldValue);
+                if (itr.hasNext()) {
+                    hashData.append("&");
+                }
+            }
+        }
+
+        return VNPayUtil.hmacSHA512(vnp_HashSecret, hashData.toString());
     }
 
 }

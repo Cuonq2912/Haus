@@ -102,6 +102,7 @@ public class UrlConstant {
         private static final String PRE_FIX = "/payment";
 
         public static final String GET_PAYMENT_URL = PRE_FIX + "/payment_url";
+        public static final String VNPAY_RETURN = PRE_FIX + "/vnpay-return";
     }
 
 
