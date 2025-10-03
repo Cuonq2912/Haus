@@ -109,6 +109,9 @@ public class ErrorMessage {
     }
 
     public static class Product {
+
+        private Product() {}
+
         public static final String ERR_PRICE_INVALID = "exception.product.price.invalid";
         public static final String ERR_QUANTITY_INVALID = "exception.product.quantity.invalid";
         public static final String ERR_PRODUCT_NOT_EXISTED = "exception.product.not.existed";
@@ -118,4 +121,17 @@ public class ErrorMessage {
         public static final String ERR_PRODUCT_VARIATION_ALREADY_DELETED = "exception.product.variation.already.deleted";
         public static final String ERR_PRODUCT_INVENTORY_QUANTITY_LESS_THAN_1 = "exception.product.inventory.quantity.less.than.1";
     }
+
+    public static class Order {
+
+
+        private Order() {}
+
+        public static final String ERR_PAYMENT_NOT_FOUND = "exception.order.not.found";
+        public static final String ERR_ORDER_NOT_EXISTED = "exception.order.not.existed";
+        public static final String ERR_PAYMENT_TYPE_INVALID = "exception.order.payment.type.invalid";
+        public static final String ERR_PAYMENT_EXPIRED = "exception.order.payment.expired";
+        public static final String ERR_PAYMENT_STATUS_INVALID = "exception.order.payment.status.invalid";
+    }
+
 }

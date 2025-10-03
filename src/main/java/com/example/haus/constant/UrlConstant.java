@@ -98,4 +98,11 @@ public class UrlConstant {
         }
     }
 
+    public static class Payment {
+        private static final String PRE_FIX = "/payment";
+
+        public static final String GET_PAYMENT_URL = PRE_FIX + "/payment_url";
+    }
+
+
 }
