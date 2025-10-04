@@ -1,7 +1,6 @@
 package com.example.haus.util;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -18,25 +17,15 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class VNPayUtil {
 
-    @Getter
-    @Value("${payment.vnPay.hashSecret}")
-    static String vnp_HashSecret;
-
     @Value("${spring.profiles.active}")
     static String activeProfile;
 
-    public static String createPaymentUrl(Map<String, String> params, boolean encodeKey) {
+    public static String createPaymentUrl(Map<String, String> params) {
         return params.entrySet().stream()
                 .filter(entry -> entry.getValue() != null && !entry.getValue().isEmpty())
                 .sorted(Map.Entry.comparingByKey())
-                .map(entry ->
-                        (
-                                encodeKey ? URLEncoder.encode(
-                                    entry.getKey(),
-                                    StandardCharsets.US_ASCII)
-                                : entry.getKey()
-                        )
-                                + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.US_ASCII))
+                .map(entry -> URLEncoder.encode(entry.getKey(), StandardCharsets.US_ASCII)
+                        + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.US_ASCII))
                 .collect(Collectors.joining("&"));
     }
 
@@ -86,24 +75,26 @@ public class VNPayUtil {
         return ipAddress;
     }
 
-
-    public static String hashAllFields(Map<String, String> fields) {
+    public static String hashAllFields(Map<String, String> fields, String hashSecret) {
         List<String> fieldNames = new ArrayList<>(fields.keySet());
         Collections.sort(fieldNames);
 
         StringBuilder hashData = new StringBuilder();
-        for (Iterator<String> itr = fieldNames.iterator(); itr.hasNext();) {
+        Iterator<String> itr = fieldNames.iterator();
+        while (itr.hasNext()) {
             String fieldName = itr.next();
             String fieldValue = fields.get(fieldName);
             if ((fieldValue != null) && (!fieldValue.isEmpty())) {
-                hashData.append(fieldName).append("=").append(fieldValue);
+                hashData.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII))
+                        .append("=")
+                        .append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
                 if (itr.hasNext()) {
                     hashData.append("&");
                 }
             }
         }
 
-        return VNPayUtil.hmacSHA512(vnp_HashSecret, hashData.toString());
+        return VNPayUtil.hmacSHA512(hashSecret, hashData.toString());
     }
 
 }
