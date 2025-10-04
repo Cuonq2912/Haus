@@ -19,10 +19,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.HashMap;
 import java.util.Map;
-
 
 @RestApiV1
 @Validated
@@ -44,17 +45,39 @@ public class PaymentController {
             @RequestParam(value = "orderId") Long orderId,
             HttpServletRequest request
     ) {
-        String VNPayUrl = vnPayService.createVNPayUrl(orderId, request);
-        return ResponseUtil.success(
-                HttpStatus.OK,
-                SuccessMessage.Payment.GET_VNPAYURL_SUCCESS,
-                VNPayUrl);
+            String VNPayUrl = vnPayService.createVNPayUrl(orderId, request);
+            return ResponseUtil.success(
+                            HttpStatus.OK,
+                            SuccessMessage.Payment.GET_VNPAYURL_SUCCESS,
+                            VNPayUrl);
+
     }
 
     @Operation(
+        summary = "VNPay IPN (Instant Payment Notification)",
+        description = "API này nhận thông báo thanh toán trực tiếp từ VNPay server (Trước vnpay return api) (Server-to-Server)"
+    )
+    @PostMapping(UrlConstant.Payment.VNPAY_IPN)
+    public ResponseEntity<?> vnPayIPN(@RequestParam Map<String, String> allParams) {
+
+            boolean success = vnPayService.checkVNPayCallback(allParams);
+            Map<String, String> response = new HashMap<>();
+
+            if (success) {
+                    response.put("RspCode", "00");
+                    response.put("Message", "Confirm Success");
+            } else {
+                    response.put("RspCode", "99");
+                    response.put("Message", "Confirm Fail");
+            }
+
+            return ResponseUtil.success(HttpStatus.OK, "" , response);
+    }
+    
+
+    @Operation(
             summary = "Xử lý VNPay return",
-            description = "VNPay gọi về khi thanh toán xong",
-            security = @SecurityRequirement(name = "Bearer Token")
+            description = "VNPay gọi về khi thanh toán xong (Callback URL)"
     )
     @GetMapping(UrlConstant.Payment.VNPAY_RETURN)
     public ResponseEntity<?> vnPayReturn(@RequestParam Map<String, String> allParams) {
@@ -64,5 +87,7 @@ public class PaymentController {
                 ? ResponseUtil.success(HttpStatus.OK, SuccessMessage.Payment.CALLBACK_VNPAY_SUCCESS)
                 : ResponseUtil.error(HttpStatus.BAD_REQUEST, ErrorMessage.Payment.CALLBACK_VNPAY_FAIL);
     }
+
+    
 
 }

@@ -1,16 +1,15 @@
 package com.example.haus.service.impl;
 
 import com.example.haus.config.VNPayConfig;
-import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.OrderStatus;
 import com.example.haus.domain.entity.product.Order;
 import com.example.haus.domain.entity.product.payment.Payment;
-import com.example.haus.domain.entity.product.payment.PaymentGateway;
 import com.example.haus.domain.entity.product.payment.PaymentStatus;
 import com.example.haus.domain.entity.product.payment.PaymentType;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.OrderRepository;
+import com.example.haus.repository.PaymentRepository;
 import com.example.haus.service.VNPayService;
 import com.example.haus.util.VNPayUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -36,6 +36,8 @@ public class VNPayServiceImpl implements VNPayService {
 
     final VNPayConfig vnPayConfig;
 
+    final PaymentRepository paymentRepository;
+
     VNPayService vNPayService;
 
     @Value("${payment.vnPay.maxTime}")
@@ -45,7 +47,6 @@ public class VNPayServiceImpl implements VNPayService {
     static String activeProfile;
 
     private final String SUCCESS_CODE = "00";
-
 
     @Override
     public String createVNPayUrl(Long orderId, HttpServletRequest request) {
@@ -71,20 +72,18 @@ public class VNPayServiceImpl implements VNPayService {
         // Tạo mã giao dịch
         String ref = order.getId() + "-" + System.currentTimeMillis();
         params.put("vnp_TxnRef", ref);
-        params.put("vnp_OrderInfo", "Thanh toán đơn hàng " + order.getId());
+        params.put("vnp_OrderInfo", "Payment for order " + order.getId());
 
         // Lấy IP
         String ipAddr = VNPayUtil.getIpAddress(request, activeProfile);
         params.put("vnp_IpAddr", ipAddr);
 
-        String query = VNPayUtil.createPaymentUrl(params, true);
-        String hashData = VNPayUtil.createPaymentUrl(params, false);
+        // Tạo hashData
+        String hashData = VNPayUtil.createPaymentUrl(params);
         String vnpSecureHash = VNPayUtil.hmacSHA512(vnPayConfig.getVnp_HashSecret(), hashData);
 
-        query += "&vnp_SecureHash=" + vnpSecureHash;
-        return vnPayConfig.getVnp_PayUrl() + "?" + query;
+        return vnPayConfig.getVnp_PayUrl() + "?" + hashData + "&vnp_SecureHash=" + vnpSecureHash;
     }
-
 
     @NotNull
     private static Payment getPayment(Order order) {
@@ -103,7 +102,6 @@ public class VNPayServiceImpl implements VNPayService {
         }
         return payment;
     }
-
 
     private void buildTimeParams(Map<String, String> params, Date expiredTime, Date currentTime) {
         Calendar now = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
@@ -128,6 +126,7 @@ public class VNPayServiceImpl implements VNPayService {
     }
 
     @Override
+    @Transactional
     public boolean checkVNPayCallback(Map<String, String> params) {
 
         String vnp_SecureHash = params.get("vnp_SecureHash");
@@ -136,35 +135,47 @@ public class VNPayServiceImpl implements VNPayService {
         fieldsToHash.remove("vnp_SecureHash");
         fieldsToHash.remove("vnp_SecureHashType");
 
-        String signValue = VNPayUtil.hashAllFields(params);
+        String hashSecret = vnPayConfig.getVnp_HashSecret();
+        log.info("Fields to hash: {}", fieldsToHash);
+
+        String signValue = VNPayUtil.hashAllFields(fieldsToHash, hashSecret);
+        log.info("Signatures match: {}", signValue.equals(vnp_SecureHash));
+
         if (!signValue.equals(vnp_SecureHash)) {
             log.error("Invalid signature! Expected: {}, Got: {}", signValue, vnp_SecureHash);
             return false;
         }
 
         String txnRef = params.get("vnp_TxnRef");
+        String responseCode = params.get("vnp_ResponseCode");
+        Long amount = Long.parseLong(params.get("vnp_Amount")) / 100;
+
         String[] p = txnRef.split("-");
         Order order = orderRepository.findById(Long.valueOf(p[0]))
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
 
-        boolean checkPayment = checkPaymentResponse(order, params);
-        if(checkPayment){
-            Payment payment = order.getPayment();
+        Payment payment = order.getPayment();
+
+        // Verify amount
+        if (!payment.getAmount().equals(amount)) {
+            payment.setStatus(PaymentStatus.CANCELLED);
+            order.setStatus(OrderStatus.CANCELLED);
+            paymentRepository.save(payment);
+            orderRepository.save(order);
+            return false;
+        }
+
+        if (SUCCESS_CODE.equals(responseCode)) {
             payment.setStatus(PaymentStatus.COMPLETED);
             order.setStatus(OrderStatus.COMPLETED);
-            orderRepository.save(order);
-            return true;
+        } else {
+            payment.setStatus(PaymentStatus.CANCELLED);
+            order.setStatus(OrderStatus.CANCELLED);
         }
-        else return false;
-    }
 
-    private boolean checkPaymentResponse(Order order, Map<String, String> params) {
-        String code = params.get("vnp_ResponseCode");
-        if(code.equals(SUCCESS_CODE)){
-            long amount = Long.parseLong(params.get("vnp_Amount")) / 100L;
-            Payment payment = order.getPayment();
-            return amount == payment.getAmount();
-        }
-        else return false;
+        paymentRepository.save(payment);
+        orderRepository.save(order);
+
+        return SUCCESS_CODE.equals(responseCode);
     }
 }
