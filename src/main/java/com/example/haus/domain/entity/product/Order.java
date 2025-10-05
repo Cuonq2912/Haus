@@ -30,6 +30,8 @@ public class Order extends BaseEntity {
 
     Double shippingFee;
 
+    Double totalAmount;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     OrderStatus status;

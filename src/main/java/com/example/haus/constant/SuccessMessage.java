@@ -53,6 +53,8 @@ public class SuccessMessage {
     }
     public static class Product {
 
+        private Product() {}
+
         public static final String GET_PRODUCT_SUCCESS = "Get product successful";
         public static final String CREATE_PRODUCT_SUCCESS = "Create product successful";
         public static final String UPDATE_PRODUCT_SUCCESS = "Update product successful";
@@ -66,4 +68,17 @@ public class SuccessMessage {
         public static final String UPDATE_PRODUCT_VARIATION_SUCCESS = "Update product variation successful";
         public static final String DELETE_PRODUCT_VARIATION_SUCCESS = "Delete product variation successful";
     }
+
+    public static class Payment {
+
+        private Payment() {}
+
+        public static final String GET_VNPAYURL_SUCCESS = "Get VNPay url request successful";
+        public static final String CALLBACK_VNPAY_SUCCESS = "VNPay callback verification successful";
+
+    }
+
+
+
+
 }
