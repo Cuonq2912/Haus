@@ -125,6 +125,7 @@ public class ErrorMessage {
     public static class Order {
 
 
+
         private Order() {}
 
         public static final String ERR_PAYMENT_NOT_FOUND = "exception.order.not.found";
@@ -132,13 +133,17 @@ public class ErrorMessage {
         public static final String ERR_PAYMENT_TYPE_INVALID = "exception.order.payment.type.invalid";
         public static final String ERR_PAYMENT_EXPIRED = "exception.order.payment.expired";
         public static final String ERR_PAYMENT_STATUS_INVALID = "exception.order.payment.status.invalid";
+        public static final String ERR_PAYMENT_COMPLETED = "exception.order.payment.completed";
+
     }
 
     public static class Payment {
 
         private Payment() {}
 
-        public static final String CALLBACK_VNPAY_FAIL = "exception.vnpay.callback.verification.failed";
+        public static final String CALLBACK_VNPAY_FAIL = "exception.vnpay.callback.fail";
+        public static final String IPN_VERIFY_FAIL = "exception.vnpay.ipn.verify.fail";
+        public static final String CREATE_VNPAY_URL_FAIL = "exception.vnpay.url.create.fail";
 
 
     }
