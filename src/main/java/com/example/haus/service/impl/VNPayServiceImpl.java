@@ -38,12 +38,10 @@ public class VNPayServiceImpl implements VNPayService {
 
     final PaymentRepository paymentRepository;
 
-    VNPayService vNPayService;
-
     @Value("${payment.vnPay.maxTime}")
     int maxPaymentTime;
 
-    @Value("${spring.profiles.active}")
+    @Value("${spring.config.activate.on-profile}")
     static String activeProfile;
 
     private final String SUCCESS_CODE = "00";
