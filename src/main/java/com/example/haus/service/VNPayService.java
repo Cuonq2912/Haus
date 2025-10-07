@@ -9,10 +9,12 @@ import java.util.Map;
 public interface VNPayService {
 
 
-    // sau khi nhấn btn "Thanh Toán": -> vnpay trả về status Success : Fail vào PaymentCallbackComponent (payment/payment-callback) return-url(config)
+    String createVNPayUrl(Long orderId, HttpServletRequest request);
 
-    public String createVNPayUrl(Long orderId, HttpServletRequest request);
+    //Xử lý IPN từ VNPay Server(Update db)
+    Map<String, String> processVNPayIPN(Map<String, String> params);
 
-    public boolean checkVNPayCallback(Map<String, String> params);
+    // Xử lý Return URL từ Browser(verify và hiển thị)
+    Map<String, Object> handleVNPayReturn(Map<String, String> params);
 
 }

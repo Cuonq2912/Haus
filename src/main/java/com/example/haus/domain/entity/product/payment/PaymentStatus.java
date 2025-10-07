@@ -6,9 +6,6 @@ public enum PaymentStatus {
     @JsonProperty("pending")
     PENDING,
 
-    @JsonProperty("cod")
-    COD,
-
     @JsonProperty("completed")
     COMPLETED,
 

@@ -57,21 +57,14 @@ public class PaymentController {
         summary = "VNPay IPN (Instant Payment Notification)",
         description = "API này nhận thông báo thanh toán trực tiếp từ VNPay server (Trước vnpay return api) (Server-to-Server)"
     )
-    @PostMapping(UrlConstant.Payment.VNPAY_IPN)
+    @GetMapping(UrlConstant.Payment.VNPAY_IPN)
     public ResponseEntity<?> vnPayIPN(@RequestParam Map<String, String> allParams) {
 
-            boolean success = vnPayService.checkVNPayCallback(allParams);
-            Map<String, String> response = new HashMap<>();
-
-            if (success) {
-                    response.put("RspCode", "00");
-                    response.put("Message", "Confirm Success");
-            } else {
-                    response.put("RspCode", "99");
-                    response.put("Message", "Confirm Fail");
-            }
-
-            return ResponseUtil.success(HttpStatus.OK, "" , response);
+        Map<String, String> response = vnPayService.processVNPayIPN(allParams);
+        return ResponseUtil.success(
+                HttpStatus.OK,
+                SuccessMessage.Payment.IPN_RECEIVED_SUCCESS,
+                response);
     }
     
 
@@ -81,10 +74,10 @@ public class PaymentController {
     )
     @GetMapping(UrlConstant.Payment.VNPAY_RETURN)
     public ResponseEntity<?> vnPayReturn(@RequestParam Map<String, String> allParams) {
-        boolean success = vnPayService.checkVNPayCallback(allParams);
-
+        Map<String, Object> result = vnPayService.handleVNPayReturn(allParams);
+        boolean success = (boolean) result.get("success");
         return success
-                ? ResponseUtil.success(HttpStatus.OK, SuccessMessage.Payment.CALLBACK_VNPAY_SUCCESS)
+                ? ResponseUtil.success(HttpStatus.OK, SuccessMessage.Payment.CALLBACK_VNPAY_SUCCESS, result)
                 : ResponseUtil.error(HttpStatus.BAD_REQUEST, ErrorMessage.Payment.CALLBACK_VNPAY_FAIL);
     }
 

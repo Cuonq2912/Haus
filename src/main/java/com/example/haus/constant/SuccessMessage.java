@@ -74,8 +74,8 @@ public class SuccessMessage {
         private Payment() {}
 
         public static final String GET_VNPAYURL_SUCCESS = "Get VNPay url request successful";
-        public static final String CALLBACK_VNPAY_SUCCESS = "VNPay callback verification successful";
-
+        public static final String IPN_RECEIVED_SUCCESS = "VNPay IPN received and processed successfully";
+        public static final String CALLBACK_VNPAY_SUCCESS = "VNPay return callback processed successfully";
     }
 
 

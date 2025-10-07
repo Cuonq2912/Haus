@@ -7,6 +7,7 @@ import com.example.haus.domain.entity.product.Order;
 import com.example.haus.domain.entity.product.payment.Payment;
 import com.example.haus.domain.entity.product.payment.PaymentStatus;
 import com.example.haus.domain.entity.product.payment.PaymentType;
+import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.OrderRepository;
 import com.example.haus.repository.PaymentRepository;
@@ -37,8 +38,6 @@ public class VNPayServiceImpl implements VNPayService {
     final VNPayConfig vnPayConfig;
 
     final PaymentRepository paymentRepository;
-
-    VNPayService vNPayService;
 
     @Value("${payment.vnPay.maxTime}")
     int maxPaymentTime;
@@ -95,10 +94,10 @@ public class VNPayServiceImpl implements VNPayService {
             throw new ResourceNotFoundException(ErrorMessage.Order.ERR_PAYMENT_TYPE_INVALID);
         }
         if (payment.getStatus() == PaymentStatus.EXPIRED) {
-            throw new ResourceNotFoundException(ErrorMessage.Order.ERR_PAYMENT_EXPIRED);
+            throw new InvalidDataException(ErrorMessage.Order.ERR_PAYMENT_EXPIRED);
         }
-        if (payment.getStatus() != PaymentStatus.PENDING) {
-            throw new ResourceNotFoundException(ErrorMessage.Order.ERR_PAYMENT_STATUS_INVALID);
+        if (payment.getStatus() == PaymentStatus.COMPLETED) {
+            throw new InvalidDataException(ErrorMessage.Order.ERR_PAYMENT_COMPLETED);
         }
         return payment;
     }
@@ -127,55 +126,100 @@ public class VNPayServiceImpl implements VNPayService {
 
     @Override
     @Transactional
-    public boolean checkVNPayCallback(Map<String, String> params) {
+    public Map<String, String> processVNPayIPN(Map<String, String> params) {
+        Map<String, String> response = new HashMap<>();
+        try{
+            if (verifySignature(params)) {
+                log.error("IPN: Invalid signature!");
+                response.put("RspCode", "97");
+                response.put("Message", "Invalid signature");
+                return response;
+            }
 
-        String vnp_SecureHash = params.get("vnp_SecureHash");
+            String txnRef = params.get("vnp_TxnRef");
+            String responseCode = params.get("vnp_ResponseCode");
+            Long amount = Long.parseLong(params.get("vnp_Amount")) / 100;
+
+            String[] p = txnRef.split("-");
+            Long orderId = Long.valueOf(p[0]);
+            Order order = orderRepository.findById(orderId)
+                    .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
+
+            Payment payment = order.getPayment();
+
+            if (payment.getStatus() == PaymentStatus.COMPLETED) {
+                log.warn("IPN: Order {} already processed as COMPLETED", orderId);
+                response.put("RspCode", "02");
+                response.put("Message", "Order already confirmed");
+                return response;
+            }
+
+            // Verify amount
+            if (!payment.getAmount().equals(amount)) {
+                log.error("IPN: Amount mismatch! Expected: {}, Got: {}", payment.getAmount(), amount);
+                response.put("RspCode", "04");
+                response.put("Message", "Invalid amount");
+                return response;
+            }
+
+            if (SUCCESS_CODE.equals(responseCode)) {
+                payment.setStatus(PaymentStatus.COMPLETED);
+                order.setStatus(OrderStatus.COMPLETED);
+            } else {
+                payment.setStatus(PaymentStatus.CANCELLED);
+                order.setStatus(OrderStatus.CANCELLED);
+            }
+
+            paymentRepository.save(payment);
+            orderRepository.save(order);
+
+            response.put("RspCode", "00");
+            response.put("Message", "Confirm Success");
+
+        } catch (Exception e){
+            response.put("RspCode", "99");
+            response.put("Message", "Unknown error");
+        }
+
+        return response;
+    }
+
+    @Override
+    public Map<String, Object> handleVNPayReturn(Map<String, String> params) {
+        Map<String, Object> result = new HashMap<>();
+
+        if (verifySignature(params)) {
+            log.error("Return: Invalid signature!");
+            result.put("success", false);
+            result.put("message", "Invalid signature");
+            return result;
+        }
+        String responseCode = params.get("vnp_ResponseCode");
+        String txnRef = params.get("vnp_TxnRef");
+        String transactionNo = params.get("vnp_TransactionNo");
+        String bankCode = params.get("vnp_BankCode");
+
+        boolean isSuccess = SUCCESS_CODE.equals(responseCode);
+        result.put("success", isSuccess);
+        result.put("orderId", txnRef.split("-")[0]);
+        result.put("transactionNo", transactionNo);
+        result.put("bankCode", bankCode);
+        result.put("message", isSuccess ? "Thanh toán thành công" : "Thanh toán thất bại");
+
+        log.info("Return: Transaction {}, Success: {}", transactionNo, isSuccess);
+
+        return result;
+    }
+
+    private boolean verifySignature(Map<String, String> params) {
+        String receivedHash = params.get("vnp_SecureHash");
 
         Map<String, String> fieldsToHash = new HashMap<>(params);
         fieldsToHash.remove("vnp_SecureHash");
         fieldsToHash.remove("vnp_SecureHashType");
 
-        String hashSecret = vnPayConfig.getVnp_HashSecret();
-        log.info("Fields to hash: {}", fieldsToHash);
+        String calculatedHash = VNPayUtil.hashAllFields(fieldsToHash, vnPayConfig.getVnp_HashSecret());
 
-        String signValue = VNPayUtil.hashAllFields(fieldsToHash, hashSecret);
-        log.info("Signatures match: {}", signValue.equals(vnp_SecureHash));
-
-        if (!signValue.equals(vnp_SecureHash)) {
-            log.error("Invalid signature! Expected: {}, Got: {}", signValue, vnp_SecureHash);
-            return false;
-        }
-
-        String txnRef = params.get("vnp_TxnRef");
-        String responseCode = params.get("vnp_ResponseCode");
-        Long amount = Long.parseLong(params.get("vnp_Amount")) / 100;
-
-        String[] p = txnRef.split("-");
-        Order order = orderRepository.findById(Long.valueOf(p[0]))
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
-
-        Payment payment = order.getPayment();
-
-        // Verify amount
-        if (!payment.getAmount().equals(amount)) {
-            payment.setStatus(PaymentStatus.CANCELLED);
-            order.setStatus(OrderStatus.CANCELLED);
-            paymentRepository.save(payment);
-            orderRepository.save(order);
-            return false;
-        }
-
-        if (SUCCESS_CODE.equals(responseCode)) {
-            payment.setStatus(PaymentStatus.COMPLETED);
-            order.setStatus(OrderStatus.COMPLETED);
-        } else {
-            payment.setStatus(PaymentStatus.CANCELLED);
-            order.setStatus(OrderStatus.CANCELLED);
-        }
-
-        paymentRepository.save(payment);
-        orderRepository.save(order);
-
-        return SUCCESS_CODE.equals(responseCode);
+        return !calculatedHash.equalsIgnoreCase(receivedHash);
     }
 }
