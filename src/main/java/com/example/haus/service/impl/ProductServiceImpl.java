@@ -284,11 +284,12 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public PaginationResponseDto<ProductResponseDto> filterProducts(PaginationRequestDto paginationRequest,
                                                                     String sortByPrice,
-                                                                    String... search) {
+                                                                    String search) {
+        log.info("sortByPrice = {}; search = {}", sortByPrice, search);
         List<SearchCriteria> searchCriteriaList = new ArrayList<>();
         if (search != null) {
-            if(search.length > 0) {
-                String[] newSearch = StringUtils.split("&", search.toString());
+            if(search.length() > 0) {
+                String[] newSearch = StringUtils.split(search, "&");
                 Pattern pattern = Pattern.compile(AppConstants.SEARCH_OPERATOR);
                 for (String s : newSearch) {
                     Matcher matcher = pattern.matcher(s);

@@ -79,7 +79,7 @@ public class EmailServiceImpl implements EmailService {
             request.setBody(mail.build());
             request.setEndpoint("mail/send");
             Response response = sendGrid.api(request);
-
+            log.info("repsonseCode = {}", response.getStatusCode());
             if(response.getStatusCode() == 202) {
                 log.info("Sending email verification successfully");
             } else {

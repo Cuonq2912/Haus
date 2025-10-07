@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
 
         String username = authentication.getName();
 
-        User user = userRepository.findByUsername(username).orElseThrow(
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
                 () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         if (Boolean.TRUE.equals(user.getIsDeleted())) {
@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto getDetailProfile(Authentication authentication) {
         String username = authentication.getName();
 
-        User user = userRepository.findByUsername(username).orElseThrow(
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
                 () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         return userMapper.userToUserResponseDto(user);
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto updateDetailProfile(ConfirmPasswordUpdateUserRequestDto requestDto, Authentication authentication) {
         String username = authentication.getName();
 
-        User user = userRepository.findByUsername(username).orElseThrow(
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
                 () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         if (requestDto.getProfileData() != null) {
@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService {
 
         String username = authentication.getName();
 
-        User user = userRepository.findByUsername(username).orElseThrow(
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
                 () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
@@ -118,7 +118,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto uploadAvatar(MultipartFile file, Authentication authentication) throws IOException {
 
-        User user = userRepository.findByUsername(authentication.getName()).orElseThrow(
+        User user = userRepository.findByUsernameAndIsDeletedFalse(authentication.getName()).orElseThrow(
                 () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         if(user.getAvatarPublicId() != null){

@@ -74,7 +74,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public LoginResponseDto authentication(LoginRequestDto request) {
 
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
+        User user = userRepository.findByEmailAndIsDeletedFalse(request.getEmail()).orElseThrow(
                 () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         try {
@@ -137,7 +137,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new InvalidDataException(ErrorMessage.Auth.INVALID_REFRESH_TOKEN);
         }
 
-        User user = userRepository.findByUsername(username).orElseThrow(
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
                 () -> new UsernameNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         String accessToken = jwtService.generateAccessToken(user.getId(), user.getUsername(),
@@ -152,10 +152,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void register(RegisterRequestDto request) {
-        if (userRepository.existsUserByUsername(request.getUsername()))
+        if (userRepository.existsUserByUsernameAndIsDeletedFalse(request.getUsername()))
             throw new InvalidDataException(ErrorMessage.User.ERR_USERNAME_EXISTED);
 
-        if (userRepository.existsUserByEmail(request.getEmail()))
+        if (userRepository.existsUserByEmailAndIsDeletedFalse(request.getEmail()))
             throw new InvalidDataException(ErrorMessage.User.ERR_EMAIL_EXISTED);
 
         String otp = OtpUtil.generateOtp();
@@ -205,7 +205,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public void forgotPassword(ForgotPasswordRequestDto request) {
         log.info(request.getEmail());
 
-        if (!userRepository.existsUserByEmail(request.getEmail()))
+        if (!userRepository.existsUserByEmailAndIsDeletedFalse(request.getEmail()))
             throw new ResourceNotFoundException(ErrorMessage.User.ERR_EMAIL_NOT_EXISTED);
 
         String otp = OtpUtil.generateOtp();
@@ -241,7 +241,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public UserResponseDto resetPassword(ResetPasswordRequestDto request) {
 
-        User user = userRepository.findByEmail(request.getEmail())
+        User user = userRepository.findByEmailAndIsDeletedFalse(request.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
