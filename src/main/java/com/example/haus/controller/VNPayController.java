@@ -19,10 +19,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RestApiV1
@@ -31,7 +29,7 @@ import java.util.Map;
 @Slf4j(topic = "PAYMENT-CONTROLLER")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Tag(name = "payment-controller", description = "Payment APIs")
-public class PaymentController {
+public class VNPayController {
 
     VNPayService vnPayService;
 

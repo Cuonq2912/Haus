@@ -1,1 +1,0 @@
-chứa các file json về các loại product

@@ -12,7 +12,7 @@ import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.OrderRepository;
 import com.example.haus.repository.PaymentRepository;
 import com.example.haus.service.VNPayService;
-import com.example.haus.util.VNPayUtil;
+import com.example.haus.util.PaymentUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -74,12 +74,12 @@ public class VNPayServiceImpl implements VNPayService {
         params.put("vnp_OrderInfo", "Payment for order " + order.getId());
 
         // Lấy IP
-        String ipAddr = VNPayUtil.getIpAddress(request, activeProfile);
+        String ipAddr = PaymentUtil.getIpAddress(request, activeProfile);
         params.put("vnp_IpAddr", ipAddr);
 
         // Tạo hashData
-        String hashData = VNPayUtil.createPaymentUrl(params);
-        String vnpSecureHash = VNPayUtil.hmacSHA512(vnPayConfig.getVnp_HashSecret(), hashData);
+        String hashData = PaymentUtil.createPaymentUrl(params);
+        String vnpSecureHash = PaymentUtil.hmacSHA512(vnPayConfig.getVnp_HashSecret(), hashData);
 
         return vnPayConfig.getVnp_PayUrl() + "?" + hashData + "&vnp_SecureHash=" + vnpSecureHash;
     }
@@ -218,7 +218,7 @@ public class VNPayServiceImpl implements VNPayService {
         fieldsToHash.remove("vnp_SecureHash");
         fieldsToHash.remove("vnp_SecureHashType");
 
-        String calculatedHash = VNPayUtil.hashAllFields(fieldsToHash, vnPayConfig.getVnp_HashSecret());
+        String calculatedHash = PaymentUtil.hashAllFields(fieldsToHash, vnPayConfig.getVnp_HashSecret());
 
         return !calculatedHash.equalsIgnoreCase(receivedHash);
     }
