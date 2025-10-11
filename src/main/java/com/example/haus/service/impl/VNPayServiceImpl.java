@@ -84,9 +84,11 @@ public class VNPayServiceImpl implements VNPayService {
     @NotNull
     private Payment getOrCreatePayment(Order order) {
         Payment payment = order.getPayment();
-        if (payment == null || payment.getStatus() == PaymentStatus.EXPIRED || payment.getStatus() == PaymentStatus.CANCELLED) {
+
+        if (payment == null) {
             return createPaymentRecord(order);
         }
+
         if (payment.getType() != PaymentType.ONLINE_PAYMENT) {
             throw new InvalidDataException(ErrorMessage.Order.ERR_PAYMENT_TYPE_INVALID);
         }
@@ -94,13 +96,34 @@ public class VNPayServiceImpl implements VNPayService {
         if (payment.getStatus() == PaymentStatus.COMPLETED) {
             throw new InvalidDataException(ErrorMessage.Order.ERR_PAYMENT_COMPLETED);
         }
+
+        // Payment EXPIRED hoặc CANCELLED
+        if (payment.getStatus() == PaymentStatus.EXPIRED || payment.getStatus() == PaymentStatus.CANCELLED) {
+            Calendar newExpireTime = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+            newExpireTime.add(Calendar.SECOND, maxPaymentTime);
+            
+            payment.setStatus(PaymentStatus.PENDING);
+            payment.setExpireAt(newExpireTime.getTime());
+            return paymentRepository.save(payment);
+        }
+
+        // Payment PENDING nhưng đã quá hạn
+        Date currentTime = new Date();
+        if (payment.getStatus() == PaymentStatus.PENDING && currentTime.after(payment.getExpireAt())) {
+            Calendar newExpireTime = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+            newExpireTime.add(Calendar.SECOND, maxPaymentTime);
+            
+            payment.setExpireAt(newExpireTime.getTime());
+            return paymentRepository.save(payment);
+        }
+        
         return payment;
     }
 
     private Payment createPaymentRecord(Order order) {
         Calendar expireTime = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
         expireTime.add(Calendar.SECOND, maxPaymentTime);
-        
+
         Payment payment = Payment.builder()
                 .amount(order.getTotalAmount())
                 .gateway(PaymentGateway.VNPAY)
