@@ -26,7 +26,7 @@ public class Payment extends BaseEntity {
     @Column(name = "id", insertable = false, updatable = false, nullable = false, columnDefinition = "CHAR(36)")
     String id;
 
-    Long amount;
+    Double amount;
 
     @Enumerated(EnumType.STRING)
     PaymentGateway gateway;

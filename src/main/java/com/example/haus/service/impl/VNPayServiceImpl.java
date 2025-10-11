@@ -5,6 +5,7 @@ import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.OrderStatus;
 import com.example.haus.domain.entity.product.Order;
 import com.example.haus.domain.entity.product.payment.Payment;
+import com.example.haus.domain.entity.product.payment.PaymentGateway;
 import com.example.haus.domain.entity.product.payment.PaymentStatus;
 import com.example.haus.domain.entity.product.payment.PaymentType;
 import com.example.haus.exception.InvalidDataException;
@@ -52,21 +53,17 @@ public class VNPayServiceImpl implements VNPayService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
 
-        Payment payment = getPayment(order);
+        Payment payment = getOrCreatePayment(order);
+
+        Map<String, String> params = vnPayConfig.getConfig();
 
         Date currentTime = new Date();
         Date expireTime = payment.getExpireAt();
 
-        if (currentTime.after(expireTime)) {
-            payment.setStatus(PaymentStatus.EXPIRED);
-            order.setPayment(payment);
-            orderRepository.save(order);
-            throw new ResourceNotFoundException(ErrorMessage.Order.ERR_PAYMENT_EXPIRED);
-        }
-
-        Map<String, String> params = vnPayConfig.getConfig();
         buildTimeParams(params, expireTime, currentTime);
-        params.put("vnp_Amount", String.valueOf(payment.getAmount() * 100L));
+        
+        long amountInVND = Math.round(payment.getAmount() * 100);
+        params.put("vnp_Amount", String.valueOf(amountInVND));
 
         // Tạo mã giao dịch
         String ref = order.getId() + "-" + System.currentTimeMillis();
@@ -85,21 +82,35 @@ public class VNPayServiceImpl implements VNPayService {
     }
 
     @NotNull
-    private static Payment getPayment(Order order) {
+    private Payment getOrCreatePayment(Order order) {
         Payment payment = order.getPayment();
-        if (payment == null) {
-            throw new ResourceNotFoundException(ErrorMessage.Order.ERR_PAYMENT_NOT_FOUND);
+        if (payment == null || payment.getStatus() == PaymentStatus.EXPIRED || payment.getStatus() == PaymentStatus.CANCELLED) {
+            return createPaymentRecord(order);
         }
-        if (payment.getType() != PaymentType.BANK_TRANSFER) {
-            throw new ResourceNotFoundException(ErrorMessage.Order.ERR_PAYMENT_TYPE_INVALID);
+        if (payment.getType() != PaymentType.ONLINE_PAYMENT) {
+            throw new InvalidDataException(ErrorMessage.Order.ERR_PAYMENT_TYPE_INVALID);
         }
-        if (payment.getStatus() == PaymentStatus.EXPIRED) {
-            throw new InvalidDataException(ErrorMessage.Order.ERR_PAYMENT_EXPIRED);
-        }
+        
         if (payment.getStatus() == PaymentStatus.COMPLETED) {
             throw new InvalidDataException(ErrorMessage.Order.ERR_PAYMENT_COMPLETED);
         }
         return payment;
+    }
+
+    private Payment createPaymentRecord(Order order) {
+        Calendar expireTime = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        expireTime.add(Calendar.SECOND, maxPaymentTime);
+        
+        Payment payment = Payment.builder()
+                .amount(order.getTotalAmount())
+                .gateway(PaymentGateway.VNPAY)
+                .type(PaymentType.ONLINE_PAYMENT)
+                .status(PaymentStatus.PENDING)
+                .expireAt(expireTime.getTime())
+                .order(order)
+                .build();
+        
+        return paymentRepository.save(payment);
     }
 
     private void buildTimeParams(Map<String, String> params, Date expiredTime, Date currentTime) {
