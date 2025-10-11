@@ -201,10 +201,25 @@
             <version>2.5.0</version>
         </dependency>
 
+        <!--    Export PDF    -->
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>itextpdf</artifactId>
             <version>5.5.13.3</version>
+        </dependency>
+
+        <!-- QR CODE  -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.5.3</version>
+        </dependency>
+
+        <!-- ZXing J2SE: Chứa MatrixToImageWriter (để chuyển BitMatrix sang BufferedImage) -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+            <version>3.5.3</version>
         </dependency>
     </dependencies>
 

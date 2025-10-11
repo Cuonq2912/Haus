@@ -1,6 +1,7 @@
 package com.example.haus.service.impl;
 
 import com.example.haus.constant.ErrorMessage;
+import com.example.haus.constant.OrderStatus;
 import com.example.haus.domain.dto.response.invoice.InvoiceItemDto;
 import com.example.haus.domain.dto.response.invoice.InvoiceResponseDto;
 import com.example.haus.domain.dto.response.user.UserResponseDto;
@@ -12,6 +13,8 @@ import com.example.haus.domain.mapper.*;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.OrderRepository;
 import com.example.haus.service.OrderService;
+import com.example.haus.util.PdfUtil;
+import com.google.zxing.WriterException;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -55,12 +58,18 @@ public class OrderServiceImpl implements OrderService {
 
     MediaMapper mediaMapper;
 
+    private static double totalPrice = 0;
+
     @Override
     @Transactional
     public InvoiceResponseDto getInvoiceDetails(Long orderId) {
 
         Order order = orderRepository.findOrderDetailsForInvoice(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
+
+        if (order.getStatus() != OrderStatus.COMPLETED) {
+            throw new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_COMPLETED);
+        }
 
         User user = order.getUser();
         Payment payment = order.getPayment();
@@ -156,7 +165,7 @@ public class OrderServiceImpl implements OrderService {
             // Thêm các phần tử vào mainTable
             mainTable.addCell(createHeaderCell(invoiceData, titleFont, normalFont, baseFont));
             mainTable.addCell(createSellerBuyerInfoCell(invoiceData, boldFont, normalFont, smallNormalFont));
-            mainTable.addCell(createItemsTable(invoiceData, smallBoldFont, smallNormalFont, boldFont));
+            mainTable.addCell(createItemsTable(invoiceData, smallBoldFont, smallNormalFont, smallBoldFont));
             mainTable.addCell(createTotalAndSignatureCell(invoiceData, boldFont, normalFont, smallNormalFont));
 
             document.add(mainTable);
@@ -173,7 +182,7 @@ public class OrderServiceImpl implements OrderService {
         // 3 cột: Logo, Tiêu đề, Số Serial
         PdfPTable headerTable = new PdfPTable(3);
         headerTable.setWidthPercentage(100);
-        headerTable.setWidths(new float[]{2f, 6f, 3f});
+        headerTable.setWidths(new float[]{2f, 5f, 2.5f});
 
         // 1. Logo Cell (Cột 1)
         // Thường sử dụng Image.getInstance() nếu có logo
@@ -181,7 +190,7 @@ public class OrderServiceImpl implements OrderService {
         logoCell.setHorizontalAlignment(Element.ALIGN_CENTER);
         logoCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         logoCell.setBorder(Rectangle.NO_BORDER);
-        addImage(logoCell, normalFont);
+        PdfUtil.addImage(logoCell, normalFont);
 
         // 2. Title Cell (Cột 2)
         PdfPTable titleSubTable = new PdfPTable(1);
@@ -190,31 +199,35 @@ public class OrderServiceImpl implements OrderService {
         // Tiêu đề
         Paragraph title = new Paragraph("HÓA ĐƠN BÁN HÀNG", titleFont);
         title.setAlignment(Element.ALIGN_CENTER);
-        titleSubTable.addCell(createCell(title, Rectangle.NO_BORDER));
+        titleSubTable.addCell(PdfUtil.createCell(title, Rectangle.NO_BORDER));
 
         // Sub Title
         Paragraph subTitle = new Paragraph("SALES INVOICE", normalFont);
         subTitle.setAlignment(Element.ALIGN_CENTER);
-        titleSubTable.addCell(createCell(subTitle, Rectangle.NO_BORDER));
+        titleSubTable.addCell(PdfUtil.createCell(subTitle, Rectangle.NO_BORDER));
 
         // Ngày tháng
         LocalDate orderDate = data.getResponseDto().getOrderDate();
         String dateStr = String.format("Ngày(day) %d tháng(month) %d năm(year) %d",
                 orderDate.getDayOfMonth(), orderDate.getMonthValue(), orderDate.getYear()); // Lấy từ Order date của bạn
-        Paragraph date = new Paragraph(dateStr, normalFont);
+        Paragraph date = new Paragraph(dateStr, new Font(baseFont, 10, Font.NORMAL));
         date.setAlignment(Element.ALIGN_CENTER);
-        titleSubTable.addCell(createCell(date, Rectangle.NO_BORDER));
+        titleSubTable.addCell(PdfUtil.createCell(date, Rectangle.NO_BORDER));
 
-        PdfPCell titleCell = createCell(titleSubTable, Rectangle.NO_BORDER);
+        PdfPCell titleCell = PdfUtil.createCell(titleSubTable, Rectangle.NO_BORDER);
 
         // 3. Serial Cell (Cột 3)
         PdfPTable serialSubTable = new PdfPTable(1);
-        Paragraph serial = new Paragraph("Mẫu số - Ký hiệu (Serial No.): 2C25TTU", new Font(baseFont, 8, Font.NORMAL));
+        Paragraph serial = new Paragraph("Mẫu số (Serial No.): 2C25TTU", new Font(baseFont, 8, Font.NORMAL));
         Paragraph invoiceNo = new Paragraph("Số hóa đơn (Invoice No.): " + data.getResponseDto().getId(), new Font(baseFont, 8, Font.BOLD));
-        serialSubTable.addCell(createCell(serial, Rectangle.NO_BORDER, Element.ALIGN_CENTER));
-        serialSubTable.addCell(createCell(invoiceNo, Rectangle.NO_BORDER, Element.ALIGN_CENTER));
+        serialSubTable.addCell(PdfUtil.createCell(serial, Rectangle.NO_BORDER, Element.ALIGN_CENTER));
+        serialSubTable.addCell(PdfUtil.createCell(invoiceNo, Rectangle.NO_BORDER, Element.ALIGN_CENTER));
 
-        PdfPCell serialCell = createCell(serialSubTable, Rectangle.NO_BORDER);
+        //QR CODE
+        Font smallNormalFont = new Font(baseFont, 6, Font.NORMAL, BaseColor.BLACK);
+        PdfUtil.generateQrCode(serialSubTable, data, smallNormalFont);
+
+        PdfPCell serialCell = PdfUtil.createCell(serialSubTable, Rectangle.NO_BORDER);
         serialCell.setVerticalAlignment(Element.ALIGN_TOP);
         serialCell.setPaddingTop(10);
 
@@ -236,7 +249,7 @@ public class OrderServiceImpl implements OrderService {
         // Hàm tiện ích để thêm cặp Label: Value
         BiConsumer<PdfPTable, String> addRow = (table, text) -> {
             try {
-                PdfPCell cell = createCell(new Paragraph(text, smallNormalFont), Rectangle.NO_BORDER, Element.ALIGN_LEFT);
+                PdfPCell cell = PdfUtil.createCell(new Paragraph(text, smallNormalFont), Rectangle.NO_BORDER, Element.ALIGN_LEFT);
                 cell.setPaddingTop(1);
                 cell.setPaddingRight(1);
                 cell.setPaddingBottom(1);
@@ -253,7 +266,7 @@ public class OrderServiceImpl implements OrderService {
         // Tiêu đề
         Paragraph titleSeller = new Paragraph("Người bán (Seller)", boldFont);
         titleSeller.setAlignment(Element.ALIGN_LEFT);
-        sellerTable.addCell(createCell(titleSeller, Rectangle.NO_BORDER, 2));
+        sellerTable.addCell(PdfUtil.createCell(titleSeller, Rectangle.NO_BORDER, 2));
 
         // Dữ liệu người bán (Giả sử bạn có dữ liệu người bán từ cấu hình/hệ thống)
         // Ví dụ:
@@ -262,7 +275,7 @@ public class OrderServiceImpl implements OrderService {
         addRow.accept(sellerTable, "Tên đơn vị (Seller): CÔNG TY TNHH NỘI THẤT HAUS");
         addRow.accept(sellerTable, "Địa chỉ (Address): Nhà lô B11, số 9A, ngõ 181 đường Xuân Thủy, Cầu Giấy, Hà Nội");
 
-        PdfPCell sellerCell = createCell(sellerTable, Rectangle.NO_BORDER);
+        PdfPCell sellerCell = PdfUtil.createCell(sellerTable, Rectangle.NO_BORDER);
         sellerCell.setPaddingTop(5);
         sellerCell.setPaddingRight(5);
         sellerCell.setPaddingBottom(5);
@@ -274,7 +287,7 @@ public class OrderServiceImpl implements OrderService {
 
         // Tiêu đề
         Paragraph buyerTitle = new Paragraph("Người mua (Co. name)", boldFont);
-        buyerTable.addCell(createCell(buyerTitle, Rectangle.NO_BORDER, 2));
+        buyerTable.addCell(PdfUtil.createCell(buyerTitle, Rectangle.NO_BORDER, 2));
 
         // Dữ liệu người mua (Lấy từ order.getUser())
         UserResponseDto user = data.getUser();
@@ -284,7 +297,7 @@ public class OrderServiceImpl implements OrderService {
         addRow.accept(buyerTable, "Email/Facebook: " + user.getEmail());
         addRow.accept(buyerTable, "Địa chỉ (Address): " + user.getUsername());
 
-        PdfPCell buyerCell = createCell(buyerTable, Rectangle.NO_BORDER);
+        PdfPCell buyerCell = PdfUtil.createCell(buyerTable, Rectangle.NO_BORDER);
         buyerCell.setPaddingTop(5);
         buyerCell.setPaddingRight(5);
         buyerCell.setPaddingBottom(5);
@@ -308,49 +321,49 @@ public class OrderServiceImpl implements OrderService {
         // Tạo 2 hàng header để giống mẫu
 
         // Hàng 1: Tiêu đề cột chính
-        addCellWithBorder(itemsTable, "STT", headerFont, Rectangle.BOX, Element.ALIGN_CENTER, 2, 1);
-        addCellWithBorder(itemsTable, "Tên hàng, dịch vụ\n(Name of good or services)", headerFont, Rectangle.BOX, Element.ALIGN_CENTER, 2, 1);
-        addCellWithBorder(itemsTable, "ĐVT\n(Unit)", headerFont, Rectangle.BOX, Element.ALIGN_CENTER, 2, 1);
-        addCellWithBorder(itemsTable, "Số lượng\n(Quantity)", headerFont, Rectangle.BOX, Element.ALIGN_CENTER, 2, 1);
-        addCellWithBorder(itemsTable, "Đơn giá\n(Unit Price)", headerFont, Rectangle.BOX, Element.ALIGN_CENTER, 2, 1);
-        addCellWithBorder(itemsTable, "Thành tiền\n(Amount)", headerFont, Rectangle.BOX, Element.ALIGN_CENTER, 2, 1);
+        PdfUtil.addCellWithBorder(itemsTable, "STT", headerFont, Rectangle.BOX, Element.ALIGN_CENTER, 2, 1);
+        PdfUtil.addCellWithBorder(itemsTable, "Tên hàng, dịch vụ\n(Name of good or services)", headerFont, Rectangle.BOX, Element.ALIGN_CENTER, 2, 1);
+        PdfUtil.addCellWithBorder(itemsTable, "ĐVT\n(Unit)", headerFont, Rectangle.BOX, Element.ALIGN_CENTER, 2, 1);
+        PdfUtil.addCellWithBorder(itemsTable, "Số lượng\n(Quantity)", headerFont, Rectangle.BOX, Element.ALIGN_CENTER, 2, 1);
+        PdfUtil.addCellWithBorder(itemsTable, "Đơn giá\n(Unit Price)", headerFont, Rectangle.BOX, Element.ALIGN_CENTER, 2, 1);
+        PdfUtil.addCellWithBorder(itemsTable, "Thành tiền\n(Amount)", headerFont, Rectangle.BOX, Element.ALIGN_CENTER, 2, 1);
 
         // --- Data Rows ---
         int count = 1;
-        double subTotal = 0.0;
+        double subTotal = 0;
         for (InvoiceItemDto item : data.getItems()) {
             subTotal += item.getTotal();
 
             // Cột 1
-            addCellWithBorder(itemsTable, String.valueOf(count++), normalFont, Rectangle.BOX, Element.ALIGN_CENTER, 0, 0);
+            PdfUtil.addCellWithBorder(itemsTable, String.valueOf(count++), normalFont, Rectangle.BOX, Element.ALIGN_CENTER, 0, 0);
 
             // Cột 2 (Tên SP + Biến thể)
             String productName = item.getProductName() + " (" + item.getColor() + "/" + item.getSize() + ")";
-            addCellWithBorder(itemsTable, productName, normalFont, Rectangle.BOX, Element.ALIGN_LEFT, 0, 0);
+            PdfUtil.addCellWithBorder(itemsTable, productName, normalFont, Rectangle.BOX, Element.ALIGN_LEFT, 0, 0);
 
             // Cột 3 (ĐVT) - Giả sử là "Sản phẩm" hoặc "Khóa"
-            addCellWithBorder(itemsTable, "Sản phẩm", normalFont, Rectangle.BOX, Element.ALIGN_CENTER, 0, 0);
+            PdfUtil.addCellWithBorder(itemsTable, "Sản phẩm", normalFont, Rectangle.BOX, Element.ALIGN_CENTER, 0, 0);
 
             // Cột 4 (SL)
-            addCellWithBorder(itemsTable, String.valueOf(item.getInventoryQuantity()), normalFont, Rectangle.BOX, Element.ALIGN_CENTER, 0, 0);
+            PdfUtil.addCellWithBorder(itemsTable, String.valueOf(item.getInventoryQuantity()), normalFont, Rectangle.BOX, Element.ALIGN_CENTER, 0, 0);
 
             // Cột 5 (Đơn giá)
-            addCellWithBorder(itemsTable, String.format("%,.0f", item.getPrice()), normalFont, Rectangle.BOX, Element.ALIGN_RIGHT, 0, 0);
+            PdfUtil.addCellWithBorder(itemsTable, String.format("%,.0f", item.getPrice()), normalFont, Rectangle.BOX, Element.ALIGN_RIGHT, 0, 0);
 
             // Cột 6 (Thành tiền)
-            addCellWithBorder(itemsTable, String.format("%,.0f", item.getTotal()), normalFont, Rectangle.BOX, Element.ALIGN_RIGHT, 0, 0);
+            PdfUtil.addCellWithBorder(itemsTable, String.format("%,.0f", item.getTotal()), normalFont, Rectangle.BOX, Element.ALIGN_RIGHT, 0, 0);
         }
 
         // --- Empty Rows (Giống mẫu) ---
         // Thêm các hàng trống để làm đầy trang (tùy chọn)
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < (data.getItems().size() < 5 ? 5 - data.getItems().size() : 1); i++) {
             for (int j = 0; j < 6; j++) {
-                addCellWithBorder(itemsTable, " ", normalFont, Rectangle.BOX, Element.ALIGN_CENTER, 0, 0);
+                PdfUtil.addCellWithBorder(itemsTable, " ", normalFont, Rectangle.BOX, Element.ALIGN_CENTER, 0, 0);
             }
         }
 
         // --- Tổng cộng (Total Row) ---
-        double finalTotal = subTotal - (data.getPromotion() != null ? data.getPromotion().getDiscountPercent() : 0.0) + data.getResponseDto().getShippingFee();
+        totalPrice = (subTotal - (data.getPromotion() != null ? data.getPromotion().getDiscountPercent() : 0L) + data.getResponseDto().getShippingFee());
 
         // Total price
         PdfPCell totalLabelCell = new PdfPCell(new Phrase("Tổng cộng: (Total price):", boldFont));
@@ -374,11 +387,26 @@ public class OrderServiceImpl implements OrderService {
         discountCell.setPadding(7);
         itemsTable.addCell(discountCell);
 
-        PdfPCell discountValueCell = new PdfPCell(new Phrase(data.getPromotion().getDiscountPercent().toString() + "% tổng tiền", normalFont));
+        double discountValue = data.getPromotion().getDiscountPercent() * subTotal;
+        PdfPCell discountValueCell = new PdfPCell(new Phrase("-" + String.format("%,.0f", discountValue), normalFont));
         discountValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         discountValueCell.setBorder(Rectangle.BOX);
         discountValueCell.setPadding(7);
         itemsTable.addCell(discountValueCell);
+
+        // Shipping fee
+        PdfPCell shippingFeeCell = new PdfPCell(new Phrase("Phí vận chuyển (Shipping fee)", boldFont));
+        shippingFeeCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        shippingFeeCell.setColspan(5);
+        shippingFeeCell.setBorder(Rectangle.BOX);
+        shippingFeeCell.setPadding(7);
+        itemsTable.addCell(shippingFeeCell);
+
+        PdfPCell shippingFeeValueCell = new PdfPCell(new Phrase(String.format("%,.0f", data.getResponseDto().getShippingFee()), normalFont));
+        shippingFeeValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        shippingFeeValueCell.setBorder(Rectangle.BOX);
+        shippingFeeValueCell.setPadding(7);
+        itemsTable.addCell(shippingFeeValueCell);
 
         // Total price
         PdfPCell totalFinalLabelCell = new PdfPCell(new Phrase("Tổng cộng tiền cần thanh toán (Total payment):", boldFont));
@@ -388,7 +416,7 @@ public class OrderServiceImpl implements OrderService {
         totalFinalLabelCell.setPadding(7);
         itemsTable.addCell(totalFinalLabelCell);
 
-        PdfPCell totalValueFinalLabelCell = new PdfPCell(new Phrase(String.format("%,.0f", finalTotal), normalFont));
+        PdfPCell totalValueFinalLabelCell = new PdfPCell(new Phrase(String.format("%,.0f", totalPrice), normalFont));
         totalValueFinalLabelCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         totalValueFinalLabelCell.setBorder(Rectangle.BOX);
         totalValueFinalLabelCell.setPadding(7);
@@ -425,19 +453,19 @@ public class OrderServiceImpl implements OrderService {
         leftTable.setWidthPercentage(100);
 
         // Chuyển số thành chữ (Cần một hàm tiện ích để làm điều này, ở đây ta giả lập)
-        String amountInWords = data.getResponseDto().getTotalAmount().toString();
-        Paragraph words = new Paragraph("Số tiền viết bằng chữ (Amount in words): " + amountInWords, normalFont);
-        leftTable.addCell(createCell(words, Rectangle.NO_BORDER, Element.ALIGN_LEFT));
+        String amountInWords = PdfUtil.convert((long) totalPrice);
+        Paragraph words = new Paragraph("Số tiền viết bằng chữ (Amount in words): " + amountInWords, smallNormalFont);
+        leftTable.addCell(PdfUtil.createCell(words, Rectangle.NO_BORDER, Element.ALIGN_LEFT));
 
         Paragraph buyerTitle = new Paragraph("Người mua hàng (Buyer)", boldFont);
         buyerTitle.setAlignment(Element.ALIGN_CENTER);
         buyerTitle.setSpacingBefore(15f);
-        leftTable.addCell(createCell(buyerTitle, Rectangle.NO_BORDER, Element.ALIGN_CENTER));
+        leftTable.addCell(PdfUtil.createCell(buyerTitle, Rectangle.NO_BORDER, Element.ALIGN_CENTER));
 
         // Vùng chữ ký người mua (để trống)
-        leftTable.addCell(createCell(new Phrase("\n\n\n", normalFont), Rectangle.NO_BORDER, Element.ALIGN_CENTER));
+        leftTable.addCell(PdfUtil.createCell(new Phrase("\n\n\n", normalFont), Rectangle.NO_BORDER, Element.ALIGN_CENTER));
 
-        PdfPCell leftCell = createCell(leftTable, Rectangle.NO_BORDER);
+        PdfPCell leftCell = PdfUtil.createCell(leftTable, Rectangle.NO_BORDER);
 
         // --- Cột 2: Người bán và Chữ ký điện tử ---
         PdfPTable rightTable = new PdfPTable(1);
@@ -448,116 +476,39 @@ public class OrderServiceImpl implements OrderService {
         sellerTitle.setAlignment(Element.ALIGN_CENTER);
         sellerTitle.setSpacingBefore(15f);
         sellerTitle.setSpacingAfter(15f);
-        rightTable.addCell(createCell(sellerTitle, Rectangle.NO_BORDER, Element.ALIGN_CENTER));
-
-        // Ký điện tử và ngày
-        Paragraph signedNote = new Paragraph("Đã được ký điện tử bởi\n(Signed digitally by)", smallNormalFont);
-        signedNote.setAlignment(Element.ALIGN_CENTER);
-        rightTable.addCell(createCell(signedNote, Rectangle.NO_BORDER, Element.ALIGN_CENTER));
+        rightTable.addCell(PdfUtil.createCell(sellerTitle, Rectangle.NO_BORDER, Element.ALIGN_CENTER));
 
         // Tên công ty (Chữ ký)
         Paragraph companyName = new Paragraph("CÔNG TY TNHH NỘI THẬT HAUS", boldFont);
         companyName.setAlignment(Element.ALIGN_CENTER);
-        rightTable.addCell(createCell(companyName, Rectangle.NO_BORDER, Element.ALIGN_CENTER));
+        rightTable.addCell(PdfUtil.createCell(companyName, Rectangle.NO_BORDER, Element.ALIGN_CENTER));
 
         // Ngày ký
         LocalDate currentDate = LocalDate.now();
-        Paragraph signDate = new Paragraph(String.format("Ngày: %d/%d/%d", currentDate.getDayOfMonth(), currentDate.getMonthValue(), currentDate.getYear()), normalFont);
+        Paragraph signDate = new Paragraph(String.format("Ngày: %d/%d/%d", currentDate.getDayOfMonth(), currentDate.getMonthValue(), currentDate.getYear()), smallNormalFont);
         signDate.setAlignment(Element.ALIGN_CENTER);
-        rightTable.addCell(createCell(signDate, Rectangle.NO_BORDER, Element.ALIGN_CENTER));
+        rightTable.addCell(PdfUtil.createCell(signDate, Rectangle.NO_BORDER, Element.ALIGN_CENTER));
 
-        PdfPCell rightCell = createCell(rightTable, Rectangle.NO_BORDER);
+        PdfPCell rightCell = PdfUtil.createCell(rightTable, Rectangle.NO_BORDER);
 
         footerTable.addCell(leftCell);
         footerTable.addCell(rightCell);
 
         // Ghi chú cuối cùng (Cần một bảng 1 cột)
-        PdfPTable bottomNote = new PdfPTable(1);
-        bottomNote.setWidthPercentage(100);
         Paragraph note = new Paragraph("(Cần kiểm tra đối chiếu khi giao, nhận hóa đơn)", smallNormalFont);
         note.setAlignment(Element.ALIGN_CENTER);
-        PdfPCell cellBottom = createCell(note, Rectangle.NO_BORDER, Element.ALIGN_BOTTOM);
-        cellBottom.setPaddingTop(30);
-        bottomNote.addCell(cellBottom);
+        PdfPCell cellBottom = PdfUtil.createCell(note, Rectangle.NO_BORDER, Element.ALIGN_TOP);
+        footerTable.addCell(cellBottom);
 
         // Cell chính
         PdfPCell mainCell = new PdfPCell();
         mainCell.addElement(footerTable);
         mainCell.addElement(new Paragraph("\n")); // Khoảng cách
-        mainCell.addElement(bottomNote);
         mainCell.setBorder(Rectangle.TOP); // Chỉ có viền trên
         mainCell.setPaddingTop(5);
         mainCell.setPaddingRight(5);
-        mainCell.setPaddingBottom(5);
         return mainCell;
     }
 
-    // Hàm tiện ích để tạo nhanh một PdfPCell từ một Element (Paragraph hoặc Table)
-    private PdfPCell createCell(Element element, int border, int colspan) throws DocumentException {
-        PdfPCell cell = new PdfPCell();
-        cell.addElement(element);
-        cell.setBorder(border);
-        cell.setPadding(2);
-        if (colspan > 0) {
-            cell.setColspan(colspan);
-        }
-        return cell;
-    }
-
-    // Overload để chỉ truyền Element và Border
-    private PdfPCell createCell(Element element, int border) throws DocumentException {
-        return createCell(element, border, 0);
-    }
-
-    // Hàm tiện ích cho bảng chi tiết để kiểm soát border, rowspan/colspan
-    private void addCellWithBorder(PdfPTable table, String text, Font font, int border, int alignment, int rowspan, int colspan) {
-        PdfPCell cell = new PdfPCell(new Phrase(text, font));
-        cell.setHorizontalAlignment(alignment);
-        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        cell.setBorder(border);
-        cell.setPadding(5);
-        if (rowspan > 0) {
-            cell.setRowspan(rowspan);
-        }
-        if (colspan > 0) {
-            cell.setColspan(colspan);
-        }
-        table.addCell(cell);
-    }
-
-    private void addImage(PdfPCell cell, Font font) {
-        try {
-            // Đường dẫn đến file ảnh trong thư mục resources
-            String imagePath = "images/logo.png"; // hoặc "images/your_logo.jpg"
-
-            // Sử dụng ClassLoader để đọc file ảnh từ classpath
-            InputStream is = getClass().getClassLoader().getResourceAsStream(imagePath);
-            if (is == null) {
-                throw new IOException("Logo image not found: " + imagePath);
-            }
-
-            // Tạo đối tượng Image từ mảng byte
-            byte[] imageData = is.readAllBytes();
-            Image logo = Image.getInstance(imageData);
-            is.close(); // Đóng InputStream
-
-            // Tùy chỉnh kích thước ảnh để vừa với ô
-            // Bạn có thể thiết lập kích thước cố định hoặc scale theo phần trăm
-            float desiredWidth = 60f; // Ví dụ: chiều rộng mong muốn
-            float scaleFactor = desiredWidth / logo.getWidth();
-            logo.scalePercent(scaleFactor * 100); // Scale ảnh theo tỷ lệ
-
-            // Hoặc scale theo một giá trị cố định (ví dụ 50% kích thước gốc)
-            // logo.scalePercent(50);
-
-            // Thêm ảnh vào cell
-            cell.addElement(logo);
-
-        } catch (IOException | BadElementException e) {
-            // Xử lý lỗi nếu không tìm thấy ảnh hoặc ảnh không hợp lệ
-            e.printStackTrace();
-            cell.addElement(new Paragraph("LOGO ERROR", font)); // Hiển thị text lỗi thay thế
-        }
-    }
 
 }

@@ -39,9 +39,9 @@ public class PromotionRequestDto {
     LocalDate endDate;
 
     @PositiveOrNull
-    Float minPriceOrder;
+    Long minPriceOrder;
     @PositiveOrNull
-    Float maxPriceOrder;
+    Long maxPriceOrder;
 
     @NotNull(message = ErrorMessage.Promotion.ERR_PROMOTION_DISCOUNT_PERCENT_NOT_NULL)
     @Min(value = 0, message = ErrorMessage.Promotion.ERR_PROMOTION_DISCOUNT_PERCENT_INVALID)

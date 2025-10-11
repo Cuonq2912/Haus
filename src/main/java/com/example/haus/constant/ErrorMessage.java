@@ -134,6 +134,7 @@ public class ErrorMessage {
         public static final String ERR_PAYMENT_EXPIRED = "exception.order.payment.expired";
         public static final String ERR_PAYMENT_STATUS_INVALID = "exception.order.payment.status.invalid";
         public static final String ERR_PAYMENT_COMPLETED = "exception.order.payment.completed";
+        public static final String ERR_ORDER_NOT_COMPLETED = "exception.order.not.completed";
 
     }
 
