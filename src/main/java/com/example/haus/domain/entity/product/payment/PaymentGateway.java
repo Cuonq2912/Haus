@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum PaymentGateway {
     @JsonProperty("vnpay")
-    VNPAY;
+    VNPAY,
+    
+    @JsonProperty("momo")
+    MOMO;
 
 }

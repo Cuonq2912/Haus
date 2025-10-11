@@ -9,5 +9,8 @@ public enum PaymentType {
     COD,
 
     @JsonProperty("bank_transfer")
-    BANK_TRANSFER;
+    BANK_TRANSFER,
+    
+    @JsonProperty("online_payment")
+    ONLINE_PAYMENT;
 }
