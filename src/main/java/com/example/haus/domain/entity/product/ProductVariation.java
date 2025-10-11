@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Entity
 @Table(name = "product_variations")
 @NoArgsConstructor
@@ -42,4 +44,7 @@ public class ProductVariation extends BaseEntity {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "productVariation", fetch = FetchType.LAZY)
     @JsonIgnore
     Media media;
+
+    @OneToMany(mappedBy = "productVariation", cascade = CascadeType.ALL)
+    List<OrderItem> orderItems;
 }

@@ -78,6 +78,11 @@ public class SuccessMessage {
         public static final String CALLBACK_VNPAY_SUCCESS = "VNPay return callback processed successfully";
     }
 
+    public static class Order {
+        private Order() {}
+
+        public static final String GET_INVOICE_SUCCESS = "Get invoice success";
+    }
 
 
 
