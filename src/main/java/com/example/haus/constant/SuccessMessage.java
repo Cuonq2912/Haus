@@ -76,6 +76,11 @@ public class SuccessMessage {
         public static final String GET_VNPAYURL_SUCCESS = "Get VNPay url request successful";
         public static final String IPN_RECEIVED_SUCCESS = "VNPay IPN received and processed successfully";
         public static final String CALLBACK_VNPAY_SUCCESS = "VNPay return callback processed successfully";
+
+        public static final String CREATE_MOMO_ORDER_SUCCESS = "Create MoMo order successful";
+        public static final String MOMO_IPN_SUCCESS = "MoMo IPN processed successfully";
+        public static final String MOMO_CALLBACK_SUCCESS = "MoMo callback processed successfully";
+
     }
 
 
