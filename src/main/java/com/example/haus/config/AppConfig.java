@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
@@ -26,5 +27,10 @@ public class AppConfig implements WebMvcConfigurer {
     @Bean
     public SendGrid sendGrid(@Value("${spring.sendGrid.apiKey}") String apiKey) {
         return new SendGrid(apiKey);
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }

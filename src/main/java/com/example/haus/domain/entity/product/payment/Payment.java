@@ -7,7 +7,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.GenericGenerator;
 
-import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -29,9 +28,11 @@ public class Payment extends BaseEntity {
     Double amount;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "gateway", length = 20)
     PaymentGateway gateway;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "type", length = 20)
     PaymentType type;
 
     @Enumerated(EnumType.STRING)

@@ -101,9 +101,13 @@ public class UrlConstant {
     public static class Payment {
         private static final String PRE_FIX = "/payment";
 
-        public static final String GET_PAYMENT_URL = PRE_FIX + "/payment_url";
-        public static final String VNPAY_RETURN = PRE_FIX + "/vnpay-return";
-        public static final String VNPAY_IPN = PRE_FIX + "/vnpay-ipn";
+        public static final String GET_PAYMENT_URL = PRE_FIX + "/vnpay/payment_url";
+        public static final String VNPAY_RETURN = PRE_FIX + "/vnpay/vnpay-return";
+        public static final String VNPAY_IPN = PRE_FIX + "/vnpay/vnpay-ipn";
+
+        public static final String MOMO_CREATE_ORDER = PRE_FIX + "/momo/create";
+        public static final String MOMO_IPN = PRE_FIX + "/momo/ipn-handler";
+        public static final String MOMO_CALLBACK = PRE_FIX + "/momo/callback";
 
         private Payment() {
         }
