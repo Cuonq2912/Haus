@@ -13,8 +13,6 @@
 
         Long productVariationId;
 
-        String productName;
-
         Integer quantity;
 
     }

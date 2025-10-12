@@ -17,6 +17,6 @@ public record CartRequest(
         @NotNull(message = "Số lượng sản phẩm không được để trống")
         @Min(value = 1, message = "Số lượng sản phẩm phải lớn hơn 0")
         @JsonProperty("quantity")
-        Integer inventoryQuantity
+        Integer quantity
 ) {
 }

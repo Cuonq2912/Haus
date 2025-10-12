@@ -5,14 +5,14 @@ import com.example.haus.domain.dto.response.cart.CartResponse;
 
 public interface CartService {
 
-    CartResponse addToCart(String userId, CartRequest cartRequest);
+    CartResponse addToCart(String email, CartRequest cartRequest);
 
-    CartResponse getCart(String userId);
+    CartResponse getCart(String email);
 
-    CartResponse removeItem(String userId, String productVariationId);
+    CartResponse removeItem(String email, Long productVariationId);
 
-    void clearCart(String userId);
+    void clearCart(String email);
 
-    CartResponse updateQuantity(String userId, CartRequest cartRequest);
+    CartResponse updateQuantity(String email, CartRequest cartRequest);
 
 }

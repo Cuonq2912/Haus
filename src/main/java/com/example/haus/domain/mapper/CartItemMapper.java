@@ -12,7 +12,6 @@ import org.mapstruct.*;
 public interface CartItemMapper {
 
     @Mapping(target = "productVariationId", source = "productVariation.id")
-    @Mapping(target = "productName", source = "productVariation.product.productName")
     CartItemResponse cartItemToCartItemResponse(CartItem cartItem);
 
 }
