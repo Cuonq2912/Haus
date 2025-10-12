@@ -31,8 +31,8 @@ public class AddressServiceImpl implements AddressService {
 
 
     @Override
-    public AddressResponseDto addAddress(String userId, AddressRequestDto addressRequestDto) {
-        User user = userRepository.findByIdAndIsDeletedFalse(userId).orElseThrow(() ->
+    public AddressResponseDto addAddress(String email, AddressRequestDto addressRequestDto) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email).orElseThrow(() ->
                 new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         Address address = addressMapper.addressRequestDtoToAddress(addressRequestDto);
@@ -61,11 +61,11 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public List<AddressResponseDto> getAddressesByUserId(String userId) {
-        User user = userRepository.findByIdAndIsDeletedFalse(userId).orElseThrow(() ->
+    public List<AddressResponseDto> getAddressesByUserId(String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email).orElseThrow(() ->
                 new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
-        List<Address> addresses = addressRepository.getAddressByUserId(userId);
+        List<Address> addresses = addressRepository.getAddressByUserId(user.getId());
 
         return addresses.stream().map(address -> addressMapper.addressToAddressResponseDto(address)).toList();
     }

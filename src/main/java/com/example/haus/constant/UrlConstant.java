@@ -112,10 +112,10 @@ public class UrlConstant {
     public static class Address {
         private static final String PRE_FIX = "/address";
 
-        public static final String ADD_ADDRESS = PRE_FIX + "/{userId}";
+        public static final String ADD_ADDRESS = PRE_FIX;
         public static final String UPDATE_ADDRESS = PRE_FIX + "/{id}";
         public static final String DELETE_ADDRESS = PRE_FIX + "/{id}";
-        public static final String GET_ADDRESSES_BY_USER_ID = PRE_FIX + "/user/{userId}";
+        public static final String GET_ADDRESSES_BY_USER_ID = PRE_FIX + "/user";
         public static final String GET_ADDRESS = PRE_FIX + "/{id}";
     }
 }

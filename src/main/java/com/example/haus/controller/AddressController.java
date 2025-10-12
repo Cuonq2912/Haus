@@ -17,6 +17,8 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,19 +33,21 @@ public class AddressController {
 
     @Operation(
             summary = "Thêm địa chỉ",
-            description = "Dùng để khách hàng thêm địa chỉ khi cập nhật thông tin hoặc địa chỉ nhận hàng"
+            description = "Dùng để khách hàng thêm địa chỉ khi cập nhật thông tin hoặc địa chỉ nhận hàng",
+            security = @SecurityRequirement(name = "Bearer Token")
     )
     @PostMapping(UrlConstant.Address.ADD_ADDRESS)
-    public ResponseEntity<?> addAddress (@PathVariable String userId, @Valid @RequestBody AddressRequestDto addressRequestDto){
+    public ResponseEntity<?> addAddress (@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody AddressRequestDto addressRequestDto){
         return ResponseUtil.success(
                 SuccessMessage.Address.ADD_ADDRESS_SUCCESS,
-                addressService.addAddress(userId, addressRequestDto)
+                addressService.addAddress(userDetails.getUsername(), addressRequestDto)
         );
     }
 
     @Operation(
             summary = "Lấy chi tiet dia chi theo ID",
-            description = "Dùng để khach hang lấy dia chi theo ID"
+            description = "Dùng để khach hang lấy dia chi theo ID",
+            security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping(UrlConstant.Address.GET_ADDRESS)
     public ResponseEntity<?> getAddressById(@PathVariable Long id){
@@ -55,19 +59,21 @@ public class AddressController {
 
     @Operation(
             summary = "Lấy danh sách địa chỉ theo user ID",
-            description = "Dùng để khach hang lấy danh sách địa chỉ theo user ID"
+            description = "Dùng để khach hang lấy danh sách địa chỉ theo user ID",
+            security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping(UrlConstant.Address.GET_ADDRESSES_BY_USER_ID)
-    public ResponseEntity<?> getAddressesByUserId(@PathVariable String userId){
+    public ResponseEntity<?> getAddressesByUserId(@AuthenticationPrincipal UserDetails userDetails){
         return ResponseUtil.success(
                 SuccessMessage.Address.GET_ADDRESS_SUCCESS,
-                addressService.getAddressesByUserId(userId)
+                addressService.getAddressesByUserId(userDetails.getUsername())
         );
     }
 
     @Operation(
             summary = "Cập nhật địa chỉ",
-            description = "Dùng để khách hàng cập nhật địa chỉ theo ID"
+            description = "Dùng để khách hàng cập nhật địa chỉ theo ID",
+            security = @SecurityRequirement(name = "Bearer Token")
     )
     @PutMapping(UrlConstant.Address.UPDATE_ADDRESS)
     public ResponseEntity<?> updateCategory(@PathVariable("id") Long id, @Valid @RequestBody AddressRequestDto addressRequestDto){
@@ -79,7 +85,8 @@ public class AddressController {
 
     @Operation(
             summary = "Xóa địa chỉ theo Id",
-            description = "Dùng để khách hàng xóa địa chỉ theo ID"
+            description = "Dùng để khách hàng xóa địa chỉ theo ID",
+            security = @SecurityRequirement(name = "Bearer Token")
     )
     @DeleteMapping(UrlConstant.Address.DELETE_ADDRESS)
     public ResponseEntity<?> deleteCategory(@PathVariable Long id){

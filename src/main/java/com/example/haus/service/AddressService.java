@@ -8,13 +8,13 @@ import java.util.List;
 
 public interface AddressService {
 
-    AddressResponseDto addAddress(String userId, AddressRequestDto addressRequestDto);
+    AddressResponseDto addAddress(String email, AddressRequestDto addressRequestDto);
 
     AddressResponseDto updateAddress(Long id, AddressRequestDto addressRequestDto);
 
     AddressResponseDto getAddressById(Long id);
 
-    List<AddressResponseDto> getAddressesByUserId(String userId);
+    List<AddressResponseDto> getAddressesByUserId(String email);
 
     void deleteAddress(Long id);
 }
