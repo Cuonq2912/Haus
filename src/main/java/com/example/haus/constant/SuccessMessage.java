@@ -41,6 +41,16 @@ public class SuccessMessage {
         public static final String DELETE_CATEGORY_SUCCESS = "Delete category successful";
     }
 
+    public static class Cart {
+
+        private Cart() {}
+
+        public static final String ADD_CART_SUCCESS = "Add cart successful";
+        public static final String UPDATE_CART_SUCCESS = "Update cart successful";
+        public static final String GET_CART_SUCCESS = "Get cart successful";
+        public static final String DELETE_CART_SUCCESS = "Delete cart successful";
+    }
+
     public static class Promotion {
 
         private Promotion() {}

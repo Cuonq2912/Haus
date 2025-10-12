@@ -57,6 +57,20 @@ public class UrlConstant {
         public static final String SEARCH_CATEGORY_BY_NAME_AND_SORT_BY_KEYWORD = PRE_FIX + "/search";
     }
 
+    public static class Cart {
+
+        private Cart() {
+        }
+
+        private static final String PRE_FIX = "/cart";
+
+        public static final String ADD_CART = PRE_FIX + "/{userId}";
+        public static final String UPDATE_CART = PRE_FIX + "/{userId}";
+        public static final String DELETE_CART = PRE_FIX + "/{userId}";
+        public static final String GET_CART_BY_USER_ID = PRE_FIX + "/{userId}";
+        public static final String GET_ALL_CART= PRE_FIX + "/list";
+    }
+
     public static class Promotion {
 
         private Promotion() {

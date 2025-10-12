@@ -149,4 +149,11 @@ public class ErrorMessage {
 
     }
 
+    public static class Cart {
+        private Cart() {}
+
+        public static final String ERR_CART_NOT_FOUND = "exception.cart.not.found";
+        public static final String ERR_CART_QUANTITY_INVALID = "exception.cart.quantity.invalid";
+    }
+
 }

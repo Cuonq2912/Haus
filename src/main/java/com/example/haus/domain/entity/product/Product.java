@@ -60,9 +60,6 @@ public class Product extends BaseEntity {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     List<Review> reviews;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    List<CartItem> cartItems;
-
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Set<ProductVariation> productVariations = new HashSet<>();
 
@@ -103,18 +100,4 @@ public class Product extends BaseEntity {
         }
     }
 
-    //Cart Item
-    public void addCartItem(CartItem cartItem) {
-        if (!cartItems.contains(cartItem)) {
-            cartItems.add(cartItem);
-            cartItem.setProduct(this);
-        }
-    }
-
-    public void removeCartItem(CartItem cartItem) {
-        if (cartItems.contains(cartItem)) {
-            cartItems.remove(cartItem);
-            cartItem.setProduct(null);
-        }
-    }
 }

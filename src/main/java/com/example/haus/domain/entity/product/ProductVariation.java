@@ -47,4 +47,7 @@ public class ProductVariation extends BaseEntity {
 
     @OneToMany(mappedBy = "productVariation", cascade = CascadeType.ALL)
     List<OrderItem> orderItems;
+
+    @OneToMany(mappedBy = "productVariation", cascade = CascadeType.ALL)
+    List<CartItem> cartItems;
 }
