@@ -49,6 +49,7 @@ public class VNPayServiceImpl implements VNPayService {
     private final String SUCCESS_CODE = "00";
 
     @Override
+    @Transactional
     public String createVNPayUrl(Long orderId, HttpServletRequest request) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
@@ -82,7 +83,8 @@ public class VNPayServiceImpl implements VNPayService {
     }
 
     @NotNull
-    private Payment getOrCreatePayment(Order order) {
+    @Transactional
+    protected Payment getOrCreatePayment(Order order) {
         Payment payment = order.getPayment();
 
         if (payment == null) {
@@ -163,12 +165,16 @@ public class VNPayServiceImpl implements VNPayService {
     public Map<String, String> processVNPayIPN(Map<String, String> params) {
         Map<String, String> response = new HashMap<>();
         try{
-            if (verifySignature(params)) {
+            log.info("IPN: Received params: {}", params);
+            
+            if (!verifySignature(params)) {  // ✅ ĐÚNG: Nếu signature KHÔNG hợp lệ
                 log.error("IPN: Invalid signature!");
                 response.put("RspCode", "97");
                 response.put("Message", "Invalid signature");
                 return response;
             }
+            
+            log.info("IPN: Signature verified successfully");
 
             String txnRef = params.get("vnp_TxnRef");
             String responseCode = params.get("vnp_ResponseCode");
@@ -176,6 +182,9 @@ public class VNPayServiceImpl implements VNPayService {
 
             String[] p = txnRef.split("-");
             Long orderId = Long.valueOf(p[0]);
+            
+            log.info("IPN: Processing order {} with responseCode: {}", orderId, responseCode);
+            
             Order order = orderRepository.findById(orderId)
                     .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
 
@@ -188,9 +197,9 @@ public class VNPayServiceImpl implements VNPayService {
                 return response;
             }
 
-            // Verify amount
-            if (!payment.getAmount().equals(amount)) {
-                log.error("IPN: Amount mismatch! Expected: {}, Got: {}", payment.getAmount(), amount);
+            long expectedAmount = Math.round(payment.getAmount());
+            if (expectedAmount != amount) {
+                log.error("IPN: Amount mismatch! Expected: {}, Got: {}", expectedAmount, amount);
                 response.put("RspCode", "04");
                 response.put("Message", "Invalid amount");
                 return response;
@@ -199,18 +208,23 @@ public class VNPayServiceImpl implements VNPayService {
             if (SUCCESS_CODE.equals(responseCode)) {
                 payment.setStatus(PaymentStatus.COMPLETED);
                 order.setStatus(OrderStatus.COMPLETED);
+                log.info("IPN: Order {} marked as COMPLETED", orderId);
             } else {
                 payment.setStatus(PaymentStatus.CANCELLED);
                 order.setStatus(OrderStatus.CANCELLED);
+                log.info("IPN: Order {} marked as CANCELLED", orderId);
             }
 
             paymentRepository.save(payment);
             orderRepository.save(order);
+            
+            log.info("IPN: Database updated successfully for order {}", orderId);
 
             response.put("RspCode", "00");
             response.put("Message", "Confirm Success");
 
         } catch (Exception e){
+            log.error("IPN: Error processing payment: ", e);
             response.put("RspCode", "99");
             response.put("Message", "Unknown error");
         }
@@ -219,10 +233,11 @@ public class VNPayServiceImpl implements VNPayService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Map<String, Object> handleVNPayReturn(Map<String, String> params) {
         Map<String, Object> result = new HashMap<>();
 
-        if (verifySignature(params)) {
+        if (!verifySignature(params)) {  // ĐÚNG: Nếu signature KHÔNG hợp lệ
             log.error("Return: Invalid signature!");
             result.put("success", false);
             result.put("message", "Invalid signature");
@@ -254,6 +269,6 @@ public class VNPayServiceImpl implements VNPayService {
 
         String calculatedHash = PaymentUtil.hashAllFields(fieldsToHash, vnPayConfig.getVnp_HashSecret());
 
-        return !calculatedHash.equalsIgnoreCase(receivedHash);
+        return calculatedHash.equalsIgnoreCase(receivedHash);  // ✅ ĐÚNG: TRUE = valid, FALSE = invalid
     }
 }

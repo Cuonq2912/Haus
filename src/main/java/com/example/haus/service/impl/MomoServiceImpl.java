@@ -30,6 +30,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -61,6 +62,7 @@ public class MomoServiceImpl implements MomoService {
     ObjectMapper objectMapper;
 
     @Override
+    @Transactional
     public Map<String, String> createPaymentOrder(Long orderId) throws JsonProcessingException {
 
         Order order = orderRepository.findById(orderId)
@@ -81,18 +83,7 @@ public class MomoServiceImpl implements MomoService {
         if (order.getStatus() == OrderStatus.CANCELLED)
             throw new InvalidDataException(ErrorMessage.Payment.MOMO_ORDER_CANCELLED);
 
-        Optional<Payment> existingPayment = paymentRepository.findByOrderIdAndGateway(orderId, PaymentGateway.MOMO);
-        if (existingPayment.isPresent()) {
-            Payment payment = existingPayment.get();
-
-            if (payment.getStatus() == PaymentStatus.PENDING)
-                throw new InvalidDataException(ErrorMessage.Payment.MOMO_PAYMENT_PENDING);
-
-            if (payment.getStatus() == PaymentStatus.COMPLETED)
-                throw new InvalidDataException(ErrorMessage.Payment.MOMO_PAYMENT_COMPLETED);
-
-            log.info("Previous payment was {}, creating new payment for order #{}", payment.getStatus(), orderId);
-        }
+        Payment payment = getOrCreatePayment(order);
 
         // Tạo request params
         String requestId = UUID.randomUUID().toString();
@@ -125,8 +116,7 @@ public class MomoServiceImpl implements MomoService {
         MomoCreateOrderResponseDto responseDto = objectMapper.readValue(response.getBody(),
                 MomoCreateOrderResponseDto.class);
 
-        // Lưu payment record và MoMo transaction
-        Payment payment = createPaymentRecord(orderId);
+        // Lưu MoMo transaction payment 
         createMomoTransaction(orderId, payment.getId(), orderIdMomo, requestId, order.getTotalAmount());
 
         Map<String, String> result = new HashMap<>();
@@ -144,6 +134,7 @@ public class MomoServiceImpl implements MomoService {
     }
 
     @Override
+    @Transactional
     public boolean handleIpnCallback(MomoIpnRequestDto request) {
 
         if (!momoHelper.verifySignature(request)) {
@@ -199,6 +190,7 @@ public class MomoServiceImpl implements MomoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Map<String, String> handleRedirectCallback(Map<String, String> params) {
         Map<String, String> result = new HashMap<>();
 
@@ -227,6 +219,31 @@ public class MomoServiceImpl implements MomoService {
 
         return result;
 
+    }
+    private Payment getOrCreatePayment(Order order) {
+        Optional<Payment> existingPaymentOpt = paymentRepository.findByOrderIdAndGateway(
+                order.getId(), PaymentGateway.MOMO);
+
+        if (existingPaymentOpt.isEmpty()) {
+            return createPaymentRecord(order.getId());
+        }
+
+        Payment payment = existingPaymentOpt.get();
+
+        if (payment.getType() != PaymentType.ONLINE_PAYMENT) {
+            throw new InvalidDataException(ErrorMessage.Order.ERR_PAYMENT_TYPE_INVALID);
+        }
+
+        if (payment.getStatus() == PaymentStatus.COMPLETED) {
+            throw new InvalidDataException(ErrorMessage.Payment.MOMO_PAYMENT_COMPLETED);
+        }
+
+        if (payment.getStatus() == PaymentStatus.EXPIRED || payment.getStatus() == PaymentStatus.CANCELLED) {
+            payment.setStatus(PaymentStatus.PENDING);
+            return paymentRepository.save(payment);
+        }
+
+        return payment;
     }
 
     private Payment createPaymentRecord(Long orderId) {
