@@ -156,6 +156,10 @@ public class ErrorMessage {
         public static final String MOMO_PAYMENT_PENDING = "exception.momo.payment.pending";
         public static final String MOMO_PAYMENT_COMPLETED = "exception.momo.payment.completed";
 
+        public static final String COD_ORDER_ALREADY_COMPLETED = "exception.cod.order.already.completed";
+        public static final String COD_ORDER_CANCELLED = "exception.cod.order.cancelled";
+        public static final String COD_PAYMENT_ALREADY_COMPLETED = "exception.cod.payment.already.completed";
+
     }
 
 }

@@ -109,9 +109,10 @@ public class UrlConstant {
         public static final String MOMO_IPN = PRE_FIX + "/momo/ipn-handler";
         public static final String MOMO_CALLBACK = PRE_FIX + "/momo/callback";
 
+        public static final String COD_PAYMENT = PRE_FIX + "/cod";
+
         private Payment() {
         }
     }
-
 
 }

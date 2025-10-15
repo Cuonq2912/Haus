@@ -81,6 +81,8 @@ public class SuccessMessage {
         public static final String MOMO_IPN_SUCCESS = "MoMo IPN processed successfully";
         public static final String MOMO_CALLBACK_SUCCESS = "MoMo callback processed successfully";
 
+        public static final String COD_PAYMENT_SUCCESS = "COD payment processed successfully";
+
     }
 
 
