@@ -78,6 +78,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/api/v1/product/filter/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/payment/momo/callback").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/payment/momo/ipn-handler").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/order/**").permitAll()
                                 .requestMatchers(userEndpoints).hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
                                 .requestMatchers(adminEndpoints).hasAnyAuthority(RoleConstant.ADMIN)
                                 .anyRequest().authenticated())

@@ -16,10 +16,6 @@ public enum OrderStatus {
     COMPLETED,
     @JsonProperty("failed")
     FAIL,
-    @JsonProperty("shipped")
-    SHIPPED,
-    @JsonProperty("out for delivery")
-    OUT_FOR_DELIVERY,
     @JsonProperty("delivered")
     DELIVERED,
     @JsonProperty("cancelled")

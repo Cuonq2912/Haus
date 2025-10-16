@@ -85,6 +85,15 @@ public class SuccessMessage {
 
     }
 
+    public static class Order {
+
+        private Order() {}
+
+        public static final String GET_ORDER_SUCCESS = "Get all order successfully";
+        public static final String UPDATE_STATUS_ORDER_SUCCESS = "Update status order successfully";
+
+    }
+
 
 
 
