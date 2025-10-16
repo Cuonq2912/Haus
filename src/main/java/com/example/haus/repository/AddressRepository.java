@@ -13,4 +13,6 @@ public interface AddressRepository extends JpaRepository<Address, String> {
     List<Address> getAddressByUserId(String userId);
 
     Optional<Address> findByIdAndIsDeletedFalse(Long id);
+
+    Optional<Address> findByIdAndUserEmailAndIsDeletedFalse(Long id, String email);
 }

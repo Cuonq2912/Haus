@@ -44,10 +44,11 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public AddressResponseDto updateAddress(Long id, AddressRequestDto addressRequestDto) {
-        Address address = addressRepository.findByIdAndIsDeletedFalse(id).orElseThrow(
-                () -> new ResourceNotFoundException(ErrorMessage.Address.ERR_ADDRESS_NOT_FOUND)
-        );
+    public AddressResponseDto updateAddress(String email, Long id, AddressRequestDto addressRequestDto) {
+        Address address = addressRepository
+                .findByIdAndUserEmailAndIsDeletedFalse(id, email)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Address.ERR_ADDRESS_NOT_FOUND));
+
         addressMapper.updateAddressFromDto(addressRequestDto, address);
         return addressMapper.addressToAddressResponseDto(addressRepository.save(address));
     }
@@ -71,10 +72,10 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public void deleteAddress(Long id) {
-        Address address = addressRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() ->
-            new ResourceNotFoundException(ErrorMessage.Address.ERR_ADDRESS_NOT_FOUND)
-        );
+    public void deleteAddress(String email, Long id) {
+        Address address = addressRepository
+                .findByIdAndUserEmailAndIsDeletedFalse(id, email)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Address.ERR_ADDRESS_NOT_FOUND));
 
         address.setIsDeleted(true);
         addressRepository.save(address);

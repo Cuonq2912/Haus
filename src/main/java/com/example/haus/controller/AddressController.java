@@ -76,10 +76,10 @@ public class AddressController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PutMapping(UrlConstant.Address.UPDATE_ADDRESS)
-    public ResponseEntity<?> updateCategory(@PathVariable("id") Long id, @Valid @RequestBody AddressRequestDto addressRequestDto){
+    public ResponseEntity<?> updateCategory(@AuthenticationPrincipal UserDetails userDetails, @PathVariable("id") Long id, @Valid @RequestBody AddressRequestDto addressRequestDto){
         return ResponseUtil.success(
                 SuccessMessage.Address.UPDATE_ADDRESS_SUCCESS,
-                addressService.updateAddress(id, addressRequestDto)
+                addressService.updateAddress(userDetails.getUsername(), id, addressRequestDto)
         );
     }
 
@@ -89,8 +89,8 @@ public class AddressController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @DeleteMapping(UrlConstant.Address.DELETE_ADDRESS)
-    public ResponseEntity<?> deleteCategory(@PathVariable Long id){
-        addressService.deleteAddress(id);
+    public ResponseEntity<?> deleteCategory(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long id){
+        addressService.deleteAddress(userDetails.getUsername(), id);
         return ResponseUtil.success(
                 HttpStatus.NO_CONTENT,
                 SuccessMessage.Address.DELETE_ADDRESS_SUCCESS

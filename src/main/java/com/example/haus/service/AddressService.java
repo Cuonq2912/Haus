@@ -10,11 +10,11 @@ public interface AddressService {
 
     AddressResponseDto addAddress(String email, AddressRequestDto addressRequestDto);
 
-    AddressResponseDto updateAddress(Long id, AddressRequestDto addressRequestDto);
+    AddressResponseDto updateAddress(String email, Long id, AddressRequestDto addressRequestDto);
 
     AddressResponseDto getAddressById(Long id);
 
     List<AddressResponseDto> getAddressesByUserId(String email);
 
-    void deleteAddress(Long id);
+    void deleteAddress(String email, Long id);
 }
