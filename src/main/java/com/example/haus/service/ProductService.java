@@ -24,6 +24,6 @@ public interface ProductService {
                                                                       PaginationRequestDto paginationRequest);
 
     PaginationResponseDto<ProductResponseDto> filterProducts(
-            PaginationRequestDto paginationRequest, String sortByPrice, String search);
+            PaginationRequestDto paginationRequest, String sortBy, String search);
 
 }
