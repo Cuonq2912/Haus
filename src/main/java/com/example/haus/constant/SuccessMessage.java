@@ -49,6 +49,7 @@ public class SuccessMessage {
         public static final String UPDATE_CART_SUCCESS = "Update cart successful";
         public static final String GET_CART_SUCCESS = "Get cart successful";
         public static final String DELETE_CART_SUCCESS = "Delete cart successful";
+        public static final String DELETE_CART_ITEM_FROM_CART = "Delete cart item from cart successful";
     }
 
     public static class Promotion {

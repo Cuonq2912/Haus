@@ -63,7 +63,7 @@ public class CartServiceImpl implements CartService {
                 .findFirst()
                 .orElse(null);
 
-        if(productVariation.getInventoryQuantity() < (cartRequest.quantity() + cartRequest.quantity())) {
+        if(productVariation.getInventoryQuantity() < (cartRequest.quantity() + cartItem.getQuantity())) {
             throw new InvalidDataException(ErrorMessage.Cart.ERR_CART_QUANTITY_INVALID);
         }
 
@@ -97,6 +97,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public CartResponse removeItem(String email, Long productVariationId) {
         User user = userRepository.findByEmailAndIsDeletedFalse(email).orElseThrow(
                 () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
@@ -127,6 +128,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public CartResponse updateQuantity(String email, CartRequest cartRequest) {
         if (cartRequest.quantity() <= 0) {
             throw new InvalidDataException(ErrorMessage.Cart.ERR_CART_QUANTITY_INVALID);
@@ -155,6 +157,8 @@ public class CartServiceImpl implements CartService {
         }
 
         existingItem.setQuantity(cartRequest.quantity());
+
+        cartItemRepository.save(existingItem);
 
         return cartMapper.cartToCartResponse(cart);
     }

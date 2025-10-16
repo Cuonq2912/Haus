@@ -61,10 +61,10 @@ public class CartController {
             description = "Xóa sản phẩm khỏi giỏ hàng dựa trên variantId.",
             security = @SecurityRequirement(name = "Bearer Token")
     )
-    @PatchMapping(UrlConstant.Cart.REMOVE_CART_ITEM_FROM_CART)
+    @DeleteMapping(UrlConstant.Cart.REMOVE_CART_ITEM_FROM_CART)
     public ResponseEntity<?> removeCartItemFromCart(@PathVariable(name = "variantId") Long variantId, @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseUtil.success(
-                SuccessMessage.Cart.GET_CART_SUCCESS,
+                SuccessMessage.Cart.DELETE_CART_ITEM_FROM_CART,
                 cartService.removeItem(userDetails.getUsername(), variantId)
         );
     }
