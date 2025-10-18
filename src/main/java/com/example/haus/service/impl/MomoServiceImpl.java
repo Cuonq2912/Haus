@@ -80,8 +80,6 @@ public class MomoServiceImpl implements MomoService {
         if (order.getStatus() == OrderStatus.CONFIRMED || order.getStatus() == OrderStatus.COMPLETED)
             throw new InvalidDataException(ErrorMessage.Payment.MOMO_ORDER_ALREADY_PAID);
 
-        if (order.getStatus() == OrderStatus.CANCELLED)
-            throw new InvalidDataException(ErrorMessage.Payment.MOMO_ORDER_CANCELLED);
 
         Payment payment = getOrCreatePayment(order);
 
