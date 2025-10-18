@@ -41,17 +41,16 @@ public class SuccessMessage {
         public static final String DELETE_CATEGORY_SUCCESS = "Delete category successful";
     }
 
-    public static class Address {
+    public static class Cart {
 
-        private Address() {}
+        private Cart() {}
 
-        public static final String ADD_ADDRESS_SUCCESS = "Add address successful";
-        public static final String UPDATE_ADDRESS_SUCCESS = "Update address successful";
-        public static final String GET_ADDRESS_SUCCESS = "Get address successful";
-        public static final String GET_ALL_ADDRESS_SUCCESS = "Get all address successful";
-        public static final String DELETE_ADDRESS_SUCCESS = "Delete address successful";
+        public static final String ADD_CART_SUCCESS = "Add cart successful";
+        public static final String UPDATE_CART_SUCCESS = "Update cart successful";
+        public static final String GET_CART_SUCCESS = "Get cart successful";
+        public static final String DELETE_CART_SUCCESS = "Delete cart successful";
+        public static final String DELETE_CART_ITEM_FROM_CART = "Delete cart item from cart successful";
     }
-
 
     public static class Promotion {
 
@@ -90,6 +89,11 @@ public class SuccessMessage {
         public static final String CALLBACK_VNPAY_SUCCESS = "VNPay return callback processed successfully";
     }
 
+    public static class Order {
+        private Order() {}
+
+        public static final String GET_INVOICE_SUCCESS = "Get invoice success";
+    }
 
 
 

@@ -27,8 +27,8 @@ public class CreateProductVariationRequestDto {
 
     @Schema(description = "Giá biến thể sản phẩm", example = "1600000.0")
     @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
-    @DecimalMin(value = "0.0", inclusive = false, message = ErrorMessage.Product.ERR_PRICE_INVALID)
-    Double price;
+    @DecimalMin(value = "0", inclusive = false, message = ErrorMessage.Product.ERR_PRICE_INVALID)
+    Long price;
 
     @Schema(description = "Số lượng tồn kho của biến thể", example = "20")
     @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)

@@ -4,6 +4,7 @@ import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.TokenType;
 import com.example.haus.domain.entity.InvalidatedToken;
+import com.example.haus.domain.entity.product.Cart;
 import com.example.haus.domain.entity.user.Role;
 import com.example.haus.domain.entity.user.User;
 import com.example.haus.domain.mapper.AuthMapper;
@@ -16,6 +17,7 @@ import com.example.haus.domain.dto.response.auth.RefreshTokenResponseDto;
 import com.example.haus.domain.dto.response.user.UserResponseDto;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
+import com.example.haus.repository.CartRepository;
 import com.example.haus.repository.InvalidatedTokenRepository;
 import com.example.haus.repository.UserRepository;
 import com.example.haus.security.CustomUserDetailsService;
@@ -66,6 +68,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     InvalidatedTokenRepository invalidatedTokenRepository;
 
     UserRepository userRepository;
+
+    CartRepository cartRepository;
 
     Map<String, PendingRegistrationRequestDto> pendingRegisterMap = new ConcurrentHashMap<>();
 
@@ -194,7 +198,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setPassword(passwordEncoder.encode(req.getPassword()));
         user.setRole(Role.USER);
 
+        Cart cart = new Cart();
+        cart.setUser(user);
+        user.setCart(cart);
+
         userRepository.save(user);
+        cart = cartRepository.save(cart);
 
         pendingRegisterMap.remove(request.getEmail());
 
