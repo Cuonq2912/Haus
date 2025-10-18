@@ -8,10 +8,7 @@ import com.example.haus.domain.dto.pagination.PaginationCustom;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.product.UpdateProductRequestDto;
-import com.example.haus.domain.entity.product.Category;
-import com.example.haus.domain.entity.product.Media;
-import com.example.haus.domain.entity.product.Product;
-import com.example.haus.domain.entity.product.ProductVariation;
+import com.example.haus.domain.entity.product.*;
 import com.example.haus.domain.mapper.ProductMapper;
 import com.example.haus.domain.dto.request.product.ProductRequestDto;
 import com.example.haus.domain.dto.response.product.ProductResponseDto;
@@ -283,9 +280,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public PaginationResponseDto<ProductResponseDto> filterProducts(PaginationRequestDto paginationRequest,
-                                                                    String sortByPrice,
+                                                                    String sortBy,
                                                                     String search) {
-        log.info("sortByPrice = {}; search = {}", sortByPrice, search);
+        log.info("sortByPrice = {}; search = {}", sortBy, search);
         List<SearchCriteria> searchCriteriaList = new ArrayList<>();
         if (search != null) {
             if(search.length() > 0) {
@@ -300,7 +297,7 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
-        List<Product> products = getProducts(paginationRequest.getPageNum(), paginationRequest.getPageSize(), searchCriteriaList,  sortByPrice);
+        List<Product> products = getProducts(paginationRequest.getPageNum(), paginationRequest.getPageSize(), searchCriteriaList,  sortBy);
 
         Long totalElements = getTotalElements(searchCriteriaList);
 
@@ -313,8 +310,8 @@ public class ProductServiceImpl implements ProductService {
                 .pageSize(paginationRequest.getPageSize())
                 .totalElement(pages.getTotalElements())
                 .totalPages(pages.getTotalPages())
-                .sortType(sortByPrice)
-                .sortBy(sortByPrice != null ? "price" : null)
+                .sortType(sortBy)
+                .sortBy(determineSortByField(sortBy))
                 .build();
 
         List<ProductResponseDto> productResponseDtoList = pages.getContent().stream()
@@ -327,7 +324,7 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
-    private List<Product> getProducts(int page, int size, List<SearchCriteria> searchCriteriaList, String sortByPrice) {
+    private List<Product> getProducts(int page, int size, List<SearchCriteria> searchCriteriaList, String sortBy) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Product> query = cb.createQuery(Product.class);
         Root<Product> root = query.from(Product.class);
@@ -342,11 +339,22 @@ public class ProductServiceImpl implements ProductService {
         query.where(predicate);
 
         // Sort theo giá
-        if (sortByPrice != null) {
-            if ("asc".equalsIgnoreCase(sortByPrice)) {
-                query.orderBy(cb.asc(root.get("price")));
-            } else if ("desc".equalsIgnoreCase(sortByPrice)) {
-                query.orderBy(cb.desc(root.get("price")));
+        if (sortBy != null) {
+            if ("asc".equalsIgnoreCase(sortBy) || "desc".equalsIgnoreCase(sortBy)) {
+                if ("asc".equalsIgnoreCase(sortBy)) {
+                    query.orderBy(cb.asc(root.get("price")));
+                } else {
+                    query.orderBy(cb.desc(root.get("price")));
+                }
+            } else if ("discount_asc".equalsIgnoreCase(sortBy) || "discount_desc".equalsIgnoreCase(sortBy)) { // Sort theo discountPercent
+                Join<Product, Category> categoryJoin = root.join("categories", JoinType.LEFT);
+                Join<Category, Promotion> promotionJoin = categoryJoin.join("promotion", JoinType.LEFT);
+
+                if ("discount_asc".equalsIgnoreCase(sortBy)) {
+                    query.orderBy(cb.asc(promotionJoin.get("discountPercent")));
+                } else {
+                    query.orderBy(cb.desc(promotionJoin.get("discountPercent")));
+                }
             }
         }
 
@@ -386,5 +394,15 @@ public class ProductServiceImpl implements ProductService {
         return entityManager.createQuery(countQuery).getSingleResult();
     }
 
+    private String determineSortByField(String sortBy) {
+        if (sortBy == null) {
+            return null;
+        } else if ("asc".equalsIgnoreCase(sortBy) || "desc".equalsIgnoreCase(sortBy)) {
+            return "price";
+        } else if ("discount_asc".equalsIgnoreCase(sortBy) || "discount_desc".equalsIgnoreCase(sortBy)) {
+            return "discountPercent";
+        }
+        return null;
+    }
 
 }

@@ -125,7 +125,6 @@ public class ErrorMessage {
 
     public static class Order {
 
-
         private Order() {
         }
 
@@ -135,6 +134,7 @@ public class ErrorMessage {
         public static final String ERR_PAYMENT_EXPIRED = "exception.order.payment.expired";
         public static final String ERR_PAYMENT_STATUS_INVALID = "exception.order.payment.status.invalid";
         public static final String ERR_PAYMENT_COMPLETED = "exception.order.payment.completed";
+        public static final String ERR_ORDER_NOT_COMPLETED = "exception.order.not.completed";
         public static final String ERR_INVALID_ORDER_STATUS = "exception.order.status.incompatible";
 
     }
@@ -164,6 +164,26 @@ public class ErrorMessage {
         public static final String STATUS_IS_NOT_SUPPORT = "exception.status.is.not.support";
 
 
+    }
+
+    public static class Cart {
+        private Cart() {}
+
+        public static final String ERR_CART_NOT_FOUND = "exception.cart.not.found";
+        public static final String ERR_CART_QUANTITY_INVALID = "exception.cart.quantity.invalid";
+        public static final String ERR_CART_ITEM_NOT_EXISTED_IN_CART = "exception.cart.item.not.existed.in.cart";
+    }
+
+    public static class Address {
+
+        private Address() {}
+
+        public static final String ERR_COUNTRY_EMPTY = "exception.country.empty";
+        public static final String ERR_CITY_EMPTY = "exception.city.empty";
+        public static final String ERR_DISTRICT_EMPTY = "exception.district.empty";
+        public static final String ERR_COMMUNE_EMPTY = "exception.commune.empty";
+        public static final String ERR_DETAIL_ADDRESS_NULL = "exception.detail.address.null";
+        public static final String ERR_ADDRESS_NOT_FOUND = "exception.address.not.found";
     }
 
 }

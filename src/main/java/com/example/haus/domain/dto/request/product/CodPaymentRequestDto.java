@@ -18,9 +18,6 @@ public class CodPaymentRequestDto {
     @Schema(description = "ID của đơn hàng cần thanh toán", example = "1")
     Long orderId;
 
-    @Schema(description = "Địa chỉ giao hàng", example = "123 Đường ABC, Quận XYZ, TP.HCM")
-    String shippingAddress;
-
     @Schema(description = "Số điện thoại liên hệ", example = "0901234567")
     String phoneNumber;
 

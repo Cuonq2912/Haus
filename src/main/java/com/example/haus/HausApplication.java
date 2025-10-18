@@ -1,8 +1,10 @@
 package com.example.haus;
 
 import com.example.haus.config.properties.AdminInfoProperties;
+import com.example.haus.domain.entity.product.Cart;
 import com.example.haus.domain.entity.user.Role;
 import com.example.haus.domain.entity.user.User;
+import com.example.haus.repository.CartRepository;
 import com.example.haus.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -24,6 +26,8 @@ public class HausApplication {
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final CartRepository cartRepository;
 
     public static void main(String[] args) {
         Environment env = SpringApplication.run(HausApplication.class, args).getEnvironment();
@@ -50,7 +54,15 @@ public class HausApplication {
                         .email(adminInfo.getEmail())
                         .role(Role.ADMIN)
                         .build();
+
                 userRepository.save(admin);
+
+                Cart cart = new Cart();
+                cart.setUser(admin);
+                admin.setCart(cart);
+
+                cartRepository.save(cart);
+
                 log.info("admin created successful with name: {} and password = {}", admin.getUsername(), admin.getPassword());
             }
         };

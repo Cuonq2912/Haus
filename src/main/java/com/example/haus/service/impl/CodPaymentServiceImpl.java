@@ -6,6 +6,7 @@ import com.example.haus.domain.dto.request.product.CodPaymentRequestDto;
 import com.example.haus.domain.dto.response.product.CodPaymentResponseDto;
 import com.example.haus.domain.entity.product.Order;
 import com.example.haus.domain.entity.product.payment.Payment;
+import com.example.haus.domain.entity.product.payment.PaymentGateway;
 import com.example.haus.domain.entity.product.payment.PaymentStatus;
 import com.example.haus.domain.entity.product.payment.PaymentType;
 import com.example.haus.exception.InvalidDataException;
@@ -65,14 +66,16 @@ public class CodPaymentServiceImpl implements CodPaymentService {
 
 
     private Payment getOrCreateCodPayment(Order order) {
-        Optional<Payment> existingPaymentOpt = paymentRepository.findByOrderIdAndType(
-                order.getId(), PaymentType.COD);
+        Optional<Payment> existingPaymentOpt = paymentRepository.findByOrderId(
+                order.getId());
 
         if (existingPaymentOpt.isPresent()) {
             Payment payment = existingPaymentOpt.get();
-            
-            if (payment.getType() != PaymentType.COD) {
-                throw new InvalidDataException(ErrorMessage.Order.ERR_PAYMENT_TYPE_INVALID);
+
+            if (payment.getStatus() == PaymentStatus.PENDING) {
+                payment.setType(PaymentType.COD);
+                payment.setGateway(null);
+                paymentRepository.save(payment);
             }
 
             if (payment.getStatus() == PaymentStatus.COMPLETED) {

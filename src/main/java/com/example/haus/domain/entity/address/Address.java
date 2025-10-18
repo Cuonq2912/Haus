@@ -1,13 +1,12 @@
 package com.example.haus.domain.entity.address;
 
+import com.example.haus.constant.CommonConstant;
 import com.example.haus.domain.entity.BaseEntity;
 import com.example.haus.domain.entity.user.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+@Builder
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,8 +16,9 @@ import lombok.Setter;
 public class Address extends BaseEntity {
 
     @Id
-    @Column(insertable = false, updatable = false, nullable = false, columnDefinition = "CHAR(36)")
-    String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "address_id")
+    Long id;
 
     @Column(name = "country")
     private String country;
@@ -32,10 +32,14 @@ public class Address extends BaseEntity {
     @Column(name = "commune")
     private String commune;
 
-    @Column(name = "detail-address")
+    @Column(name = "detail_address")
     private String detailAddress;
 
-    @OneToOne
+    @Builder.Default
+    @Column(name = "is_deleted")
+    private Boolean isDeleted = CommonConstant.FALSE;
+
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 }

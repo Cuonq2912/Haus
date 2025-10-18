@@ -34,4 +34,5 @@ public class UserResponseDto {
 
     String nationality;
 
+    Long cartId;
 }

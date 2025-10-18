@@ -30,7 +30,7 @@ public class User extends BaseEntity {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(insertable = false, updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+    @Column(insertable = false, updatable = false, nullable = false, columnDefinition = "CHAR(36) DEFAULT (UUID())")
     String id;
 
     @Column(nullable = false, updatable = false, unique = true)
@@ -89,6 +89,6 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     List<CommentNews> newsComments;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    Address address;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    List<Address> addresses;
 }

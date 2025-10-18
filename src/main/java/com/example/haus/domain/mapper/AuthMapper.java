@@ -17,5 +17,6 @@ public interface AuthMapper {
     @Mapping(target = "password", ignore = true)
     User registerRequestDtoToUser(RegisterRequestDto request);
 
+    @Mapping(target = "cartId", source = "user.cart.id")
     UserResponseDto userToUserResponseDto(User user);
 }
