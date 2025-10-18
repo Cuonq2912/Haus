@@ -30,6 +30,17 @@ public class SuccessMessage {
         public static final String UPDATE_AVATAR_SUCCESS = "Update avatar user successful";
     }
 
+    public static class Address {
+
+        private Address() {}
+
+        public static final String ADD_ADDRESS_SUCCESS = "Add address successful";
+        public static final String UPDATE_ADDRESS_SUCCESS = "Update address successful";
+        public static final String GET_ADDRESS_SUCCESS = "Get address successful";
+        public static final String GET_ALL_ADDRESS_SUCCESS = "Get all address successful";
+        public static final String DELETE_ADDRESS_SUCCESS = "Delete address successful";
+    }
+
     public static class Category {
 
         private Category() {}
@@ -39,6 +50,17 @@ public class SuccessMessage {
         public static final String GET_CATEGORY_SUCCESS = "Get category successful";
         public static final String GET_ALL_CATEGORY_SUCCESS = "Get all category successful";
         public static final String DELETE_CATEGORY_SUCCESS = "Delete category successful";
+    }
+
+    public static class Cart {
+
+        private Cart() {}
+
+        public static final String ADD_CART_SUCCESS = "Add cart successful";
+        public static final String UPDATE_CART_SUCCESS = "Update cart successful";
+        public static final String GET_CART_SUCCESS = "Get cart successful";
+        public static final String DELETE_CART_SUCCESS = "Delete cart successful";
+        public static final String DELETE_CART_ITEM_FROM_CART = "Delete cart item from cart successful";
     }
 
     public static class Promotion {
@@ -85,6 +107,11 @@ public class SuccessMessage {
 
     }
 
+    public static class Order {
+        private Order() {}
+
+        public static final String GET_INVOICE_SUCCESS = "Get invoice success";
+    }
 
 
 

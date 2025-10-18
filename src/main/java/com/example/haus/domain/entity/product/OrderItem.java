@@ -20,12 +20,17 @@ public class OrderItem extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
+    @Column(nullable = false)
+    Integer quantity;
+
+    @Column(nullable = false)
+    Double priceAtSale;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    Product product;
-
+    @JoinColumn(name = "product_variant_id", nullable = false)
+    ProductVariation productVariation;
 }
