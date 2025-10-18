@@ -77,9 +77,8 @@ public class MomoServiceImpl implements MomoService {
         if (amount > MAX_AMOUNT)
             throw new InvalidDataException(ErrorMessage.Payment.MOMO_AMOUNT_TOO_HIGH);
 
-        if (order.getStatus() == OrderStatus.CONFIRMED || order.getStatus() == OrderStatus.COMPLETED)
+        if (order.getStatus() == OrderStatus.COMPLETED)
             throw new InvalidDataException(ErrorMessage.Payment.MOMO_ORDER_ALREADY_PAID);
-
 
         Payment payment = getOrCreatePayment(order);
 
@@ -219,8 +218,8 @@ public class MomoServiceImpl implements MomoService {
 
     }
     private Payment getOrCreatePayment(Order order) {
-        Optional<Payment> existingPaymentOpt = paymentRepository.findByOrderIdAndGateway(
-                order.getId(), PaymentGateway.MOMO);
+        Optional<Payment> existingPaymentOpt = paymentRepository.findByOrderId(
+                order.getId());
 
         if (existingPaymentOpt.isEmpty()) {
             return createPaymentRecord(order.getId());
@@ -228,8 +227,10 @@ public class MomoServiceImpl implements MomoService {
 
         Payment payment = existingPaymentOpt.get();
 
-        if (payment.getType() != PaymentType.ONLINE_PAYMENT) {
-            throw new InvalidDataException(ErrorMessage.Order.ERR_PAYMENT_TYPE_INVALID);
+        if (payment.getStatus() == PaymentStatus.PENDING) {
+            payment.setType(PaymentType.ONLINE_PAYMENT);
+            payment.setGateway(PaymentGateway.MOMO);
+            paymentRepository.save(payment);
         }
 
         if (payment.getStatus() == PaymentStatus.COMPLETED) {
