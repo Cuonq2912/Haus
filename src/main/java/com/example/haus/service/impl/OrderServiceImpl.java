@@ -380,19 +380,21 @@ public class OrderServiceImpl implements OrderService {
         itemsTable.addCell(totalValueCell);
 
         // Discount Percent
-        PdfPCell discountCell = new PdfPCell(new Phrase("Giảm giá (Discount)", boldFont));
-        discountCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        discountCell.setColspan(5);
-        discountCell.setBorder(Rectangle.BOX);
-        discountCell.setPadding(7);
-        itemsTable.addCell(discountCell);
+        if (data.getPromotion() != null) {
+            PdfPCell discountCell = new PdfPCell(new Phrase("Giảm giá (Discount)", boldFont));
+            discountCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            discountCell.setColspan(5);
+            discountCell.setBorder(Rectangle.BOX);
+            discountCell.setPadding(7);
+            itemsTable.addCell(discountCell);
 
-        double discountValue = data.getPromotion().getDiscountPercent() * subTotal;
-        PdfPCell discountValueCell = new PdfPCell(new Phrase("-" + String.format("%,.0f", discountValue), normalFont));
-        discountValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        discountValueCell.setBorder(Rectangle.BOX);
-        discountValueCell.setPadding(7);
-        itemsTable.addCell(discountValueCell);
+            double discountValue = data.getPromotion().getDiscountPercent() * subTotal;
+            PdfPCell discountValueCell = new PdfPCell(new Phrase("-" + String.format("%,.0f", discountValue), normalFont));
+            discountValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            discountValueCell.setBorder(Rectangle.BOX);
+            discountValueCell.setPadding(7);
+            itemsTable.addCell(discountValueCell);
+        }
 
         // Shipping fee
         PdfPCell shippingFeeCell = new PdfPCell(new Phrase("Phí vận chuyển (Shipping fee)", boldFont));

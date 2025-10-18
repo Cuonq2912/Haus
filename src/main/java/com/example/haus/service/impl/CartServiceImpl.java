@@ -45,7 +45,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartResponse addToCart(String email, CartRequest cartRequest) {
 
-        User user = userRepository.findByEmailAndIsDeletedFalse(email).orElseThrow(
+        User user = userRepository.findByUsernameAndIsDeletedFalse(email).orElseThrow(
                 () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         Cart cart = cartRepository.findByUserId(user.getId())
@@ -86,7 +86,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartResponse getCart(String email) {
-        User user = userRepository.findByEmailAndIsDeletedFalse(email).orElseThrow(
+        User user = userRepository.findByUsernameAndIsDeletedFalse(email).orElseThrow(
                 () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         Cart cart = cartRepository.findByUserId(user.getId())
@@ -99,7 +99,7 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public CartResponse removeItem(String email, Long productVariationId) {
-        User user = userRepository.findByEmailAndIsDeletedFalse(email).orElseThrow(
+        User user = userRepository.findByUsernameAndIsDeletedFalse(email).orElseThrow(
                 () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         Cart cart = cartRepository.findByUserId(user.getId())
@@ -117,7 +117,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public void clearCart(String email) {
-        User user = userRepository.findByEmailAndIsDeletedFalse(email).orElseThrow(
+        User user = userRepository.findByUsernameAndIsDeletedFalse(email).orElseThrow(
                 () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         Cart cart = cartRepository.findByUserId(user.getId())
@@ -134,7 +134,7 @@ public class CartServiceImpl implements CartService {
             throw new InvalidDataException(ErrorMessage.Cart.ERR_CART_QUANTITY_INVALID);
         }
 
-        User user = userRepository.findByEmailAndIsDeletedFalse(email).orElseThrow(
+        User user = userRepository.findByUsernameAndIsDeletedFalse(email).orElseThrow(
                 () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         Cart cart = cartRepository.findByUserId(user.getId())

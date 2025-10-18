@@ -32,7 +32,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public AddressResponseDto addAddress(String email, AddressRequestDto addressRequestDto) {
-        User user = userRepository.findByEmailAndIsDeletedFalse(email).orElseThrow(() ->
+        User user = userRepository.findByUsernameAndIsDeletedFalse(email).orElseThrow(() ->
                 new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         Address address = addressMapper.addressRequestDtoToAddress(addressRequestDto);
@@ -46,7 +46,7 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public AddressResponseDto updateAddress(String email, Long id, AddressRequestDto addressRequestDto) {
         Address address = addressRepository
-                .findByIdAndUserEmailAndIsDeletedFalse(id, email)
+                .findByIdAndUserUsernameAndIsDeletedFalse(id, email)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Address.ERR_ADDRESS_NOT_FOUND));
 
         addressMapper.updateAddressFromDto(addressRequestDto, address);
@@ -63,7 +63,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public List<AddressResponseDto> getAddressesByUserId(String email) {
-        User user = userRepository.findByEmailAndIsDeletedFalse(email).orElseThrow(() ->
+        User user = userRepository.findByUsernameAndIsDeletedFalse(email).orElseThrow(() ->
                 new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         List<Address> addresses = addressRepository.getAddressByUserId(user.getId());
@@ -74,7 +74,7 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public void deleteAddress(String email, Long id) {
         Address address = addressRepository
-                .findByIdAndUserEmailAndIsDeletedFalse(id, email)
+                .findByIdAndUserUsernameAndIsDeletedFalse(id, email)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Address.ERR_ADDRESS_NOT_FOUND));
 
         address.setIsDeleted(true);
