@@ -160,4 +160,16 @@ public class ErrorMessage {
         public static final String ERR_ADDRESS_NOT_FOUND = "exception.address.not.found";
     }
 
+    public static class Address {
+
+        private Address() {}
+
+        public static final String ERR_COUNTRY_EMPTY = "exception.country.empty";
+        public static final String ERR_CITY_EMPTY = "exception.city.empty";
+        public static final String ERR_DISTRICT_EMPTY = "exception.district.empty";
+        public static final String ERR_COMMUNE_EMPTY = "exception.commune.empty";
+        public static final String ERR_DETAIL_ADDRESS_NULL = "exception.detail.address.null";
+        public static final String ERR_ADDRESS_NOT_FOUND = "exception.address.not.found";
+    }
+
 }
