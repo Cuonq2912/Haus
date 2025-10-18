@@ -4,9 +4,9 @@ import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.OrderStatus;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
-import com.example.haus.domain.dto.response.product.OrderResponseDto;
 import com.example.haus.domain.dto.response.invoice.InvoiceItemDto;
 import com.example.haus.domain.dto.response.invoice.InvoiceResponseDto;
+import com.example.haus.domain.dto.response.product.OrderResponseDto;
 import com.example.haus.domain.dto.response.user.UserResponseDto;
 import com.example.haus.domain.entity.product.Order;
 import com.example.haus.domain.entity.product.Promotion;
@@ -55,7 +55,7 @@ public class OrderServiceImpl implements OrderService {
 
     OrderMapper orderMapper;
 
-//    PaymentMapper paymentMapper;
+    PaymentMapper paymentMapper;
 
     ProductMapper productMapper;
 
