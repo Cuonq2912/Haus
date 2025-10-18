@@ -63,7 +63,7 @@ public class CartServiceImpl implements CartService {
                 .findFirst()
                 .orElse(null);
 
-        if(productVariation.getInventoryQuantity() < (cartRequest.quantity() + cartItem.getQuantity())) {
+        if(productVariation.getInventoryQuantity() < (cartRequest.quantity() + (cartItem != null ? cartItem.getQuantity() : 0))) {
             throw new InvalidDataException(ErrorMessage.Cart.ERR_CART_QUANTITY_INVALID);
         }
 

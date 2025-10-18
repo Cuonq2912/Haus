@@ -30,6 +30,17 @@ public class SuccessMessage {
         public static final String UPDATE_AVATAR_SUCCESS = "Update avatar user successful";
     }
 
+    public static class Address {
+
+        private Address() {}
+
+        public static final String ADD_ADDRESS_SUCCESS = "Add address successful";
+        public static final String UPDATE_ADDRESS_SUCCESS = "Update address successful";
+        public static final String GET_ADDRESS_SUCCESS = "Get address successful";
+        public static final String GET_ALL_ADDRESS_SUCCESS = "Get all address successful";
+        public static final String DELETE_ADDRESS_SUCCESS = "Delete address successful";
+    }
+
     public static class Category {
 
         private Category() {}
