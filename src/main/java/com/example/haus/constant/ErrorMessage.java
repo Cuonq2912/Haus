@@ -135,6 +135,7 @@ public class ErrorMessage {
         public static final String ERR_PAYMENT_STATUS_INVALID = "exception.order.payment.status.invalid";
         public static final String ERR_PAYMENT_COMPLETED = "exception.order.payment.completed";
         public static final String ERR_ORDER_NOT_COMPLETED = "exception.order.not.completed";
+        public static final String ERR_INVALID_ORDER_STATUS = "exception.order.status.incompatible";
 
     }
 
@@ -160,6 +161,8 @@ public class ErrorMessage {
         public static final String COD_ORDER_ALREADY_COMPLETED = "exception.cod.order.already.completed";
         public static final String COD_ORDER_CANCELLED = "exception.cod.order.cancelled";
         public static final String COD_PAYMENT_ALREADY_COMPLETED = "exception.cod.payment.already.completed";
+        public static final String STATUS_IS_NOT_SUPPORT = "exception.status.is.not.support";
+
 
     }
 

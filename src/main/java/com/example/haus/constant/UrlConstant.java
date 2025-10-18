@@ -130,6 +130,19 @@ public class UrlConstant {
         }
     }
 
+
+    public static class Order {
+        private static final String PRE_FIX = "/order";
+
+        public static final String GET_ALL_ORDERS = PRE_FIX;
+        public static final String GET_ORDER_BY_ID = PRE_FIX + "/{id}";
+        public static final String UPDATE_STATUS_ORDER_BY_ID = PRE_FIX + "/{id}";
+
+        private Order() {
+
+        }
+    }
+
     public static class Address {
         private static final String PRE_FIX = "/address";
 
