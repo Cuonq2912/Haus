@@ -91,12 +91,20 @@ public class VNPayServiceImpl implements VNPayService {
             return createPaymentRecord(order);
         }
 
-        if (payment.getType() != PaymentType.ONLINE_PAYMENT) {
-            throw new InvalidDataException(ErrorMessage.Order.ERR_PAYMENT_TYPE_INVALID);
-        }
-        
         if (payment.getStatus() == PaymentStatus.COMPLETED) {
             throw new InvalidDataException(ErrorMessage.Order.ERR_PAYMENT_COMPLETED);
+        }
+
+        if (payment.getExpireAt() == null) {
+            Calendar newExpireTime = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+            newExpireTime.add(Calendar.SECOND, maxPaymentTime);
+            payment.setExpireAt(newExpireTime.getTime());
+        }
+
+        if (payment.getStatus() == PaymentStatus.PENDING) {
+            payment.setType(PaymentType.ONLINE_PAYMENT);
+            payment.setGateway(PaymentGateway.VNPAY);
+            paymentRepository.save(payment);
         }
 
         // Payment EXPIRED hoặc CANCELLED
@@ -139,6 +147,11 @@ public class VNPayServiceImpl implements VNPayService {
     }
 
     private void buildTimeParams(Map<String, String> params, Date expiredTime, Date currentTime) {
+        // Validate input parameters
+        if (expiredTime == null || currentTime == null) {
+            throw new InvalidDataException("Expired time and current time must not be null");
+        }
+        
         Calendar now = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
 
         // Thời gian còn lại (giây)
