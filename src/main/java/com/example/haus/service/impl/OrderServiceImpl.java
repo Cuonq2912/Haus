@@ -432,7 +432,7 @@ public class OrderServiceImpl implements OrderService {
         paymentMethodLabelCell.setPadding(7);
         itemsTable.addCell(paymentMethodLabelCell);
 
-        PdfPCell paymentMethodValueCell = new PdfPCell(new Phrase(data.getPayment().getType() == PaymentType.BANK_TRANSFER ? "Thanh toán bằng ngân hàng" : "Thanh toán khi nhân hàng", normalFont));
+        PdfPCell paymentMethodValueCell = new PdfPCell(new Phrase(data.getPayment().getType() == PaymentType.ONLINE_PAYMENT ? "Thanh toán bằng ngân hàng" : "Thanh toán khi nhân hàng", normalFont));
         paymentMethodValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         paymentMethodValueCell.setBorder(Rectangle.BOX);
         paymentMethodValueCell.setPadding(7);

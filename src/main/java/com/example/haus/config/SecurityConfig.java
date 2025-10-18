@@ -31,6 +31,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -76,6 +77,8 @@ public class SecurityConfig {
 //                                .requestMatchers(HttpMethod.GET, "/api/v1/promotion/**").permitAll()
 //                                .requestMatchers(HttpMethod.GET, "/api/v1/product/**").permitAll()
 //                                .requestMatchers(HttpMethod.GET, "/api/v1/product/filter/**").permitAll()
+//                                .requestMatchers(HttpMethod.GET, "/api/v1/payment/momo/callback").permitAll()
+//                                .requestMatchers(HttpMethod.POST, "/api/v1/payment/momo/ipn-handler").permitAll()
 //                                .requestMatchers(userEndpoints).hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
 //                                .requestMatchers(adminEndpoints).hasAnyAuthority(RoleConstant.ADMIN)
                                 .requestMatchers("**").permitAll()
@@ -92,7 +95,8 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
                 "https://ahistorical-undelusory-soren.ngrok-free.dev",
-                "https://sandbox.vnpayment.vn")); // domain FE + ngrok + VNPay
+                "https://sandbox.vnpayment.vn",
+                "https://test-payment.momo.vn")); // domain FE + ngrok + VNPay + MoMo
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);

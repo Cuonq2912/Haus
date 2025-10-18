@@ -110,7 +110,8 @@ public class ErrorMessage {
 
     public static class Product {
 
-        private Product() {}
+        private Product() {
+        }
 
         public static final String ERR_PRICE_INVALID = "exception.product.price.invalid";
         public static final String ERR_QUANTITY_INVALID = "exception.product.quantity.invalid";
@@ -124,9 +125,8 @@ public class ErrorMessage {
 
     public static class Order {
 
-
-
-        private Order() {}
+        private Order() {
+        }
 
         public static final String ERR_PAYMENT_NOT_FOUND = "exception.order.not.found";
         public static final String ERR_ORDER_NOT_EXISTED = "exception.order.not.existed";
@@ -140,12 +140,26 @@ public class ErrorMessage {
 
     public static class Payment {
 
-        private Payment() {}
+        private Payment() {
+        }
 
         public static final String CALLBACK_VNPAY_FAIL = "exception.vnpay.callback.fail";
         public static final String IPN_VERIFY_FAIL = "exception.vnpay.ipn.verify.fail";
         public static final String CREATE_VNPAY_URL_FAIL = "exception.vnpay.url.create.fail";
 
+        public static final String CREATE_MOMO_ORDER_FAIL = "exception.momo.create.order.fail";
+        public static final String MOMO_IPN_VERIFY_FAIL = "exception.momo.ipn.verify.fail";
+        public static final String MOMO_CALLBACK_FAIL = "exception.momo.callback.fail";
+        public static final String MOMO_AMOUNT_TOO_LOW = "exception.momo.amount.too.low";
+        public static final String MOMO_AMOUNT_TOO_HIGH = "exception.momo.amount.too.high";
+        public static final String MOMO_ORDER_ALREADY_PAID = "exception.momo.order.already.paid";
+        public static final String MOMO_ORDER_CANCELLED = "exception.momo.order.cancelled";
+        public static final String MOMO_PAYMENT_PENDING = "exception.momo.payment.pending";
+        public static final String MOMO_PAYMENT_COMPLETED = "exception.momo.payment.completed";
+
+        public static final String COD_ORDER_ALREADY_COMPLETED = "exception.cod.order.already.completed";
+        public static final String COD_ORDER_CANCELLED = "exception.cod.order.cancelled";
+        public static final String COD_PAYMENT_ALREADY_COMPLETED = "exception.cod.payment.already.completed";
 
     }
 
