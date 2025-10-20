@@ -121,11 +121,13 @@ public class ProductController {
     public ResponseEntity<?> getProductsByCategoryId(
                     @PathVariable Long categoryId,
                     @RequestParam(defaultValue = "1") Integer pageNum,
-                    @RequestParam(defaultValue = "10") Integer pageSize) {
+                    @RequestParam(defaultValue = "10") Integer pageSize,
+                    @RequestParam(required = false) @Schema(example = "asc or discount_asc") String sortBy,
+                    @RequestParam(required = false) @Schema(example = "priceRange:under_1m&color:Nâu đậm&categoryId:1&keyword:a") String search) {
             PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
             return ResponseUtil.success(
                             SuccessMessage.Product.GET_PRODUCT_SUCCESS,
-                            productService.getProductsByCategoryId(categoryId, paginationRequest));
+                            productService.getProductsByCategoryId(categoryId, paginationRequest, sortBy, search));
     }
 
 

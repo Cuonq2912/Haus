@@ -260,14 +260,12 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public PaginationResponseDto<ProductResponseDto> getProductsByCategoryId(Long categoryId,
-            PaginationRequestDto paginationRequest) {
+                                                                             PaginationRequestDto paginationRequest, String sortBy, String search) {
         if (categoryId == null || categoryId <= 0) {
             throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
         }
 
-        Pageable pageable = PageRequest.of(paginationRequest.getPageNum(), paginationRequest.getPageSize());
-
-        Page<Product> productsPage = productRepository.findProductsByCategoryId(categoryId, pageable);
+        Page<Product> productsPage = getProductsPageByFilter(categoryId, paginationRequest, sortBy, search);
 
         List<ProductResponseDto> productResponseList = productsPage.getContent().stream()
                 .map(productMapper::productToProductResponse)
@@ -276,47 +274,20 @@ public class ProductServiceImpl implements ProductService {
         return PaginationUtil.createPaginationResponse(productsPage, paginationRequest, productResponseList);
     }
 
-
     @Override
     @Transactional(readOnly = true)
     public PaginationResponseDto<ProductResponseDto> filterProducts(PaginationRequestDto paginationRequest,
                                                                     String sortBy,
                                                                     String search) {
-        log.info("sortByPrice = {}; search = {}", sortBy, search);
-        List<SearchCriteria> searchCriteriaList = new ArrayList<>();
-        if (search != null) {
-            if(search.length() > 0) {
-                String[] newSearch = StringUtils.split(search, "&");
-                Pattern pattern = Pattern.compile(AppConstants.SEARCH_OPERATOR);
-                for (String s : newSearch) {
-                    Matcher matcher = pattern.matcher(s);
-                    if (matcher.find()) {
-                        searchCriteriaList.add(new SearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3)));
-                    }
-                }
-            }
-        }
+        log.info("Sorting by: {}; Search query: {}", sortBy, search);
 
-        List<Product> products = getProducts(paginationRequest.getPageNum(), paginationRequest.getPageSize(), searchCriteriaList,  sortBy);
+        Page<Product> productsPage = getProductsPageByFilter(null, paginationRequest, sortBy, search);
 
-        Long totalElements = getTotalElements(searchCriteriaList);
-
-        Pageable pageable = PageRequest.of(paginationRequest.getPageNum(), paginationRequest.getPageSize());
-
-        Page<Product> pages = new PageImpl<>(products, pageable, totalElements);
-
-        PaginationCustom paginationCustom = PaginationCustom.builder()
-                .pageNum(paginationRequest.getPageNum() + 1)
-                .pageSize(paginationRequest.getPageSize())
-                .totalElement(pages.getTotalElements())
-                .totalPages(pages.getTotalPages())
-                .sortType(sortBy)
-                .sortBy(determineSortByField(sortBy))
-                .build();
-
-        List<ProductResponseDto> productResponseDtoList = pages.getContent().stream()
-                .map(product -> productMapper.productToProductResponse(product))
+        List<ProductResponseDto> productResponseDtoList = productsPage.getContent().stream()
+                .map(productMapper::productToProductResponse)
                 .toList();
+
+        PaginationCustom paginationCustom = createPagination(paginationRequest, sortBy, productsPage);
 
         return PaginationResponseDto.<ProductResponseDto>builder()
                 .pageCustom(paginationCustom)
@@ -324,7 +295,46 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
-    private List<Product> getProducts(int page, int size, List<SearchCriteria> searchCriteriaList, String sortBy) {
+
+    private Page<Product> getProductsPageByFilter(Long categoryId, // Tham số categoryId
+                                                  PaginationRequestDto paginationRequest,
+                                                  String sortBy,
+                                                  String search) {
+        List<SearchCriteria> searchCriteriaList = new ArrayList<>();
+        if (search != null && search.length() > 0) {
+            String[] newSearch = StringUtils.split(search, "&");
+            Pattern pattern = Pattern.compile(AppConstants.SEARCH_OPERATOR);
+            for (String s : newSearch) {
+                Matcher matcher = pattern.matcher(s);
+                if (matcher.find()) {
+                    searchCriteriaList.add(new SearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3)));
+                }
+            }
+        }
+
+        List<Product> products = getProducts(categoryId, paginationRequest, searchCriteriaList,  sortBy);
+        Long totalElements = getTotalElements(categoryId, searchCriteriaList);
+
+        Pageable pageable = PageRequest.of(paginationRequest.getPageNum(), paginationRequest.getPageSize());
+
+        return new PageImpl<>(products, pageable, totalElements);
+    }
+
+
+    private PaginationCustom createPagination(PaginationRequestDto paginationRequest,
+                                              String sortBy,
+                                              Page pages) {
+        return PaginationCustom.builder()
+                .pageNum(paginationRequest.getPageNum() + 1)
+                .pageSize(pages.getSize())
+                .totalElement(pages.getTotalElements())
+                .totalPages(pages.getTotalPages())
+                .sortType(sortBy)
+                .sortBy(determineSortByField(sortBy))
+                .build();
+    }
+
+    private List<Product> getProducts(Long categoryId, PaginationRequestDto requestDto, List<SearchCriteria> searchCriteriaList, String sortBy) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Product> query = cb.createQuery(Product.class);
         Root<Product> root = query.from(Product.class);
@@ -332,21 +342,27 @@ public class ProductServiceImpl implements ProductService {
         Predicate predicate = cb.conjunction();
         SearchQueryCriteriaConsumer<Product> consumer = new SearchQueryCriteriaConsumer(predicate, cb, root);
 
-        // Áp dụng tất cả search criteria
         searchCriteriaList.forEach(consumer);
         predicate = consumer.getPredicate();
 
+        if (categoryId != null) {
+            Join<Product, Category> categoryJoin = root.join("categories", JoinType.INNER);
+            Predicate categoryPredicate = cb.equal(categoryJoin.get("id"), categoryId);
+            predicate = cb.and(predicate, categoryPredicate);
+        }
+
         query.where(predicate);
 
-        // Sort theo giá
         if (sortBy != null) {
-            if ("asc".equalsIgnoreCase(sortBy) || "desc".equalsIgnoreCase(sortBy)) {
-                if ("asc".equalsIgnoreCase(sortBy)) {
-                    query.orderBy(cb.asc(root.get("price")));
-                } else {
-                    query.orderBy(cb.desc(root.get("price")));
-                }
-            } else if ("discount_asc".equalsIgnoreCase(sortBy) || "discount_desc".equalsIgnoreCase(sortBy)) { // Sort theo discountPercent
+            if ("asc".equalsIgnoreCase(sortBy)) {
+                query.orderBy(cb.asc(root.get("price")));
+                requestDto.setSortBy("price");
+                requestDto.setSortType(sortBy);
+            } else if ("desc".equalsIgnoreCase(sortBy)) {
+                query.orderBy(cb.desc(root.get("price")));
+                requestDto.setSortBy("price");
+                requestDto.setSortType(sortBy);
+            } else if ("discount_asc".equalsIgnoreCase(sortBy) || "discount_desc".equalsIgnoreCase(sortBy)) {
                 Join<Product, Category> categoryJoin = root.join("categories", JoinType.LEFT);
                 Join<Category, Promotion> promotionJoin = categoryJoin.join("promotion", JoinType.LEFT);
 
@@ -355,22 +371,23 @@ public class ProductServiceImpl implements ProductService {
                 } else {
                     query.orderBy(cb.desc(promotionJoin.get("discountPercent")));
                 }
+                requestDto.setSortBy("discount");
+                requestDto.setSortType(sortBy.substring(9));
             }
         }
 
         return entityManager.createQuery(query)
-                .setFirstResult(page * size)
-                .setMaxResults(size)
+                .setFirstResult(requestDto.getPageNum() * requestDto.getPageSize())
+                .setMaxResults(requestDto.getPageSize())
                 .getResultList();
     }
 
 
-    private Long getTotalElements(List<SearchCriteria> searchCriteriaList) {
+    private Long getTotalElements(Long categoryId, List<SearchCriteria> searchCriteriaList) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
         Root<Product> root = countQuery.from(Product.class);
 
-        // Join với productVariants để filter giống truy vấn chính
         Join<Product, ProductVariation> variantsJoin = root.join("productVariations", JoinType.LEFT);
 
         Predicate predicate = cb.conjunction();
@@ -378,7 +395,12 @@ public class ProductServiceImpl implements ProductService {
         searchCriteriaList.forEach(consumer);
         predicate = consumer.getPredicate();
 
-        // Nếu có filter theo variant (ví dụ màu sắc)
+        if (categoryId != null) {
+            Join<Product, Category> categoryJoin = root.join("categories", JoinType.INNER);
+            Predicate categoryPredicate = cb.equal(categoryJoin.get("id"), categoryId);
+            predicate = cb.and(predicate, categoryPredicate);
+        }
+
         if (searchCriteriaList.stream().anyMatch(c -> c.getKey().equalsIgnoreCase("color"))) {
             List<String> colorValues = searchCriteriaList.stream()
                     .filter(c -> c.getKey().equalsIgnoreCase("color"))
