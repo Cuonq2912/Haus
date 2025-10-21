@@ -34,6 +34,9 @@ public class ProductVariation extends BaseEntity {
     @Column(nullable = false)
     Integer inventoryQuantity;
 
+    @Column(nullable = false)
+    Integer soldQuantity;
+
     @Column()
     Boolean isDeleted;
 

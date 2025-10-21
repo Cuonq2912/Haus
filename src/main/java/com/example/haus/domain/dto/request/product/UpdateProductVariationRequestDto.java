@@ -17,13 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateProductVariationRequestDto {
 
-    @Schema(description = "ID của product variation cần cập nhật", example = "1")
-    @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
-    Long id;
-
-    @Schema(description = "File ảnh mới của biến thể sản phẩm")
-    MultipartFile imageFile;
-
     @Schema(description = "Màu sắc mới của biến thể", example = "Xanh")
     @Size(max = 50, message = ErrorMessage.INVALID_SOME_THING_FIELD)
     String color;
@@ -37,6 +30,12 @@ public class UpdateProductVariationRequestDto {
     Double price;
 
     @Schema(description = "Số lượng tồn kho mới của biến thể", example = "30")
+    @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
     @Min(value = 0, message = ErrorMessage.Product.ERR_QUANTITY_INVALID)
     Integer inventoryQuantity;
+
+    @Schema(description = "Số lượng mới đã bán của biến thể", example = "0")
+    @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
+    @Min(value = 0, message = ErrorMessage.Product.ERR_QUANTITY_INVALID)
+    Integer soldQuantity;
 }

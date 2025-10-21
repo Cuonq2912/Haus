@@ -20,6 +20,8 @@ public class ProductVariationResponseDto {
 
     Integer inventoryQuantity;
 
+    Integer soldQuantity;
+
     MediaResponseDto media;
 
 }

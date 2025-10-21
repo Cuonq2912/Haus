@@ -15,6 +15,7 @@ import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.ProductRepository;
 import com.example.haus.repository.ProductVariationRepository;
 import com.example.haus.service.ProductVariationService;
+import com.example.haus.util.UpdateSoldQuantityUtil;
 import com.example.haus.util.UploadFileUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +23,12 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -76,7 +80,7 @@ public class ProductVariationServiceImpl implements ProductVariationService {
 
     @Override
     @Transactional
-    public ProductVariationResponseDto createProductVariation(CreateProductVariationRequestDto request) {
+    public ProductVariationResponseDto createProductVariation(CreateProductVariationRequestDto request, MultipartFile image) {
         if (request == null) {
             throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
         }
@@ -92,11 +96,9 @@ public class ProductVariationServiceImpl implements ProductVariationService {
 
         productVariation.setIsDeleted(CommonConstant.FALSE);
 
-        product.setInventoryQuantity(product.getInventoryQuantity() + request.getInventoryQuantity());
-
         String imageUrl = null;
-        if (request.getImageFile() != null && !request.getImageFile().isEmpty()) {
-            imageUrl = uploadFileUtil.uploadFile(request.getImageFile());
+        if (image != null && !image.isEmpty()) {
+            imageUrl = uploadFileUtil.uploadFile(image);
         }
 
         if (StringUtils.isNotBlank(imageUrl)) {
@@ -110,18 +112,14 @@ public class ProductVariationServiceImpl implements ProductVariationService {
 
         ProductVariation savedVariation = productVariationRepository.save(productVariation);
 
-        updateProductTotalInventory(product.getId());
+        UpdateSoldQuantityUtil.updateProductTotalInventoryAndSoldQuantity(product.getId());
 
         return productVariationMapper.toProductVariationResponseDto(savedVariation);
     }
 
     @Override
-    public ProductVariationResponseDto updateProductVariation(UpdateProductVariationRequestDto request) {
-        if (request == null || request.getId() == null || request.getId() <= 0) {
-            throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED);
-        }
-
-        ProductVariation existingVariation = productVariationRepository.findById(request.getId())
+    public ProductVariationResponseDto updateProductVariation(Long productVariantId, UpdateProductVariationRequestDto request, MultipartFile image) {
+        ProductVariation existingVariation = productVariationRepository.findById(productVariantId)
                 .orElseThrow(
                         () -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
 
@@ -141,8 +139,8 @@ public class ProductVariationServiceImpl implements ProductVariationService {
         }
 
         String imageUrl = null;
-        if (request.getImageFile() != null && !request.getImageFile().isEmpty()) {
-            imageUrl = uploadFileUtil.uploadFile(request.getImageFile());
+        if (image != null && !image.isEmpty()) {
+            imageUrl = uploadFileUtil.uploadFile(image);
         }
 
         if (StringUtils.isNotBlank(imageUrl)) {
@@ -162,7 +160,7 @@ public class ProductVariationServiceImpl implements ProductVariationService {
 
         ProductVariation updatedVariation = productVariationRepository.save(existingVariation);
 
-        updateProductTotalInventory(product.getId());
+        UpdateSoldQuantityUtil.updateProductTotalInventoryAndSoldQuantity(product.getId());
 
         return productVariationMapper.toProductVariationResponseDto(updatedVariation);
     }
@@ -187,7 +185,7 @@ public class ProductVariationServiceImpl implements ProductVariationService {
         productVariation.setDeletedAt(new Date());
         productVariationRepository.save(productVariation);
 
-        updateProductTotalInventory(product.getId());
+        UpdateSoldQuantityUtil.updateProductTotalInventoryAndSoldQuantity(product.getId());
     }
 
     private int calculateTotalInventoryQuantity(Long productId, Long excludeVariationId, Integer overrideQuantity,
@@ -210,20 +208,5 @@ public class ProductVariationServiceImpl implements ProductVariationService {
         }
 
         return totalQuantity;
-    }
-    private void updateProductTotalInventory(Long productId) {
-        List<ProductVariation> activeVariations = productVariationRepository
-                .findByProductIdAndIsDeletedFalse(productId);
-
-        int totalQuantity = activeVariations.stream()
-                .mapToInt(ProductVariation::getInventoryQuantity)
-                .sum();
-
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED));
-
-        product.setInventoryQuantity(totalQuantity);
-        product.setUpdatedAt(new Date());
-        productRepository.save(product);
     }
 }

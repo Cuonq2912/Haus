@@ -45,6 +45,9 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     Integer inventoryQuantity;
 
+    @Column(nullable = false)
+    Integer soldQuantity;
+
     @Column()
     Boolean isDeleted = CommonConstant.FALSE;
 
@@ -74,14 +77,12 @@ public class Product extends BaseEntity {
         }
         if (!categories.contains(category)) {
             categories.add(category);
-            category.getProducts().add(this);
         }
     }
 
     public void removeCategory(Category category) {
         if (categories.contains(category)) {
             categories.remove(category);
-            category.getProducts().remove(this);
         }
     }
 

@@ -29,6 +29,8 @@ public class ProductResponseDto {
 
     Integer inventoryQuantity;
 
+    Integer soldQuantity;
+
     Date updatedAt;
 
     Boolean isDeleted;

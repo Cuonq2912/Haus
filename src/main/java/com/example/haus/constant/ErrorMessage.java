@@ -136,6 +136,7 @@ public class ErrorMessage {
         public static final String ERR_PAYMENT_COMPLETED = "exception.order.payment.completed";
         public static final String ERR_ORDER_NOT_COMPLETED = "exception.order.not.completed";
         public static final String ERR_INVALID_ORDER_STATUS = "exception.order.status.incompatible";
+        public static final String ERR_ORDER_ITEMS_EMPTY = "exception.order.items.empty";
 
     }
 
@@ -147,6 +148,7 @@ public class ErrorMessage {
         public static final String CALLBACK_VNPAY_FAIL = "exception.vnpay.callback.fail";
         public static final String IPN_VERIFY_FAIL = "exception.vnpay.ipn.verify.fail";
         public static final String CREATE_VNPAY_URL_FAIL = "exception.vnpay.url.create.fail";
+        public static final String ERR_ORDER_TOTAL_AMOUNT_NOT_MATCH = "exception.order.total.amount.not.match";
 
         public static final String CREATE_MOMO_ORDER_FAIL = "exception.momo.create.order.fail";
         public static final String MOMO_IPN_VERIFY_FAIL = "exception.momo.ipn.verify.fail";

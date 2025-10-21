@@ -44,6 +44,16 @@ public class ProductRequestDto {
     @NotBlank(message = ErrorMessage.NOT_BLANK_FIELD)
     String detailDescription;
 
+    @Schema(description = "Số lượng tồn kho mới của biến thể", example = "30")
+    @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
+    @Min(value = 0, message = ErrorMessage.Product.ERR_QUANTITY_INVALID)
+    Integer inventoryQuantity;
+
+    @Schema(description = "Số lượng mới đã bán của biến thể", example = "0")
+    @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
+    @Min(value = 0, message = ErrorMessage.Product.ERR_QUANTITY_INVALID)
+    Integer soldQuantity;
+
     @Schema(description = "Tên các thể loại", example = "[\"Phòng ngủ\", \"Phòng khách\"]")
     @NotEmpty(message = ErrorMessage.NOT_EMPTY_FIELD)
     List<String> categories;
