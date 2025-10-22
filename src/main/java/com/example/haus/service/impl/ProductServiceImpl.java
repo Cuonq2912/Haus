@@ -351,6 +351,9 @@ public class ProductServiceImpl implements ProductService {
             predicate = cb.and(predicate, categoryPredicate);
         }
 
+        Predicate deletedPredicate = cb.equal(root.get("isDeleted"), false);
+        predicate = cb.and(predicate, deletedPredicate);
+
         query.where(predicate);
 
         if (sortBy != null) {
@@ -403,6 +406,9 @@ public class ProductServiceImpl implements ProductService {
             Predicate categoryPredicate = cb.equal(categoryJoin.get("id"), categoryId);
             predicate = cb.and(predicate, categoryPredicate);
         }
+
+        Predicate deletedPredicate = cb.equal(root.get("isDeleted"), false);
+        predicate = cb.and(predicate, deletedPredicate);
 
         if (searchCriteriaList.stream().anyMatch(c -> c.getKey().equalsIgnoreCase("color"))) {
             List<String> colorValues = searchCriteriaList.stream()
