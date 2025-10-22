@@ -45,11 +45,6 @@ public class UpdateProductRequestDto {
     @Min(value = 0, message = ErrorMessage.Product.ERR_QUANTITY_INVALID)
     Integer inventoryQuantity;
 
-    @Schema(description = "Số lượng mới đã bán của biến thể", example = "0")
-    @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
-    @Min(value = 0, message = ErrorMessage.Product.ERR_QUANTITY_INVALID)
-    Integer soldQuantity;
-
     @Schema(description = "Tên các thể loại", example = "[\"Phòng ngủ\", \"Phòng khách\"]")
     List<String> categories;
 

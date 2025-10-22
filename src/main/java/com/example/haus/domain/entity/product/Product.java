@@ -46,7 +46,8 @@ public class Product extends BaseEntity {
     Integer inventoryQuantity;
 
     @Column(nullable = false)
-    Integer soldQuantity;
+    @Builder.Default
+    Integer soldQuantity = 0;
 
     @Column()
     @Builder.Default
