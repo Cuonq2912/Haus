@@ -3,6 +3,7 @@ package com.example.haus.domain.dto.response.product;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalTime;
 import java.util.Date;
 
 @AllArgsConstructor
@@ -25,6 +26,8 @@ public class ProductVariationResponseDto {
     Integer soldQuantity;
 
     Float discountPercent;
+
+    Long daysRemaining;
 
     Date createdAt;
 

@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,9 +32,11 @@ public class ProductResponseDto {
 
     Integer soldQuantity;
 
-    Date createdAt;
-
     Float discountPercent;
+
+    Long daysRemaining;
+
+    Date createdAt;
 
     Date updatedAt;
 
