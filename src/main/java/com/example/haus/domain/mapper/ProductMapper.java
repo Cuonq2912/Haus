@@ -10,11 +10,19 @@ import org.mapstruct.*;
         componentModel = "spring",
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-        uses = {CategoryMapper.class, MediaMapper.class}
+        uses = {CategoryMapper.class, MediaMapper.class, ProductVariationMapper.class}
 )
 public interface ProductMapper {
     @Mapping(target = "categoriesName",
             expression = "java(product.getCategories().stream().map(com.example.haus.domain.entity.product.Category::getCategoryName).collect(java.util.stream.Collectors.toList()))")
+    @Mapping(target = "discountPercent",
+            expression = "java(product.getCategories().stream()" +
+                    "    .map(com.example.haus.domain.entity.product.Category::getPromotion)" +
+                    "    .filter(java.util.Objects::nonNull)" +
+                    "    .map(com.example.haus.domain.entity.product.Promotion::getDiscountPercent)" +
+                    "    .filter(java.util.Objects::nonNull)" +
+                    "    .max(java.util.Comparator.naturalOrder())" +
+                    "    .orElse(0.0f))")
     ProductResponseDto productToProductResponse(Product product);
 
     @Mapping(target = "categories", ignore = true)

@@ -24,6 +24,8 @@ public class ProductVariationResponseDto {
 
     Integer soldQuantity;
 
+    Float discountPercent;
+
     Date createdAt;
 
     Date updatedAt;

@@ -33,6 +33,8 @@ public class ProductResponseDto {
 
     Date createdAt;
 
+    Float discountPercent;
+
     Date updatedAt;
 
     Boolean isDeleted;
