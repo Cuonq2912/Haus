@@ -49,6 +49,7 @@ public class Product extends BaseEntity {
     Integer soldQuantity;
 
     @Column()
+    @Builder.Default
     Boolean isDeleted = CommonConstant.FALSE;
 
     @ManyToMany(fetch = FetchType.LAZY)

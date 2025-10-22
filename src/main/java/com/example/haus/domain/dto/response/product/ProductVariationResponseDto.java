@@ -3,6 +3,8 @@ package com.example.haus.domain.dto.response.product;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Date;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -21,6 +23,10 @@ public class ProductVariationResponseDto {
     Integer inventoryQuantity;
 
     Integer soldQuantity;
+
+    Date createdAt;
+
+    Date updatedAt;
 
     MediaResponseDto media;
 

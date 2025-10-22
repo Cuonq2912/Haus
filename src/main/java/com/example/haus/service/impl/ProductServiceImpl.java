@@ -362,6 +362,10 @@ public class ProductServiceImpl implements ProductService {
                 query.orderBy(cb.asc(root.get("soldQuantity")));
             } else if ("sold_quantity_desc".equalsIgnoreCase(sortBy)) {
                 query.orderBy(cb.desc(root.get("soldQuantity")));
+            } else if ("created_at_asc".equalsIgnoreCase(sortBy)) {
+                query.orderBy(cb.asc(root.get("createdAt")));
+            } else if ("created_at_desc".equalsIgnoreCase(sortBy)) {
+                query.orderBy(cb.desc(root.get("createdAt")));
             }
             else if ("discount_asc".equalsIgnoreCase(sortBy) || "discount_desc".equalsIgnoreCase(sortBy)) {
                 Join<Product, Category> categoryJoin = root.join("categories", JoinType.LEFT);
@@ -424,6 +428,9 @@ public class ProductServiceImpl implements ProductService {
             return "discountPercent";
         } else if ("sold_quantity_asc".equalsIgnoreCase(sortBy) || "sold_quantity_desc".equalsIgnoreCase(sortBy)) {
             return "sold_quantity";
+        }
+        else if ("created_at_asc".equalsIgnoreCase(sortBy) || "created_at_desc".equalsIgnoreCase(sortBy)) {
+            return "created_at";
         }
         return null;
     }

@@ -31,6 +31,8 @@ public class ProductResponseDto {
 
     Integer soldQuantity;
 
+    Date createdAt;
+
     Date updatedAt;
 
     Boolean isDeleted;
