@@ -9,20 +9,22 @@ import com.example.haus.repository.ProductVariationRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UpdateSoldQuantityUtil {
 
-    static ProductVariationRepository productVariationRepository;
+    ProductVariationRepository productVariationRepository;
 
-    static ProductRepository productRepository;
+    ProductRepository productRepository;
 
-    public static void updateProductTotalInventoryAndSoldQuantity(Long productId) {
+    public void updateProductTotalInventoryAndSoldQuantity(Long productId) {
         List<ProductVariation> activeVariations = productVariationRepository
                 .findByProductId(productId);
 

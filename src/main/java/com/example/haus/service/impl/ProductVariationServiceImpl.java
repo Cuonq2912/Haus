@@ -39,6 +39,7 @@ public class ProductVariationServiceImpl implements ProductVariationService {
     ProductVariationRepository productVariationRepository;
     ProductRepository productRepository;
     UploadFileUtil uploadFileUtil;
+    UpdateSoldQuantityUtil updateSoldQuantityUtil;
 
     ProductVariationMapper productVariationMapper;
 
@@ -112,7 +113,7 @@ public class ProductVariationServiceImpl implements ProductVariationService {
 
         ProductVariation savedVariation = productVariationRepository.save(productVariation);
 
-        UpdateSoldQuantityUtil.updateProductTotalInventoryAndSoldQuantity(product.getId());
+        updateSoldQuantityUtil.updateProductTotalInventoryAndSoldQuantity(product.getId());
 
         return productVariationMapper.toProductVariationResponseDto(savedVariation);
     }
@@ -160,7 +161,7 @@ public class ProductVariationServiceImpl implements ProductVariationService {
 
         ProductVariation updatedVariation = productVariationRepository.save(existingVariation);
 
-        UpdateSoldQuantityUtil.updateProductTotalInventoryAndSoldQuantity(product.getId());
+        updateSoldQuantityUtil.updateProductTotalInventoryAndSoldQuantity(product.getId());
 
         return productVariationMapper.toProductVariationResponseDto(updatedVariation);
     }
@@ -185,7 +186,7 @@ public class ProductVariationServiceImpl implements ProductVariationService {
         productVariation.setDeletedAt(new Date());
         productVariationRepository.save(productVariation);
 
-        UpdateSoldQuantityUtil.updateProductTotalInventoryAndSoldQuantity(product.getId());
+        updateSoldQuantityUtil.updateProductTotalInventoryAndSoldQuantity(product.getId());
     }
 
     private int calculateTotalInventoryQuantity(Long productId, Long excludeVariationId, Integer overrideQuantity,

@@ -48,6 +48,8 @@ public class VNPayServiceImpl implements VNPayService {
 
     final ProductVariationRepository productVariationRepository;
 
+    final UpdateSoldQuantityUtil updateSoldQuantityUtil;
+
     Map<String, Boolean> checkIpnList = new ConcurrentHashMap<>();
 
     @Value("${payment.vnPay.maxTime}")
@@ -335,7 +337,7 @@ public class VNPayServiceImpl implements VNPayService {
         }
 
         for (Long productId : productIdsToUpdate) {
-            UpdateSoldQuantityUtil.updateProductTotalInventoryAndSoldQuantity(productId);
+            updateSoldQuantityUtil.updateProductTotalInventoryAndSoldQuantity(productId);
         }
     }
 }
