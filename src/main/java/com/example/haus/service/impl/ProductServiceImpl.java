@@ -351,6 +351,17 @@ public class ProductServiceImpl implements ProductService {
             predicate = cb.and(predicate, categoryPredicate);
         }
 
+        if (searchCriteriaList.stream().anyMatch(c -> c.getKey().equalsIgnoreCase("material"))) {
+            List<String> materialValues = searchCriteriaList.stream()
+                    .filter(c -> c.getKey().equalsIgnoreCase("material"))
+                    .map(SearchCriteria::getValue)
+                    .map(Object::toString)
+                    .toList();
+            if (materialValues.size() > 1) {
+                predicate = cb.and(predicate, root.get("material").in(materialValues));
+            }
+        }
+
         query.where(predicate);
 
         if (sortBy != null) {
@@ -407,7 +418,15 @@ public class ProductServiceImpl implements ProductService {
                     .map(SearchCriteria::getValue)
                     .map(Object::toString)
                     .toList();
-            predicate = cb.and(predicate, variantsJoin.get("color").in(colorValues));
+        }
+
+        if (searchCriteriaList.stream().anyMatch(c -> c.getKey().equalsIgnoreCase("material"))) {
+            List<String> materialValues = searchCriteriaList.stream()
+                    .filter(c -> c.getKey().equalsIgnoreCase("material"))
+                    .map(SearchCriteria::getValue)
+                    .map(Object::toString)
+                    .toList();
+            predicate = cb.and(predicate, root.get("material").in(materialValues));
         }
 
         countQuery.select(cb.countDistinct(root));

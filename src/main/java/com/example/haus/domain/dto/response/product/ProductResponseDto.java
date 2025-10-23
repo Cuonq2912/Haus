@@ -1,6 +1,5 @@
 package com.example.haus.domain.dto.response.product;
 
-import jakarta.persistence.Column;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -28,6 +27,8 @@ public class ProductResponseDto {
     String detailDescription;
 
     Integer inventoryQuantity;
+
+    String material;
 
     Date updatedAt;
 

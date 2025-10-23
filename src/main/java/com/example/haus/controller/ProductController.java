@@ -123,7 +123,7 @@ public class ProductController {
                     @RequestParam(defaultValue = "1") Integer pageNum,
                     @RequestParam(defaultValue = "10") Integer pageSize,
                     @RequestParam(required = false) @Schema(example = "asc or discount_asc") String sortBy,
-                    @RequestParam(required = false) @Schema(example = "priceRange:under_1m&color:Nâu đậm&categoryId:1&keyword:a") String search) {
+                    @RequestParam(required = false) @Schema(example = "priceRange:under_1m&color:Nâu đậm&material:wood&categoryId:1&keyword:a") String search) {
             PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
             return ResponseUtil.success(
                             SuccessMessage.Product.GET_PRODUCT_SUCCESS,
@@ -134,14 +134,14 @@ public class ProductController {
     @Tag(name = "public-product-controller", description = "Public Product APIs")
     @Operation(
             summary = "Lọc sản phẩm theo nhiều tiêu chí",
-            description = "Lọc sản phẩm theo khoảng giá, màu sắc, kiểu dáng với phân trang"
+            description = "Lọc sản phẩm theo khoảng giá, màu sắc, chất liệu với phân trang"
     )
     @GetMapping(UrlConstant.Product.FILTER_PRODUCTS)
     public ResponseEntity<?> filterProducts(
             @RequestParam(defaultValue = "1", required = false) Integer pageNum,
             @RequestParam(defaultValue = "10", required = false) Integer pageSize,
             @RequestParam(required = false) @Schema(example = "asc or discount_asc") String sortBy,
-            @RequestParam(required = false) @Schema(example = "priceRange:under_1m&color:Nâu đậm&categoryId:1&keyword:a") String search) {
+            @RequestParam(required = false) @Schema(example = "priceRange:under_1m&color:Nâu đậm&material:wood&categoryId:1&keyword:a") String search) {
             PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
             return ResponseUtil.success(
                             SuccessMessage.Product.GET_PRODUCT_SUCCESS,

@@ -43,6 +43,9 @@ public class UpdateProductRequestDto {
     @Schema(description = "Tên các thể loại", example = "[\"Phòng ngủ\", \"Phòng khách\"]")
     List<String> categories;
 
+    @Schema(description = "Chất liệu sản phẩm", example = "metal")
+    String material;
+
     @Schema(description = "Danh sách ID của các hình ảnh cần xóa", example = "[1, 2, 3]")
     List<Long> imageIdsToDelete;
 }

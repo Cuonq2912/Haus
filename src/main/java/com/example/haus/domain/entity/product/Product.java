@@ -45,6 +45,9 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     Integer inventoryQuantity;
 
+    @Column(length = 100)
+    String material;
+
     @Column()
     Boolean isDeleted = CommonConstant.FALSE;
 
