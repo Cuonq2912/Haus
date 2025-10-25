@@ -1,10 +1,13 @@
 package com.example.haus.domain.mapper;
 
+import com.example.haus.domain.dto.response.cart.ProductVariationInCartResponseDto;
+import com.example.haus.domain.entity.product.CartItem;
 import com.example.haus.domain.entity.product.ProductVariation;
 import com.example.haus.domain.dto.request.product.CreateProductVariationRequestDto;
 import com.example.haus.domain.dto.request.product.UpdateProductVariationRequestDto;
 import com.example.haus.domain.dto.response.product.ProductVariationResponseDto;
 import org.mapstruct.*;
+import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
@@ -14,6 +17,8 @@ import java.util.List;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
 public interface ProductVariationMapper {
+
+        ProductVariationMapper INSTANCE = Mappers.getMapper(ProductVariationMapper.class);
 
         List<ProductVariationResponseDto> toListProductVariationResponseDto(List<ProductVariation> productVariations);
 
@@ -42,4 +47,19 @@ public interface ProductVariationMapper {
         void updateProductVariationFromDto(
                         @MappingTarget ProductVariation productVariation,
                         UpdateProductVariationRequestDto request);
+
+        @Mappings({
+                @Mapping(target = "id", source = "productVariation.id"),
+                @Mapping(target = "color", source = "productVariation.color"),
+                @Mapping(target = "size", source = "productVariation.size"),
+                @Mapping(target = "price", source = "productVariation.price"),
+                @Mapping(target = "inventoryQuantity", source = "productVariation.inventoryQuantity"),
+                @Mapping(target = "soldQuantity", source = "productVariation.soldQuantity"),
+                @Mapping(target = "media", source = "productVariation.media"),
+                @Mapping(target = "discountPercent", ignore = true) // Cần logic bổ sung nếu có
+        })
+                // CartItem = Variant trong product
+        ProductVariationInCartResponseDto cartItemToProductVariationInCartDto(CartItem cartItem);
+
+        List<ProductVariationInCartResponseDto> cartItemListToProductVariationInCartDtoList(List<CartItem> cartItems);
 }

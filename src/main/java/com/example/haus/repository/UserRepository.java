@@ -9,8 +9,6 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
 
-    Optional<User> findUserDetailsByUsernameAndIsDeletedFalse(String username);
-
     Optional<User> findByUsernameAndIsDeletedFalse(String username);
 
     boolean existsUserByUsernameAndIsDeletedFalse(String username);
@@ -19,5 +17,4 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     Optional<User> findByEmailAndIsDeletedFalse(String email);
 
-    Optional<User> findByIdAndIsDeletedFalse(String id);
 }

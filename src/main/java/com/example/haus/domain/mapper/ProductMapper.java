@@ -1,10 +1,13 @@
 package com.example.haus.domain.mapper;
 
+import com.example.haus.domain.dto.response.cart.CartItemResponseDto;
+import com.example.haus.domain.dto.response.cart.ProductInCartResponseDto;
 import com.example.haus.domain.entity.product.Product;
 import com.example.haus.domain.dto.request.product.ProductRequestDto;
 import com.example.haus.domain.dto.request.product.UpdateProductRequestDto;
 import com.example.haus.domain.dto.response.product.ProductResponseDto;
 import org.mapstruct.*;
+import org.mapstruct.factory.Mappers;
 
 @Mapper(
         componentModel = "spring",
@@ -13,6 +16,8 @@ import org.mapstruct.*;
         uses = {CategoryMapper.class, MediaMapper.class, ProductVariationMapper.class}
 )
 public interface ProductMapper {
+    ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
+
     @Mapping(target = "categoriesName",
             expression = "java(product.getCategories().stream().map(com.example.haus.domain.entity.product.Category::getCategoryName).collect(java.util.stream.Collectors.toList()))")
     @Mapping(target = "discountPercent",
@@ -40,4 +45,10 @@ public interface ProductMapper {
     @Mapping(target = "categories", ignore = true)
     @Mapping(target = "isDeleted", ignore = true)
     void updateProductFromUpdateDto(UpdateProductRequestDto request, @MappingTarget Product product);
+
+    @Mapping(target = "productName", source = "productName")
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "productVariants", ignore = true)
+    //CartItemResponse === ProductInCart
+    ProductInCartResponseDto toProductInCartResponseDto(Product product);
 }

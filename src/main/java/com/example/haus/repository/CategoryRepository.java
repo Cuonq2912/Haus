@@ -21,11 +21,4 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     List<Category> findByParentCategoryIsNotNull();
 
-    @Query("""
-        SELECT p FROM Category p
-        WHERE (LOWER(CAST(p.description AS string)) LIKE LOWER(CONCAT('%', :keyword, '%'))
-              OR LOWER(p.categoryName) LIKE LOWER(CONCAT('%', :keyword, '%')))
-    """)
-    Page<Category> searchCategoryByKeyword(@Param("keyword") String keyword, Pageable pageable);
-
 }

@@ -1,6 +1,7 @@
 package com.example.haus.domain.mapper;
 
-import com.example.haus.domain.dto.response.cart.CartResponse;
+import com.example.haus.domain.dto.response.cart.CartItemResponseDto;
+import com.example.haus.domain.dto.response.cart.CartResponseDto;
 import com.example.haus.domain.entity.product.Cart;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,7 +15,6 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 )
 public interface CartMapper {
 
-    @Mapping(target = "items", source = "cart.cartItems")
-    @Mapping(target = "lastUpdated", source = "cart.updatedAt")
-    CartResponse cartToCartResponse(Cart cart);
+    @Mapping(target = "cartItems", source = "products")
+    CartResponseDto cartToCartResponse(CartItemResponseDto cartItemResponseDto);
 }
