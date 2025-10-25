@@ -5,19 +5,19 @@ import com.example.haus.domain.dto.request.cart.CartRequest;
 import com.example.haus.domain.dto.response.cart.CartItemResponseDto;
 import com.example.haus.domain.dto.response.cart.CartResponseDto;
 import com.example.haus.domain.dto.response.cart.ProductInCartResponseDto;
+import com.example.haus.domain.dto.response.cart.ProductVariationInCartResponseDto;
 import com.example.haus.domain.entity.product.Cart;
 import com.example.haus.domain.entity.product.CartItem;
+import com.example.haus.domain.entity.product.Product;
 import com.example.haus.domain.entity.product.ProductVariation;
 import com.example.haus.domain.entity.user.User;
 import com.example.haus.domain.mapper.CartItemMapper;
 import com.example.haus.domain.mapper.CartMapper;
 import com.example.haus.domain.mapper.ProductMapper;
+import com.example.haus.domain.mapper.ProductVariationMapper;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
-import com.example.haus.repository.CartItemRepository;
-import com.example.haus.repository.CartRepository;
-import com.example.haus.repository.ProductVariationRepository;
-import com.example.haus.repository.UserRepository;
+import com.example.haus.repository.*;
 import com.example.haus.service.CartService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -25,6 +25,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -43,6 +45,8 @@ public class CartServiceImpl implements CartService {
     CartItemRepository cartItemRepository;
 
     UserRepository userRepository;
+
+    ProductRepository productRepository;
 
     @Transactional
     @Override
@@ -84,12 +88,13 @@ public class CartServiceImpl implements CartService {
 
         Cart updatedCart = cartRepository.save(cart);
 
-        return cartMapper.cartToCartResponse(CartItemResponseDto.builder()
+        return getAllProductVariantInCart(cartMapper.cartToCartResponse(CartItemResponseDto.builder()
                 .products(cartItemMapper.groupCartItemByProduct(updatedCart.getCartItems()))
-                .build());
+                .build()));
     }
 
     @Override
+    @Transactional
     public CartResponseDto getCart(String email) {
         User user = userRepository.findByUsernameAndIsDeletedFalse(email).orElseThrow(
                 () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
@@ -97,9 +102,9 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Cart.ERR_CART_NOT_FOUND));
 
-        return cartMapper.cartToCartResponse(CartItemResponseDto.builder()
+        return getAllProductVariantInCart(cartMapper.cartToCartResponse(CartItemResponseDto.builder()
                         .products(cartItemMapper.groupCartItemByProduct(cart.getCartItems()))
-                .build());
+                .build()));
     }
 
     @Override
@@ -118,9 +123,9 @@ public class CartServiceImpl implements CartService {
             throw new InvalidDataException(ErrorMessage.Cart.ERR_CART_ITEM_NOT_EXISTED_IN_CART);
         }
 
-        return cartMapper.cartToCartResponse(CartItemResponseDto.builder()
+        return getAllProductVariantInCart(cartMapper.cartToCartResponse(CartItemResponseDto.builder()
                 .products(cartItemMapper.groupCartItemByProduct(cartRepository.save(cart).getCartItems()))
-                .build());
+                .build()));
     }
 
     @Override
@@ -168,8 +173,38 @@ public class CartServiceImpl implements CartService {
 
         cartItemRepository.save(existingItem);
 
-        return cartMapper.cartToCartResponse(CartItemResponseDto.builder()
+        return getAllProductVariantInCart(cartMapper.cartToCartResponse(CartItemResponseDto.builder()
                 .products(cartItemMapper.groupCartItemByProduct(cart.getCartItems()))
-                .build());
+                .build()));
+    }
+
+    private CartResponseDto getAllProductVariantInCart(CartResponseDto cartResponseDto) {
+        if (cartResponseDto == null || cartResponseDto.getCartItems().isEmpty()) { // Sửa getCartItems() -> getProducts()
+            throw new ResourceNotFoundException(ErrorMessage.Cart.ERR_CART_NOT_FOUND);
+        }
+
+        for (var item : cartResponseDto.getCartItems()) {
+            Product product = productRepository.findByIdWithActiveVariations(item.getId());
+
+            if (product != null) {
+                List<Long> existingVariantIds = item.getProductVariants().stream()
+                        .map(com.example.haus.domain.dto.response.cart.ProductVariationInCartResponseDto::getId)
+                        .toList();
+
+                List<ProductVariation> missingVariations = product.getProductVariations()
+                        .stream()
+                        .filter(dbVariant -> !existingVariantIds.contains(dbVariant.getId()))
+                        .toList();
+
+                for (var variant : missingVariations) {
+                    ProductVariationInCartResponseDto productVariationInCartResponseDto = ProductVariationMapper.INSTANCE.productVariationToProductVariationInCartDto(variant);
+                    productVariationInCartResponseDto.setIsSelected(false);
+                    item.getProductVariants().add(
+                            productVariationInCartResponseDto
+                    );
+                }
+            }
+        }
+        return cartResponseDto;
     }
 }

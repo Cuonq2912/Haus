@@ -56,10 +56,21 @@ public interface ProductVariationMapper {
                 @Mapping(target = "inventoryQuantity", source = "productVariation.inventoryQuantity"),
                 @Mapping(target = "soldQuantity", source = "productVariation.soldQuantity"),
                 @Mapping(target = "media", source = "productVariation.media"),
-                @Mapping(target = "discountPercent", ignore = true) // Cần logic bổ sung nếu có
+                @Mapping(target = "discountPercent",
+                        expression = "java(cartItem.getProductVariation().getProduct()" +
+                                "     .getCategories().stream()" +
+                                "    .map(com.example.haus.domain.entity.product.Category::getPromotion)" +
+                                "    .filter(java.util.Objects::nonNull)" +
+                                "    .map(com.example.haus.domain.entity.product.Promotion::getDiscountPercent)" +
+                                "    .filter(java.util.Objects::nonNull)" +
+                                "    .max(java.util.Comparator.naturalOrder())" +
+                                "    .orElse(0.0f))"), // Cần logic bổ sung nếu có
+                @Mapping(target = "isSelected", expression = "java(true)")
         })
                 // CartItem = Variant trong product
         ProductVariationInCartResponseDto cartItemToProductVariationInCartDto(CartItem cartItem);
 
         List<ProductVariationInCartResponseDto> cartItemListToProductVariationInCartDtoList(List<CartItem> cartItems);
+
+        ProductVariationInCartResponseDto productVariationToProductVariationInCartDto(ProductVariation productVariation);
 }

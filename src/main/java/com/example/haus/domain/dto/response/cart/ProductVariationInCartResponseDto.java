@@ -30,4 +30,6 @@ public class ProductVariationInCartResponseDto {
     Float discountPercent;
 
     MediaResponseDto media;
+
+    Boolean isSelected = false;
 }
