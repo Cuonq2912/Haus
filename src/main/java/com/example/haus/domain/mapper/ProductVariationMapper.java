@@ -64,13 +64,24 @@ public interface ProductVariationMapper {
                                 "    .map(com.example.haus.domain.entity.product.Promotion::getDiscountPercent)" +
                                 "    .filter(java.util.Objects::nonNull)" +
                                 "    .max(java.util.Comparator.naturalOrder())" +
-                                "    .orElse(0.0f))"), // Cần logic bổ sung nếu có
-                @Mapping(target = "isSelected", expression = "java(true)")
+                                "    .orElse(0.0f))"),
+                @Mapping(target = "isSelected", expression = "java(true)"),
+                @Mapping(target = "cartQuantity", source = "quantity")
         })
                 // CartItem = Variant trong product
         ProductVariationInCartResponseDto cartItemToProductVariationInCartDto(CartItem cartItem);
 
         List<ProductVariationInCartResponseDto> cartItemListToProductVariationInCartDtoList(List<CartItem> cartItems);
 
+        @Mapping(target = "discountPercent",
+                expression = "java(productVariation.getProduct()" +
+                        "     .getCategories().stream()" +
+                        "    .map(com.example.haus.domain.entity.product.Category::getPromotion)" +
+                        "    .filter(java.util.Objects::nonNull)" +
+                        "    .map(com.example.haus.domain.entity.product.Promotion::getDiscountPercent)" +
+                        "    .filter(java.util.Objects::nonNull)" +
+                        "    .max(java.util.Comparator.naturalOrder())" +
+                        "    .orElse(0.0f))")
+        @Mapping(target = "cartQuantity", expression = "java(0)")
         ProductVariationInCartResponseDto productVariationToProductVariationInCartDto(ProductVariation productVariation);
 }

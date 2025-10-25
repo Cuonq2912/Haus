@@ -17,6 +17,6 @@ import java.util.List;
 public class CartResponseDto {
     List<ProductInCartResponseDto> cartItems;
 
-    @UpdateTimestamp
-    LocalDateTime lastUpdated;
+    @Builder.Default
+    LocalDateTime lastUpdated = LocalDateTime.now();
 }

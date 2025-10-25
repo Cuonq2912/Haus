@@ -27,6 +27,9 @@ public class ProductVariationInCartResponseDto {
 
     Integer soldQuantity;
 
+    @Builder.Default
+    Integer cartQuantity = 0;
+
     Float discountPercent;
 
     MediaResponseDto media;
