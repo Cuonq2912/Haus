@@ -6,6 +6,7 @@ import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.request.auth.LoginRequestDto;
 import com.example.haus.domain.dto.request.cart.CartRequest;
+import com.example.haus.domain.dto.request.cart.UpdateCartRequest;
 import com.example.haus.service.CartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -75,10 +76,10 @@ public class CartController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PatchMapping(UrlConstant.Cart.UPDATE_CART)
-    public ResponseEntity<?> updateQuantity(@RequestBody @Valid CartRequest cartRequest, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> updateCart(@RequestBody @Valid UpdateCartRequest updateCartRequest, @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseUtil.success(
                 SuccessMessage.Cart.UPDATE_CART_SUCCESS,
-                cartService.updateQuantity(userDetails.getUsername(), cartRequest)
+                cartService.updateCart(userDetails.getUsername(), updateCartRequest)
         );
     }
 

@@ -2,6 +2,7 @@ package com.example.haus.service.impl;
 
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.domain.dto.request.cart.CartRequest;
+import com.example.haus.domain.dto.request.cart.UpdateCartRequest;
 import com.example.haus.domain.dto.response.cart.CartItemResponseDto;
 import com.example.haus.domain.dto.response.cart.CartResponseDto;
 import com.example.haus.domain.dto.response.cart.ProductInCartResponseDto;
@@ -142,8 +143,8 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public CartResponseDto updateQuantity(String email, CartRequest cartRequest) {
-        if (cartRequest.quantity() <= 0) {
+    public CartResponseDto updateCart(String email, UpdateCartRequest updateCartRequest) {
+            if (updateCartRequest.quantity() <= 0) {
             throw new InvalidDataException(ErrorMessage.Cart.ERR_CART_QUANTITY_INVALID);
         }
 
@@ -154,7 +155,7 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Cart.ERR_CART_NOT_FOUND));
 
         CartItem existingItem = cart.getCartItems().stream()
-                .filter(item -> item.getProductVariation().getId().equals(cartRequest.variantId()))
+                .filter(item -> item.getProductVariation().getId().equals(updateCartRequest.changedVariantId()))
                 .findFirst()
                 .orElse(null);
 
@@ -162,14 +163,15 @@ public class CartServiceImpl implements CartService {
             throw new InvalidDataException(ErrorMessage.Cart.ERR_CART_ITEM_NOT_EXISTED_IN_CART);
         }
 
-        ProductVariation productVariation = productVariationRepository.findByIdAndIsDeletedFalse(cartRequest.variantId())
+        ProductVariation productVariation = productVariationRepository.findByIdAndIsDeletedFalse(updateCartRequest.variantId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
 
-        if(productVariation.getInventoryQuantity() < cartRequest.quantity() ) {
+        if(productVariation.getInventoryQuantity() < updateCartRequest.quantity() ) {
             throw new InvalidDataException(ErrorMessage.Cart.ERR_CART_QUANTITY_INVALID);
         }
 
-        existingItem.setQuantity(cartRequest.quantity());
+        existingItem.setProductVariation(productVariation);
+        existingItem.setQuantity(updateCartRequest.quantity());
 
         cartItemRepository.save(existingItem);
 

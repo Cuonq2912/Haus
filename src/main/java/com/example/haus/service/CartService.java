@@ -1,6 +1,7 @@
 package com.example.haus.service;
 
 import com.example.haus.domain.dto.request.cart.CartRequest;
+import com.example.haus.domain.dto.request.cart.UpdateCartRequest;
 import com.example.haus.domain.dto.response.cart.CartResponseDto;
 
 public interface CartService {
@@ -13,6 +14,6 @@ public interface CartService {
 
     void clearCart(String email);
 
-    CartResponseDto updateQuantity(String email, CartRequest cartRequest);
+    CartResponseDto updateCart(String email, UpdateCartRequest updateCartRequest);
 
 }
