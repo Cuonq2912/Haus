@@ -174,6 +174,7 @@ public class ErrorMessage {
         public static final String ERR_CART_NOT_FOUND = "exception.cart.not.found";
         public static final String ERR_CART_QUANTITY_INVALID = "exception.cart.quantity.invalid";
         public static final String ERR_CART_ITEM_NOT_EXISTED_IN_CART = "exception.cart.item.not.existed.in.cart";
+        public static final String ERR_CURR_CART_ITEM_NOT_EXISTED_IN_CART = "exception.curr.cart.item.not.existed.in.cart";
     }
 
     public static class Address {

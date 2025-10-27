@@ -154,16 +154,22 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Cart.ERR_CART_NOT_FOUND));
 
-        CartItem existingItem = cart.getCartItems().stream()
-                .filter(item -> item.getProductVariation().getId().equals(updateCartRequest.changedVariantId()))
-                .findFirst()
-                .orElse(null);
+        CartItem existingItem = null;
 
-        if (existingItem == null) {
-            throw new InvalidDataException(ErrorMessage.Cart.ERR_CART_ITEM_NOT_EXISTED_IN_CART);
+        if (updateCartRequest.oldVariantId() != null) {
+            existingItem = cart.getCartItems().stream()
+                    .filter(item -> item.getProductVariation().getId().equals(updateCartRequest.oldVariantId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (existingItem == null) {
+                throw new InvalidDataException(ErrorMessage.Cart.ERR_CURR_CART_ITEM_NOT_EXISTED_IN_CART);
+            }
         }
 
-        ProductVariation productVariation = productVariationRepository.findByIdAndIsDeletedFalse(updateCartRequest.variantId())
+        var currentVariantInCart = updateCartRequest.newVariantId() != null ? updateCartRequest.newVariantId() : updateCartRequest.newVariantId();
+
+        ProductVariation productVariation = productVariationRepository.findByIdAndIsDeletedFalse(currentVariantInCart)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
 
         if(productVariation.getInventoryQuantity() < updateCartRequest.quantity() ) {

@@ -71,8 +71,8 @@ public class CartController {
     }
 
     @Operation(
-            summary = "Cập nhật số lượng sản phẩm trong giỏ hàng",
-            description = "Cập nhật số lượng của một sản phẩm trong giỏ hàng dựa trên variantId.",
+            summary = "Cập nhật sản phẩm trong giỏ hàng",
+            description = "Cập nhật của một sản phẩm trong giỏ hàng dựa trên newVariantId và oldVariantId.",
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PatchMapping(UrlConstant.Cart.UPDATE_CART)
