@@ -89,6 +89,13 @@ public class SuccessMessage {
         public static final String CREATE_PRODUCT_VARIATION_SUCCESS = "Create product variation successful";
         public static final String UPDATE_PRODUCT_VARIATION_SUCCESS = "Update product variation successful";
         public static final String DELETE_PRODUCT_VARIATION_SUCCESS = "Delete product variation successful";
+        
+        // Favorite Messages
+        public static final String ADD_FAVORITE_SUCCESS = "Added product to favorite list";
+        public static final String REMOVE_FAVORITE_SUCCESS = "Deleted product to favorite list";
+        public static final String GET_FAVORITES_SUCCESS = "Get favorite list successfully";
+        public static final String CHECK_FAVORITE_SUCCESS = "Check status favorite successfully";
+
     }
 
     public static class Payment {
