@@ -28,11 +28,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p WHERE (p.isDeleted IS NULL OR p.isDeleted = false)")
     Page<Product> findAllActiveProducts(Pageable pageable);
 
-    @Query("SELECT DISTINCT p FROM Product p " +
-            "JOIN p.categories c " +
-            "WHERE c.id = :categoryId " +
-            "AND (p.isDeleted IS NULL OR p.isDeleted = false)")
-    Page<Product> findProductsByCategoryId(@Param("categoryId") Long categoryId, Pageable pageable);
-
 
 }

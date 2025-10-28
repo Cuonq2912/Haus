@@ -9,8 +9,6 @@ import java.util.Optional;
 @Repository
 public interface PromotionRepository extends JpaRepository<Promotion, Long> {
 
-    boolean existsByPromotionCode(String promotionCode);
-
     Optional<Promotion> findByPromotionCodeAndIsDeletedFalse(String promotionCode);
 
     Boolean existsByPromotionCodeAndIsDeletedFalse(String promotionCode);

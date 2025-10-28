@@ -15,10 +15,10 @@ public interface ProductVariationRepository extends JpaRepository<ProductVariati
     @Query("SELECT pv FROM ProductVariation pv WHERE pv.product.id = :productId AND pv.isDeleted = FALSE")
     List<ProductVariation> findByProductIdAndIsDeletedFalse(@Param("productId") Long productId);
 
-//    @Query("SELECT pv FROM ProductVariation pv WHERE pv.product.id = :productId")
-//    List<ProductVariation> findAllByProductId(@Param("productId") Long productId);
-
     @Query("SELECT pv FROM ProductVariation pv WHERE pv.id = :id AND pv.isDeleted = FALSE")
     Optional<ProductVariation> findByIdAndIsDeletedFalse(@Param("id") Long id);
+
+    @Query("SELECT pv FROM ProductVariation pv WHERE pv.product.id = :productId")
+    List<ProductVariation> findByProductId(@Param("productId") Long productId);
 
 }
