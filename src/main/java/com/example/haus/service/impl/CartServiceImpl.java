@@ -195,7 +195,7 @@ public class CartServiceImpl implements CartService {
             Product product = productRepository.findByIdWithActiveVariations(item.getId());
 
             if (product != null) {
-                List<Long> existingVariantIds = item.getProductVariants().stream()
+                List<Long> existingVariantIds = item.getProductVariations().stream()
                         .map(com.example.haus.domain.dto.response.cart.ProductVariationInCartResponseDto::getId)
                         .toList();
 
@@ -207,7 +207,7 @@ public class CartServiceImpl implements CartService {
                 for (var variant : missingVariations) {
                     ProductVariationInCartResponseDto productVariationInCartResponseDto = ProductVariationMapper.INSTANCE.productVariationToProductVariationInCartDto(variant);
                     productVariationInCartResponseDto.setIsSelected(false);
-                    item.getProductVariants().add(
+                    item.getProductVariations().add(
                             productVariationInCartResponseDto
                     );
                 }
