@@ -18,6 +18,6 @@ public class ProductInCartResponseDto {
 
     String productName;
 
-    List<ProductVariationInCartResponseDto> productVariants;
+    List<ProductVariationInCartResponseDto> productVariations;
 
 }

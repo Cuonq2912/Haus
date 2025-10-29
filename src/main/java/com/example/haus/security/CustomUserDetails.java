@@ -1,10 +1,8 @@
 package com.example.haus.security;
 
 import com.example.haus.domain.entity.user.User;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,9 +13,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @Getter
 @Setter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CustomUserDetails implements UserDetails {
 
-    private final User user;
+    User user;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
