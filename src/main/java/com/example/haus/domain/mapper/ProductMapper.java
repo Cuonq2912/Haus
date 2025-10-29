@@ -48,7 +48,7 @@ public interface ProductMapper {
 
     @Mapping(target = "productName", source = "productName")
     @Mapping(target = "id", source = "id")
-    @Mapping(target = "productVariants", ignore = true)
+    @Mapping(target = "productVariations", ignore = true)
     //CartItemResponse === ProductInCart
     ProductInCartResponseDto toProductInCartResponseDto(Product product);
 }

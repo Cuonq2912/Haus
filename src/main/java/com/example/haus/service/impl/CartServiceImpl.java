@@ -167,7 +167,7 @@ public class CartServiceImpl implements CartService {
             }
         }
 
-        var currentVariantInCart = updateCartRequest.newVariantId() != null ? updateCartRequest.newVariantId() : updateCartRequest.newVariantId();
+        var currentVariantInCart = updateCartRequest.newVariantId() != null ? updateCartRequest.newVariantId() : updateCartRequest.oldVariantId();
 
         ProductVariation productVariation = productVariationRepository.findByIdAndIsDeletedFalse(currentVariantInCart)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
@@ -187,7 +187,7 @@ public class CartServiceImpl implements CartService {
     }
 
     private CartResponseDto getAllProductVariantInCart(CartResponseDto cartResponseDto) {
-        if (cartResponseDto == null || cartResponseDto.getCartItems().isEmpty()) { // Sửa getCartItems() -> getProducts()
+        if (cartResponseDto == null) {
             throw new ResourceNotFoundException(ErrorMessage.Cart.ERR_CART_NOT_FOUND);
         }
 
