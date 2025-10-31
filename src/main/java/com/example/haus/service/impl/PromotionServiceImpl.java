@@ -60,7 +60,7 @@ public class PromotionServiceImpl implements PromotionService {
     @Override
     public PromotionResponseDto addPromotion(PromotionRequestDto requestDto) {
         // Kiểm tra code đã tồn tại chưa
-        if (promotionRepository.existsByPromotionCodeAndIsDeletedFalse(requestDto.getPromotionCode(), LocalDateTime.now())) {
+        if (promotionRepository.existsByPromotionCodeAndIsDeletedFalse(requestDto.getPromotionCode())) {
             throw new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_EXISTED);
         }
 
@@ -125,7 +125,7 @@ public class PromotionServiceImpl implements PromotionService {
 
     @Override
     public PromotionResponseDto getPromotionByPromotionCode(String promotionCode) {
-        Promotion promotion = promotionRepository.findByPromotionCodeAndIsDeletedFalse(promotionCode, LocalDateTime.now())
+        Promotion promotion = promotionRepository.findByPromotionCodeAndIsDeletedFalse(promotionCode)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
         return promotionMapper.promotionToPromotionResponseDto(promotion);
@@ -192,7 +192,6 @@ public class PromotionServiceImpl implements PromotionService {
         searchCriteriaList.forEach(consumer);
         predicate = consumer.getPredicate();
         predicate = cb.and(predicate, cb.isFalse(root.get("isDeleted")));
-        predicate = cb.and(predicate, cb.greaterThan(root.get("endDate"), new Date()));
 
         cq.where(predicate);
 
@@ -221,7 +220,6 @@ public class PromotionServiceImpl implements PromotionService {
         searchCriteriaList.forEach(consumer);
         predicate = consumer.getPredicate();
         predicate = cb.and(predicate, cb.isFalse(root.get("isDeleted")));
-        predicate = cb.and(predicate, cb.greaterThan(root.get("endDate"), new Date()));
 
 
         countQuery.select(cb.count(root));
