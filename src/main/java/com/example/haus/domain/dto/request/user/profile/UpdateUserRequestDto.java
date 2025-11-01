@@ -2,6 +2,7 @@ package com.example.haus.domain.dto.request.user.profile;
 
 import com.example.haus.domain.entity.user.Gender;
 import com.example.haus.domain.validator.GenderSubset;
+import com.example.haus.domain.validator.PhoneNumber;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -36,6 +37,7 @@ public class UpdateUserRequestDto {
     String email;
 
     @Schema(description = "Điện thoại", example = "0123456789")
+    @PhoneNumber()
     String phone;
 
     @Schema(description = "Giới tính", example = "MALE / FEMALE / OTHER")

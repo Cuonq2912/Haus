@@ -181,6 +181,8 @@ public class ErrorMessage {
 
         private Address() {}
 
+        public static final String ERR_RECIPIENT_NAME_EMPTY = "exception.recipient.name.empty";
+        public static final String ERR_PHONE_NUMBER_EMPTY = "exception.phone.number.empty";
         public static final String ERR_COUNTRY_EMPTY = "exception.country.empty";
         public static final String ERR_CITY_EMPTY = "exception.city.empty";
         public static final String ERR_DISTRICT_EMPTY = "exception.district.empty";

@@ -20,6 +20,12 @@ public class Address extends BaseEntity {
     @Column(name = "address_id")
     Long id;
 
+    @Column(name = "recipient_name")
+    private String recipientName;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
     @Column(name = "country")
     private String country;
 
