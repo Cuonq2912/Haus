@@ -674,25 +674,20 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponseDto checkoutFromCart(String username, CheckoutRequest request) {
         log.info("User {} checkout {} selected items from cart", username, request.getCartItemIds().size());
 
-        // 1. Validate user exists
         User user = userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
-        // 2. Get cart
         Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Cart.ERR_CART_NOT_FOUND));
 
-        // 3. Validate cart not empty
         if (cart.getCartItems() == null || cart.getCartItems().isEmpty()) {
             throw new InvalidDataException(ErrorMessage.Order.ERR_CART_EMPTY);
         }
 
-        // 4. Filter only selected cart items
         List<CartItem> selectedCartItems = cart.getCartItems().stream()
                 .filter(item -> request.getCartItemIds().contains(item.getId()))
                 .toList();
 
-        // 5. Validate selected items exist
         if (selectedCartItems.isEmpty()) {
             throw new InvalidDataException("No valid cart items selected for checkout");
         }
@@ -701,29 +696,24 @@ public class OrderServiceImpl implements OrderService {
             throw new InvalidDataException("Some selected cart items do not exist or do not belong to you");
         }
 
-        // 6. Validate address
         Address address = addressRepository.findById(String.valueOf(request.getAddressId()))
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Address.ERR_ADDRESS_NOT_FOUND));
 
-        // 7. Validate stock and calculate total for SELECTED items only
         double subtotal = 0.0;
         List<OrderItem> orderItems = new ArrayList<>();
 
         for (CartItem cartItem : selectedCartItems) {
             ProductVariation variation = cartItem.getProductVariation();
             
-            // Check stock
             if (variation.getInventoryQuantity() < cartItem.getQuantity()) {
                 throw new InvalidDataException(
                     ErrorMessage.Order.ERR_INSUFFICIENT_STOCK + ": " + variation.getProduct().getProductName()
                 );
             }
 
-            // Calculate subtotal
             double itemTotal = variation.getPrice() * cartItem.getQuantity();
             subtotal += itemTotal;
 
-            // Create OrderItem
             OrderItem orderItem = OrderItem.builder()
                     .productVariation(variation)
                     .quantity(cartItem.getQuantity())
@@ -732,12 +722,10 @@ public class OrderServiceImpl implements OrderService {
             
             orderItems.add(orderItem);
 
-            // Reduce stock
             variation.setInventoryQuantity(variation.getInventoryQuantity() - cartItem.getQuantity());
             productVariationRepository.save(variation);
         }
 
-        // 6. Apply promotion if exists
         Promotion promotion = null;
         double discount = 0.0;
         if (request.getPromotionCode() != null && !request.getPromotionCode().trim().isEmpty()) {
@@ -747,13 +735,10 @@ public class OrderServiceImpl implements OrderService {
             discount = subtotal * (promotion.getDiscountPercent() / 100.0);
         }
 
-        // 7. Calculate shipping fee (Fixed for now, can be dynamic later)
-        double shippingFee = 30000.0; // 30k VND
+        double shippingFee = 30000.0;
 
-        // 8. Calculate total
         double total = subtotal - discount + shippingFee;
 
-        // 9. Create Order
         String orderNumber = generateOrderNumber();
         Order order = Order.builder()
                 .orderNumber(orderNumber)
@@ -769,13 +754,11 @@ public class OrderServiceImpl implements OrderService {
                 .recipientPhone(request.getRecipientPhone() != null ? request.getRecipientPhone() : user.getPhone())
                 .build();
 
-        // Link order items to order
         for (OrderItem orderItem : orderItems) {
             orderItem.setOrder(order);
         }
         order.setOrderItems(orderItems);
 
-        // 10. Create Payment
         Payment payment = Payment.builder()
                 .amount(total)
                 .type(PaymentType.valueOf(request.getPaymentMethod().toUpperCase()))
@@ -785,10 +768,8 @@ public class OrderServiceImpl implements OrderService {
         
         order.setPayment(payment);
 
-        // 11. Save order
         Order savedOrder = orderRepository.save(order);
 
-        // 12. Remove only SELECTED items from cart
         cart.getCartItems().removeAll(selectedCartItems);
         cartRepository.save(cart);
 
@@ -801,15 +782,12 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponseDto buyNow(String username, BuyNowRequest request) {
         log.info("User {} buy now product variation {}", username, request.getProductVariationId());
 
-        // 1. Validate user exists
         User user = userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
-        // 2. Validate product variation
         ProductVariation variation = productVariationRepository.findById(request.getProductVariationId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
 
-        // 3. Validate quantity
         if (request.getQuantity() <= 0) {
             throw new InvalidDataException(ErrorMessage.Order.ERR_INVALID_QUANTITY);
         }
@@ -818,14 +796,11 @@ public class OrderServiceImpl implements OrderService {
             throw new InvalidDataException(ErrorMessage.Order.ERR_INSUFFICIENT_STOCK);
         }
 
-        // 4. Validate address
         Address address = addressRepository.findById(String.valueOf(request.getAddressId()))
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Address.ERR_ADDRESS_NOT_FOUND));
 
-        // 5. Calculate subtotal
         double subtotal = variation.getPrice() * request.getQuantity();
 
-        // 6. Apply promotion if exists
         Promotion promotion = null;
         double discount = 0.0;
         if (request.getPromotionCode() != null && !request.getPromotionCode().trim().isEmpty()) {
@@ -835,20 +810,16 @@ public class OrderServiceImpl implements OrderService {
             discount = subtotal * (promotion.getDiscountPercent() / 100.0);
         }
 
-        // 7. Calculate shipping fee
-        double shippingFee = 30000.0; // 30k VND
+        double shippingFee = 30000.0;
 
-        // 8. Calculate total
         double total = subtotal - discount + shippingFee;
 
-        // 9. Create OrderItem
         OrderItem orderItem = OrderItem.builder()
                 .productVariation(variation)
                 .quantity(request.getQuantity())
                 .priceAtSale(variation.getPrice())
                 .build();
 
-        // 10. Create Order
         String orderNumber = generateOrderNumber();
         Order order = Order.builder()
                 .orderNumber(orderNumber)
@@ -864,11 +835,9 @@ public class OrderServiceImpl implements OrderService {
                 .recipientPhone(request.getRecipientPhone() != null ? request.getRecipientPhone() : user.getPhone())
                 .build();
 
-        // Link order item to order
         orderItem.setOrder(order);
         order.setOrderItems(List.of(orderItem));
 
-        // 11. Create Payment
         Payment payment = Payment.builder()
                 .amount(total)
                 .type(PaymentType.valueOf(request.getPaymentMethod().toUpperCase()))
@@ -878,18 +847,15 @@ public class OrderServiceImpl implements OrderService {
         
         order.setPayment(payment);
 
-        // 12. Reduce stock
         variation.setInventoryQuantity(variation.getInventoryQuantity() - request.getQuantity());
         productVariationRepository.save(variation);
 
-        // 13. Save order
         Order savedOrder = orderRepository.save(order);
 
         log.info("Order {} created successfully via buy now", savedOrder.getOrderNumber());
         return convertToOrderResponseDto(savedOrder);
     }
 
-    // Helper method to generate unique order number
     private String generateOrderNumber() {
         return "ORD-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
