@@ -24,11 +24,11 @@ public interface ProductMapper {
             expression = "java(product.getCategories().stream()" +
                     "    .map(com.example.haus.domain.entity.product.Category::getPromotion)" +
                     "    .filter(java.util.Objects::nonNull)" +
-                    "    .filter(p -> \"ACTIVE\".equals(p.getStatus()))" +
+                    "    .filter(p -> com.example.haus.constant.promotion.PromotionStatus.ACTIVE.equals(p.getStatus()))" +
                     "    .map(com.example.haus.domain.entity.product.Promotion::getDiscountPercent)" +
                     "    .filter(java.util.Objects::nonNull)" +
                     "    .max(java.util.Comparator.naturalOrder())" +
-                    "    .orElse(0.0f))")
+                    "    .orElse(null))")
     @Mapping(target = "daysRemaining",
             expression = "java(product.getCategories().stream()" +
                     "    .map(com.example.haus.domain.entity.product.Category::getPromotion)" +

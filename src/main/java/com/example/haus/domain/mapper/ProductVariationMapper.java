@@ -27,11 +27,11 @@ public interface ProductVariationMapper {
                         "     .getCategories().stream()" +
                         "    .map(com.example.haus.domain.entity.product.Category::getPromotion)" +
                         "    .filter(java.util.Objects::nonNull)" +
-                        "    .filter(p -> \"ACTIVE\".equals(p.getStatus()))" +
+                        "    .filter(p -> com.example.haus.constant.promotion.PromotionStatus.ACTIVE.equals(p.getStatus()))" +
                         "    .map(com.example.haus.domain.entity.product.Promotion::getDiscountPercent)" +
                         "    .filter(java.util.Objects::nonNull)" +
                         "    .max(java.util.Comparator.naturalOrder())" +
-                        "    .orElse(0.0f))")
+                        "    .orElse(null))")
         @Mapping(target = "daysRemaining",
                 expression = "java(productVariation.getProduct().getCategories().stream()" +
                         "    .map(com.example.haus.domain.entity.product.Category::getPromotion)" +
@@ -62,10 +62,11 @@ public interface ProductVariationMapper {
                                 "     .getCategories().stream()" +
                                 "    .map(com.example.haus.domain.entity.product.Category::getPromotion)" +
                                 "    .filter(java.util.Objects::nonNull)" +
+                                "    .filter(p -> com.example.haus.constant.promotion.PromotionStatus.ACTIVE.equals(p.getStatus()))" +
                                 "    .map(com.example.haus.domain.entity.product.Promotion::getDiscountPercent)" +
                                 "    .filter(java.util.Objects::nonNull)" +
                                 "    .max(java.util.Comparator.naturalOrder())" +
-                                "    .orElse(0.0f))"),
+                                "    .orElse(null))"),
                 @Mapping(target = "isSelected", expression = "java(true)"),
                 @Mapping(target = "cartQuantity", source = "quantity")
         })
@@ -79,10 +80,11 @@ public interface ProductVariationMapper {
                         "     .getCategories().stream()" +
                         "    .map(com.example.haus.domain.entity.product.Category::getPromotion)" +
                         "    .filter(java.util.Objects::nonNull)" +
+                        "    .filter(p -> com.example.haus.constant.promotion.PromotionStatus.ACTIVE.equals(p.getStatus()))" +
                         "    .map(com.example.haus.domain.entity.product.Promotion::getDiscountPercent)" +
                         "    .filter(java.util.Objects::nonNull)" +
                         "    .max(java.util.Comparator.naturalOrder())" +
-                        "    .orElse(0.0f))")
+                        "    .orElse(null))")
         @Mapping(target = "cartQuantity", expression = "java(0)")
         ProductVariationInCartResponseDto productVariationToProductVariationInCartDto(ProductVariation productVariation);
 }
