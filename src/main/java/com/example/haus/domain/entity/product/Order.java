@@ -2,6 +2,7 @@ package com.example.haus.domain.entity.product;
 
 import com.example.haus.constant.OrderStatus;
 import com.example.haus.domain.entity.BaseEntity;
+import com.example.haus.domain.entity.address.Address;
 import com.example.haus.domain.entity.product.payment.Payment;
 import com.example.haus.domain.entity.user.User;
 import jakarta.persistence.*;
@@ -40,9 +41,22 @@ public class Order extends BaseEntity {
 
     LocalDate deliveryDate;
 
+    @Column(length = 500)
+    String note;
+
+    @Column(length = 100)
+    String recipientName;
+
+    @Column(length = 20)
+    String recipientPhone;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shipping_address_id", nullable = false)
+    Address shippingAddress;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     List<OrderItem> orderItems;
