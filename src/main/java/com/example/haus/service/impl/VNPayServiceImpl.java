@@ -265,26 +265,15 @@ public class VNPayServiceImpl implements VNPayService {
             return result;
         }
         String responseCode = params.get("vnp_ResponseCode");
-        String txnRef = params.get("vnp_TxnRef");
-        String transactionNo = params.get("vnp_TransactionNo");
-        String bankCode = params.get("vnp_BankCode");
-
-        log.info("Response code = {}", responseCode);
-        log.info("vnp_TxnRef = {}", params.get("vnp_TxnRef").split("-")[0]);
-        log.info("checkIpn = {}", checkIpnList.get(params.get("vnp_TxnRef").split("-")[0]));
 
         Boolean isSuccess = (Boolean)(SUCCESS_CODE.equals(responseCode)
                 && Boolean.TRUE.equals(checkIpnList.get(params.get("vnp_TxnRef").split("-")[0])));
 
-        result.put("success", isSuccess);
-        result.put("orderId", txnRef.split("-")[0]);
-        result.put("transactionNo", transactionNo);
-        result.put("bankCode", bankCode);
         result.put("message", isSuccess ? "Thanh toán thành công" : "Thanh toán thất bại");
 
         checkIpnList.remove(params.get("vnp_TxnRef").split("-")[0]);
 
-        log.info("Return: Transaction {}, Success: {}", transactionNo, isSuccess);
+        log.info("Response code = {} and success = {}", responseCode, isSuccess);
 
         return result;
     }
@@ -337,6 +326,7 @@ public class VNPayServiceImpl implements VNPayService {
 
             productIdsToUpdate.add(variation.getProduct().getId());
         }
+        totalAmountCheck += order.getShippingFee();
 
         log.info("totalCheck = {}", totalAmountCheck);
         log.info("totaorder.getTotalAmount()lCheck = {}", order.getTotalAmount());
