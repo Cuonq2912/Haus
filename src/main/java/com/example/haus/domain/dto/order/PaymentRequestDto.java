@@ -5,6 +5,7 @@ import com.example.haus.domain.entity.product.payment.PaymentGateway;
 import com.example.haus.domain.entity.product.payment.PaymentType;
 import com.example.haus.domain.validator.EnumValue;
 import com.example.haus.domain.validator.ValidPromotionDates;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -18,9 +19,10 @@ import lombok.experimental.FieldDefaults;
 public class PaymentRequestDto {
 
     @EnumValue(name = "paymentGateway", enumClass = PaymentGateway.class)
+    @Schema(example = "VNPAY")
     PaymentGateway paymentGateway;
 
     @EnumValue(name = "paymentType", enumClass = PaymentType.class)
-    @NotEmpty(message = ErrorMessage.Order.ERR_PAYMENT_TYPE_EMPTY)
+    @Schema(example = "ONLINE_PAYMENT")
     PaymentType paymentType;
 }

@@ -29,6 +29,6 @@ public class OrderAllRequestDto {
     //order
     OrderRequestDto order;
     //payment
-    PaymentRequestDto paymentRequestDto;
+    PaymentRequestDto payment;
 
 }

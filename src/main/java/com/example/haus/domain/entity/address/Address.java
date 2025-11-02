@@ -1,6 +1,5 @@
 package com.example.haus.domain.entity.address;
 
-import com.example.haus.constant.AddressType;
 import com.example.haus.constant.CommonConstant;
 import com.example.haus.domain.entity.BaseEntity;
 import com.example.haus.domain.entity.product.Order;
@@ -42,10 +41,6 @@ public class Address extends BaseEntity {
 
     @Column(name = "detail_address")
     private String detailAddress;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type")
-    private AddressType type;
 
     @Builder.Default
     @Column(name = "is_selected")

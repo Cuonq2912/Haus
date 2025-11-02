@@ -1,6 +1,5 @@
 package com.example.haus.service.impl;
 
-import com.example.haus.constant.AddressType;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.OrderStatus;
 import com.example.haus.domain.dto.order.OrderAllRequestDto;
@@ -238,10 +237,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Long createOrder(String username, OrderAllRequestDto orderAllRequestDto) {
-        if (userRepository.existsUserByUsernameAndIsDeletedFalse(username)) {
-            throw new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED);
-        }
-
         User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
                 () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED)
         );
@@ -255,14 +250,20 @@ public class OrderServiceImpl implements OrderService {
 
             OrderItem orderItem = orderItemMapper.orderItemRequestDtoToOrderItem(orderItemRequestDto);
             orderItem.setProductVariation(productVariation);
-            return orderItemRepository.save(orderItem);
+
+            orderItem.setOrder(order); // Gán Order cho OrderItem
+
+            return orderItem;
         }).toList();
 
 
-        Payment payment = paymentMapper.paymentRequestDtoToPayment(orderAllRequestDto.getPaymentRequestDto());
+        Payment payment = paymentMapper.paymentRequestDtoToPayment(orderAllRequestDto.getPayment());
         payment.setStatus(PaymentStatus.PENDING);
         payment.setAmount(orderAllRequestDto.getOrder().getTotalAmount());
         payment.setExpireAt(new Date(System.currentTimeMillis() + 1000 * 60 * 20));
+
+        payment.setOrder(order);
+
 
         Promotion promotion = promotionRepository.findByIdAndIsDeletedFalse(orderAllRequestDto.getOrder().getPromotionId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
@@ -271,19 +272,19 @@ public class OrderServiceImpl implements OrderService {
             Address address = addressRepository.findByIdAndIsDeletedFalse(addressRequestDto.getId())
                     .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Address.ERR_ADDRESS_NOT_FOUND));
             address.setIsSelected(addressRequestDto.getIsSelected());
-            address.setType(AddressType.ORDER);
+
             return address;
         }).toList();
 
-        //Relation
-
         order.setUser(user);
         order.setOrderItems(orderItems);
-        order.setPayment(paymentRepository.save(payment));
+        order.setPayment(payment);
         order.setPromotion(promotion);
         order.setAddresses(addresses);
 
-        return orderRepository.save(order).getId();
+        Order savedOrder = orderRepository.save(order);
+
+        return savedOrder.getId();
     }
 
     @Override
