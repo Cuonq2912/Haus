@@ -1,7 +1,9 @@
 package com.example.haus.domain.entity.address;
 
+import com.example.haus.constant.AddressType;
 import com.example.haus.constant.CommonConstant;
 import com.example.haus.domain.entity.BaseEntity;
+import com.example.haus.domain.entity.product.Order;
 import com.example.haus.domain.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -41,6 +43,14 @@ public class Address extends BaseEntity {
     @Column(name = "detail_address")
     private String detailAddress;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    private AddressType type;
+
+    @Builder.Default
+    @Column(name = "is_selected")
+    private Boolean isSelected = CommonConstant.FALSE;
+
     @Builder.Default
     @Column(name = "is_deleted")
     private Boolean isDeleted = CommonConstant.FALSE;
@@ -48,4 +58,8 @@ public class Address extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order;
 }

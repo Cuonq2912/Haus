@@ -1,14 +1,22 @@
 package com.example.haus.service.impl;
 
+import com.example.haus.constant.AddressType;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.OrderStatus;
+import com.example.haus.domain.dto.order.OrderAllRequestDto;
+import com.example.haus.domain.dto.order.OrderItemRequestDto;
+import com.example.haus.domain.dto.order.OrderRequestDto;
+import com.example.haus.domain.dto.order.PaymentRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.response.invoice.InvoiceItemDto;
 import com.example.haus.domain.dto.response.invoice.InvoiceResponseDto;
 import com.example.haus.domain.dto.response.product.OrderResponseDto;
 import com.example.haus.domain.dto.response.user.UserResponseDto;
+import com.example.haus.domain.entity.address.Address;
 import com.example.haus.domain.entity.product.Order;
+import com.example.haus.domain.entity.product.OrderItem;
+import com.example.haus.domain.entity.product.ProductVariation;
 import com.example.haus.domain.entity.product.Promotion;
 import com.example.haus.domain.entity.product.payment.Payment;
 import com.example.haus.domain.entity.product.payment.PaymentStatus;
@@ -17,7 +25,7 @@ import com.example.haus.domain.entity.user.User;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.domain.mapper.*;
 import com.example.haus.exception.ResourceNotFoundException;
-import com.example.haus.repository.OrderRepository;
+import com.example.haus.repository.*;
 import com.example.haus.service.OrderService;
 import com.example.haus.util.PaginationUtil;
 import com.example.haus.util.PdfUtil;
@@ -42,7 +50,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
 @Service
@@ -50,6 +61,12 @@ import java.util.function.BiConsumer;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j(topic = "ORDER-SERVICE")
 public class OrderServiceImpl implements OrderService {
+
+    AddressMapper addressMapper;
+
+    AddressRepository addressRepository;
+
+    OrderItemMapper orderItemMapper;
 
     OrderRepository orderRepository;
 
@@ -66,6 +83,16 @@ public class OrderServiceImpl implements OrderService {
     PromotionMapper promotionMapper;
 
     MediaMapper mediaMapper;
+
+    UserRepository userRepository;
+
+    PaymentRepository paymentRepository;
+
+    OrderItemRepository orderItemRepository;
+
+    ProductVariationRepository productVariationRepository;
+
+    PromotionRepository promotionRepository;
 
     private static double totalPrice = 0;
 
@@ -207,6 +234,56 @@ public class OrderServiceImpl implements OrderService {
                 .type(payment.getType())
                 .status(payment.getStatus())
                 .build();
+    }
+
+    @Override
+    public Long createOrder(String username, OrderAllRequestDto orderAllRequestDto) {
+        if (userRepository.existsUserByUsernameAndIsDeletedFalse(username)) {
+            throw new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED);
+        }
+
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
+                () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED)
+        );
+
+        Order order = orderMapper.orderRequestDtoToOrder(orderAllRequestDto.getOrder());
+        order.setStatus(OrderStatus.PENDING);
+
+        List<OrderItem> orderItems = orderAllRequestDto.getOrderItems().stream().map(orderItemRequestDto -> {
+            ProductVariation productVariation = productVariationRepository.findByIdAndIsDeletedFalse(orderItemRequestDto.getProductVariationId())
+                    .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
+
+            OrderItem orderItem = orderItemMapper.orderItemRequestDtoToOrderItem(orderItemRequestDto);
+            orderItem.setProductVariation(productVariation);
+            return orderItemRepository.save(orderItem);
+        }).toList();
+
+
+        Payment payment = paymentMapper.paymentRequestDtoToPayment(orderAllRequestDto.getPaymentRequestDto());
+        payment.setStatus(PaymentStatus.PENDING);
+        payment.setAmount(orderAllRequestDto.getOrder().getTotalAmount());
+        payment.setExpireAt(new Date(System.currentTimeMillis() + 1000 * 60 * 20));
+
+        Promotion promotion = promotionRepository.findByIdAndIsDeletedFalse(orderAllRequestDto.getOrder().getPromotionId())
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
+
+        List<Address> addresses = orderAllRequestDto.getOrder().getAddresses().stream().map(addressRequestDto -> {
+            Address address = addressRepository.findByIdAndIsDeletedFalse(addressRequestDto.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Address.ERR_ADDRESS_NOT_FOUND));
+            address.setIsSelected(addressRequestDto.getIsSelected());
+            address.setType(AddressType.ORDER);
+            return address;
+        }).toList();
+
+        //Relation
+
+        order.setUser(user);
+        order.setOrderItems(orderItems);
+        order.setPayment(paymentRepository.save(payment));
+        order.setPromotion(promotion);
+        order.setAddresses(addresses);
+
+        return orderRepository.save(order).getId();
     }
 
     @Override

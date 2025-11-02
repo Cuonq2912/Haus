@@ -4,7 +4,11 @@ import com.example.haus.base.ResponseUtil;
 import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
+import com.example.haus.domain.dto.order.OrderAllRequestDto;
+import com.example.haus.domain.dto.order.OrderItemRequestDto;
+import com.example.haus.domain.dto.order.OrderRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
+import com.example.haus.domain.entity.product.OrderItem;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.service.OrderService;
 import com.itextpdf.text.DocumentException;
@@ -13,6 +17,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,15 +26,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @RestApiV1
 @Validated
@@ -39,6 +44,22 @@ import java.nio.charset.StandardCharsets;
 public class OrderController {
 
     OrderService orderService;
+
+    @Operation(
+            summary = "Tạo đơn hàng mới",
+            description = "Giúp người dùng tạo đơn hàng mới.",
+            security = @SecurityRequirement(name = "Bearer Token")
+    )
+    @PostMapping("/api/v1/orders")
+    public ResponseEntity<?> createOrder(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody OrderAllRequestDto orderAllRequestDto) {
+        String username = userDetails.getUsername();
+        log.info("Username = {}", username);
+        return ResponseUtil.success(
+                SuccessMessage.Order.CREATE_ORDER_SUCCESS,
+                orderService.createOrder(username, orderAllRequestDto)
+        );
+    }
+
 
         @Tag(name = "public-order-controller", description = "Public Order APIs")
         @Operation(
