@@ -1,5 +1,6 @@
 package com.example.haus.service.impl;
 
+import com.example.haus.config.keycloak.KeycloakProperties;
 import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.TokenType;
@@ -16,6 +17,7 @@ import com.example.haus.domain.dto.response.auth.LoginResponseDto;
 import com.example.haus.domain.dto.response.auth.RefreshTokenResponseDto;
 import com.example.haus.domain.dto.response.user.UserResponseDto;
 import com.example.haus.exception.InvalidDataException;
+import com.example.haus.exception.KeycloakException;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.CartRepository;
 import com.example.haus.repository.InvalidatedTokenRepository;
@@ -27,10 +29,12 @@ import com.example.haus.service.JwtService;
 import com.example.haus.service.UserService;
 import com.example.haus.util.OtpUtil;
 import com.nimbusds.jwt.SignedJWT;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.*;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -40,6 +44,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.text.ParseException;
 import java.time.LocalDateTime;
@@ -52,6 +59,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 @Slf4j(topic = "AUTHENTICATION-SERVICE")
 public class AuthenticationServiceImpl implements AuthenticationService {
+
+    KeycloakProperties keycloakProperties;
 
     JwtService jwtService;
 
@@ -71,11 +80,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     CartRepository cartRepository;
 
+    RestTemplate restTemplate;
+
     Map<String, PendingRegistrationRequestDto> pendingRegisterMap = new ConcurrentHashMap<>();
 
     Map<String, PendingResetPasswordRequestDto> pendingResetPasswordMap = new ConcurrentHashMap<>();
 
     @Override
+    @Transactional
     public LoginResponseDto authentication(LoginRequestDto request) {
 
         User user = userRepository.findByEmailAndIsDeletedFalse(request.getEmail()).orElseThrow(
@@ -156,11 +168,42 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void register(RegisterRequestDto request) {
-        if (userRepository.existsUserByUsernameAndIsDeletedFalse(request.getUsername()))
-            throw new InvalidDataException(ErrorMessage.User.ERR_USERNAME_EXISTED);
 
-        if (userRepository.existsUserByEmailAndIsDeletedFalse(request.getEmail()))
-            throw new InvalidDataException(ErrorMessage.User.ERR_EMAIL_EXISTED);
+        final String url = keycloakProperties.serverUrl() + "/admin/realm" + keycloakProperties.realm() + "/users";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.AUTHORIZATION, CommonConstant.BEARER_TOKEN + "" + getAdminToken());
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String, Object> user = new HashMap<>();
+        user.put("username", request.getUsername());
+        user.put("enabled", true);
+        user.put("email", request.getEmail());
+        user.put("emailVerified", false);
+        user.put("firstName", request.getFirstName());
+        user.put("lastName", request.getLastName());
+        user.put("credentials", List.of(Map.of(
+                "type", "password",
+                "value", request.getPassword(),
+                "temporary", false
+        )));
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(user, headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+
+            if (response.getStatusCode().isError()) {
+                String errorBody = response.getBody();
+
+                if (response.getStatusCode() == HttpStatus.CONFLICT && errorBody != null && !errorBody.isEmpty()) {
+                    throw new KeycloakException(errorBody);
+                }
+                throw new KeycloakException(ErrorMessage.Auth.ERR_CAN_NOT_CREATE_USER);
+            }
+        } catch (Exception ex) {
+            throw new KeycloakException(ErrorMessage.Auth.ERR_CAN_NOT_CREATE_USER);
+        }
 
         String otp = OtpUtil.generateOtp();
 
@@ -267,4 +310,50 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return authMapper.userToUserResponseDto(user);
     }
 
+    private String getAdminToken() {
+        final String adminUrl = keycloakProperties.serverUrl() + "realms/Haus/protocol/openid-connect/token";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "password");
+        params.add("client_id", keycloakProperties.clientId());
+        params.add("client_secret", keycloakProperties.clientSecret());
+        params.add("scope", "openid");
+        params.add("username", keycloakProperties.adminUser());
+        params.add("password", keycloakProperties.adminPassword());
+
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(params, headers);
+        ResponseEntity<Map> response = restTemplate.postForEntity(adminUrl, entity, Map.class);
+
+        return response.getBody().get("access_token").toString();
+    }
+
+    private String getUserId(String username) {
+        String url = keycloakProperties.serverUrl() + "admin/realm/" + keycloakProperties.realm() + "/users?username=" + username;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.AUTHORIZATION, getAdminToken());
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<List> response = restTemplate.exchange(url, HttpMethod.GET, entity, List.class);
+
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null && !response.getBody().isEmpty()) {
+            Map<String, Object> user = (Map<String, Object>) response.getBody().get(0);
+            return (String) user.get("id");
+        }
+
+        url = keycloakProperties.serverUrl() + "admin/realm/" + keycloakProperties.realm() + "/users?email=" + username;
+
+        entity = new HttpEntity<>(headers);
+        response = restTemplate.exchange(url, HttpMethod.GET, entity, List.class);
+
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null && !response.getBody().isEmpty()) {
+            Map<String, Object> user = (Map<String, Object>) response.getBody().get(0);
+            return (String) user.get("id");
+        }
+
+        throw new RuntimeException("User not found in Keycloak with provided username or email");
+    }
 }

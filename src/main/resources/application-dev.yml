@@ -87,3 +87,12 @@ payment:
     orderType: ${VNPAY_ORDER_TYPE:other}
     currCode: ${VNPAY_CURRCODE:VND}
     locale: ${VNPAY_LOCALE:vn}
+
+#KeyCloak
+keycloak:
+  serverUrl: ${KEYCLOAK_SERVERURL}
+  realm: ${KEYCLOAK_REALM}
+  clientId: ${KEYCLOAK_CLIENTID}
+  clientSecret: ${KEYCLOAK_CLIENTSECRET}
+  adminUser: ${KEYCLOAK_ADMINUSER}
+  adminPassword: ${KEYCLOAK_ADMINPASSWORD}

@@ -255,6 +255,18 @@ public class GlobalExceptionHandler {
         return errorResponse;
     }
 
+    @ExceptionHandler(KeycloakException.class)
+    @ResponseStatus(CONFLICT)
+    public ErrorResponse handleKeycloakException(InvalidDataException e, WebRequest webRequest) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setStatus(BAD_REQUEST.value());
+        errorResponse.setPath(webRequest.getDescription(false).replace("uri:", ""));
+        errorResponse.setError(BAD_REQUEST.getReasonPhrase());
+        errorResponse.setMessage(e.getMessage());
+        return errorResponse;
+    }
+
     /**
      * Handle exception when internal server error
      *

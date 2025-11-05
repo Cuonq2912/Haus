@@ -48,6 +48,7 @@ public class ErrorMessage {
         public static final String EXPIRED_REFRESH_TOKEN = "exception.auth.expired.refresh.token";
         public static final String ERR_TOKEN_INVALIDATED = "exception.auth.token.invalidated";
         public static final String ERR_MALFORMED_TOKEN = "exception.auth.malformed.token";
+        public static final String ERR_CAN_NOT_CREATE_USER = "exception.can.not.create.user";
         // OTP
         public static final String ERR_PENDING_RESET_REQUEST_NULL = "exception.auth.pending.reset.request.null";
         public static final String ERR_PENDING_REGISTER_REQUEST_NULL = "exception.auth.pending.register.request.null";
