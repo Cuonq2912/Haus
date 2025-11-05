@@ -257,7 +257,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(KeycloakException.class)
     @ResponseStatus(CONFLICT)
-    public ErrorResponse handleKeycloakException(InvalidDataException e, WebRequest webRequest) {
+    public ErrorResponse handleKeycloakException(KeycloakException e, WebRequest webRequest) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(new Date());
         errorResponse.setStatus(BAD_REQUEST.value());
