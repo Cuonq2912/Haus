@@ -156,29 +156,43 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public RefreshTokenResponseDto refresh(RefreshTokenRequestDto request) {
-        String refreshToken = request.getRefreshToken();
 
-        String username = jwtService.extractUserName(refreshToken, TokenType.REFRESH_TOKEN);
+        final String url = keycloakProperties.serverUrl() + "/realms/" + keycloakProperties.realm() + "/protocol/openid-connect/token";
 
-        if (jwtService.isExpired(refreshToken, TokenType.REFRESH_TOKEN)) {
-            throw new InvalidDataException(ErrorMessage.Auth.EXPIRED_REFRESH_TOKEN);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        params.add("client_id", keycloakProperties.clientId());
+        params.add("client_secret", keycloakProperties.clientSecret());
+        params.add("grant_type", "refresh_token");
+        params.add("refresh_token", request.getRefreshToken());
+
+        HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(params, headers);
+
+        try {
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                Map<String, Object> body = response.getBody();
+                String accessToken = (String) body.get("access_token");
+
+                DecodedJWT decodedJWT = JWT.decode(accessToken);
+                Map<String, Claim> claims = decodedJWT.getClaims();
+
+                List<String> realmRoles = (List<String>) claims.get("realm_access")
+                        .asMap().get("roles");
+
+                return RefreshTokenResponseDto.builder()
+                        .tokenType(CommonConstant.BEARER_TOKEN)
+                        .accessToken(accessToken)
+                        .refreshToken((String) body.get("refresh_token"))
+                        .build();
+            }
+        } catch (Exception ex) {
+            throw new KeycloakException(ErrorMessage.Auth.ERR_LOGIN_FAILED_IN_KEYCLOAK);
         }
-
-        if (!jwtService.isValid(refreshToken, TokenType.REFRESH_TOKEN, username)) {
-            throw new InvalidDataException(ErrorMessage.Auth.INVALID_REFRESH_TOKEN);
-        }
-
-        User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
-                () -> new UsernameNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
-
-        String accessToken = jwtService.generateAccessToken(user.getId(), user.getUsername(),
-                List.of(new SimpleGrantedAuthority(user.getRole().toString())));
-
-        return RefreshTokenResponseDto.builder()
-                .tokenType(CommonConstant.BEARER_TOKEN)
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+        throw new InvalidDataException(ErrorMessage.Auth.ERR_USERNAME_PASSWORD_INCORRECT);
     }
 
     @Override
