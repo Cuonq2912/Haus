@@ -64,6 +64,24 @@ public class KeycloakUtil {
 
         return true;
     }
+    public boolean resetPassword(String userId, String newPassword) {
+        // 1. Endpoint chuyên dụng
+        final String url = keycloakProperties.serverUrl() + "admin/realms/" + keycloakProperties.realm() +
+                "/users/" + userId + "/reset-password";
+
+        // 2. Header dùng Admin Token
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // 3. Body yêu cầu Reset Password
+        String jsonBody = "{\"type\": \"password\", \"value\": \"" + newPassword + "\", \"temporary\": false}";
+
+        HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
+
+        // ... Thực hiện restTemplate.exchange ...
+    }
+
 
     public String getAdminToken() {
         final String adminUrl = keycloakProperties.serverUrl() + "realms/Haus/protocol/openid-connect/token";
