@@ -22,7 +22,11 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Map;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.Claim;
+import com.auth0.jwt.interfaces.DecodedJWT;
 @Component
 @Slf4j(topic = "CUSTOMIZE-PRE-FILTER")
 @RequiredArgsConstructor
@@ -50,12 +54,17 @@ public class CustomizePreFilter extends OncePerRequestFilter {
 
         final String token = authHeader.substring(7);
         try {
-            String username = jwtService.extractUserName(token, TokenType.ACCESS_TOKEN);
+            DecodedJWT decodedJWT = JWT.decode(token);
+            Map<String, Claim> claims = decodedJWT.getClaims();
+
+            String preferredUsername = claims.get("preferred_username").toString();
+            String username = preferredUsername.substring(1, preferredUsername.length() - 1);
 
             if (!username.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
-
+                log.info("1");
                 if (jwtService.isValid(token, TokenType.ACCESS_TOKEN, userDetails.getUsername())) {
+                    log.info("2");
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

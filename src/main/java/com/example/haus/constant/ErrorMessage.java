@@ -55,6 +55,8 @@ public class ErrorMessage {
         public static final String ERR_OTP_EXPIRED = "exception.auth.otp.expired";
         public static final String ERR_OTP_NOT_MATCH = "exception.auth.otp.not.match";
         public static final String ERR_VERIFY_FAILED_IN_KEYCLOAK = "exception.verify.failed.in.keycloak";
+        public static final String ERR_LOGIN_FAILED_IN_KEYCLOAK = "exception.login.failed.in.keycloak";
+        public static final String ERR_USERNAME_PASSWORD_INCORRECT = "exception.username.password.incorrect";
     }
 
     public static class User {

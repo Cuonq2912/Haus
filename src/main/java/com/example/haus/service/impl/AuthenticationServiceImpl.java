@@ -50,6 +50,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.ParseException;
@@ -72,13 +73,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     AuthMapper authMapper;
 
-    CustomUserDetailsService userDetailsService;
-
     EmailService emailService;
-
-    AuthenticationManager authenticationManager;
-
-    UserService userService;
 
     InvalidatedTokenRepository invalidatedTokenRepository;
 
@@ -96,8 +91,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Transactional
     public LoginResponseDto authentication(LoginRequestDto request) {
 
-        log.info("1");
-
         final String url = keycloakProperties.serverUrl() + "realms/" + keycloakProperties.realm() + "/protocol/openid-connect/token";
 
         HttpHeaders headers = new HttpHeaders();
@@ -111,62 +104,36 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         params.add("username", request.getUsername());
         params.add("password", request.getPassword());
 
-        log.info("2");
-
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(params, headers);
-        ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
-
-        log.info("3");
-
-        if (response.getStatusCode().is2xxSuccessful()) {
-            Map<String, Object> body = response.getBody();
-
-            String accessToken = (String) body.get("access_token");
-            DecodedJWT decodedJWT = JWT.decode(accessToken);
-
-            Map<String, Claim> claims = decodedJWT.getClaims();
-
-            List<String> realmRoles = (List<String>) claims.get("realm_access")
-                    .asMap().get("roles");
-
-            return LoginResponseDto.builder()
-                    .tokenType(CommonConstant.BEARER_TOKEN)
-                    .userId(keycloakUtil.getUserId(request.getUsername()))
-                    .role(realmRoles.toString())
-                    .accessToken(accessToken)
-                    .refreshToken((String) body.get("refresh_token"))
-                    .build();
-        }
-
-        User user = userRepository.findByEmailAndIsDeletedFalse(request.getUsername()).orElseThrow(
-                () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
-
         try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(user.getUsername(),
-                            request.getPassword()));
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        } catch (DisabledException e) {
-            throw new BadCredentialsException(ErrorMessage.Auth.ERR_ACCOUNT_LOCKED);
-        } catch (AuthenticationException e) {
-            throw new InternalAuthenticationServiceException(ErrorMessage.Auth.ERR_INCORRECT_PASSWORD);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                Map<String, Object> body = response.getBody();
+
+                String accessToken = (String) body.get("access_token");
+                DecodedJWT decodedJWT = JWT.decode(accessToken);
+
+                Map<String, Claim> claims = decodedJWT.getClaims();
+
+                List<String> realmRoles = (List<String>) claims.get("realm_access")
+                        .asMap().get("roles");
+
+                return LoginResponseDto.builder()
+                        .tokenType(CommonConstant.BEARER_TOKEN)
+                        .userId(keycloakUtil.getUserId(request.getUsername()))
+                        .role(realmRoles.toString().contains("ADMIN") ? "ADMIN" : "USER")
+                        .accessToken(accessToken)
+                        .refreshToken((String) body.get("refresh_token"))
+                        .build();
+            }
+            else {
+                log.error("Đăng nhập thất bại với username = {}", request.getUsername());
+            }
+        } catch (Exception ex) {
+            throw new KeycloakException(ErrorMessage.Auth.ERR_LOGIN_FAILED_IN_KEYCLOAK);
         }
-        String accessToken = jwtService.generateAccessToken(user.getId(), user.getUsername(),
-                List.of(new SimpleGrantedAuthority(user.getRole().toString())));
-
-        String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getUsername(),
-                List.of(new SimpleGrantedAuthority(user.getRole().toString())));
-
-        //save to redis if use (Best practise) -> Although you can use both redis and db
-
-        return LoginResponseDto.builder()
-                .tokenType(CommonConstant.BEARER_TOKEN)
-                .userId(user.getId())
-                .role(user.getRole().toString())
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+        throw new InvalidDataException(ErrorMessage.Auth.ERR_USERNAME_PASSWORD_INCORRECT);
     }
 
     @Override
