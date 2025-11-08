@@ -2,6 +2,7 @@ package com.example.haus.domain.entity.product;
 
 import com.example.haus.constant.OrderStatus;
 import com.example.haus.domain.entity.BaseEntity;
+import com.example.haus.domain.entity.address.Address;
 import com.example.haus.domain.entity.product.payment.Payment;
 import com.example.haus.domain.entity.user.User;
 import jakarta.persistence.*;
@@ -53,6 +54,9 @@ public class Order extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "promotion_id")
     Promotion promotion;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    List<Address> addresses;
 
     // ---------------- Helper methods ----------------
 

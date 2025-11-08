@@ -17,6 +17,10 @@ import lombok.experimental.FieldDefaults;
 public class AddressResponseDto {
 
     Long id;
+
+    String recipientName;
+
+    String phoneNumber;
     
     String country;
     

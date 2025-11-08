@@ -121,6 +121,7 @@ public class SuccessMessage {
         public static final String GET_ORDER_SUCCESS = "Get all order successfully";
         public static final String UPDATE_STATUS_ORDER_SUCCESS = "Update status order successfully";
         public static final String GET_INVOICE_SUCCESS = "Get invoice success";
+        public static final String CREATE_ORDER_SUCCESS = "Create order success";
 
     }
 
