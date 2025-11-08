@@ -15,6 +15,7 @@ import org.mapstruct.factory.Mappers;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         uses = {CategoryMapper.class, MediaMapper.class, ProductVariationMapper.class}
 )
+
 public interface ProductMapper {
     ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
 

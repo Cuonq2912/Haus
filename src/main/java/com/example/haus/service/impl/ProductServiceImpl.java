@@ -285,10 +285,6 @@ public class ProductServiceImpl implements ProductService {
 
         List<ProductResponseDto> productResponseDtoList = productsPage.getContent().stream()
                 .map(product -> {
-                    log.info("=========================================");
-                    product.getCategories().forEach(cate -> {
-                        log.info("DiscountPs = {}", cate.getPromotion().getDiscountPercent());
-                    });
                     return productMapper.productToProductResponse(product);
 
                 })
