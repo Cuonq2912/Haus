@@ -120,7 +120,7 @@ public class ErrorMessage {
         public static final String ERR_PRODUCT_ALREADY_DELETED = "exception.product.already.deleted";
         public static final String ERR_PRODUCT_VARIATION_NOT_EXISTED = "exception.product.variation.not.existed";
         public static final String ERR_PRODUCT_VARIATION_ALREADY_DELETED = "exception.product.variation.already.deleted";
-        public static final String ERR_PRODUCT_INVENTORY_QUANTITY_LESS_THAN_1 = "exception.product.inventory.quantity.less.than.1";
+        public static final String ERR_PRODUCT_FAVORITE_FAILED = "exception.product.favorite.failed";
     }
 
     public static class Order {

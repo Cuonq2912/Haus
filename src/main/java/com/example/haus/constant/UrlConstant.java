@@ -108,6 +108,11 @@ public class UrlConstant {
 
         public static final String SEARCH_PRODUCTS_BY_KEYWORD = PRE_FIX + "/search";
         public static final String FILTER_PRODUCTS = PRE_FIX + "/filter";
+        
+        public static final String ADD_FAVORITE = PRE_FIX + "/favorites";
+        public static final String REMOVE_FAVORITE = PRE_FIX + "/favorites/{productId}";
+        public static final String GET_FAVORITES = PRE_FIX + "/favorites";
+        public static final String CHECK_FAVORITE = PRE_FIX + "/favorites/check/{productId}";
 
         private Product() {
         }
