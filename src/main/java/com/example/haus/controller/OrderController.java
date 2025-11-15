@@ -67,42 +67,30 @@ public class OrderController {
     }
 
 
-        @Tag(name = "public-order-controller", description = "Public Order APIs")
-        @Operation(
-                summary = "Lấy tất đơn hàng",
-                description = "Lấy danh sách tất cả đơn hàng với phân trang và filter theo trạng thái",
-                parameters = {
-                        @Parameter(name = "status", description = "Order status để filter (optional)",
-                                schema = @Schema(allowableValues = {
-                                        "pending", "confirmed", "processing", "delivered",
-                                        "completed", "returned", "cancelled", "refunded",}), example = "pending")
-                }, security = @SecurityRequirement(name = "Bearer Token")
-        )
-        @GetMapping(UrlConstant.Order.GET_ALL_ORDERS)
-        public ResponseEntity<?> getAllOrders(
-                        @RequestParam(defaultValue = "1") Integer pageNum,
-                        @RequestParam(defaultValue = "10") Integer pageSize,
-                        @RequestParam(required = false) String status) {
+    @Tag(name = "public-order-controller", description = "Public Order APIs")
+    @Operation(
+            summary = "Lấy tất đơn hàng",
+            description = "Lấy danh sách tất cả đơn hàng với phân trang và filter theo trạng thái",
+            parameters = {
+                    @Parameter(name = "status", description = "Order status để filter (optional)",
+                            schema = @Schema(allowableValues = {
+                                    "pending", "confirmed", "processing", "delivered",
+                                    "completed", "returned", "cancelled", "refunded",}), example = "pending")
+            }, security = @SecurityRequirement(name = "Bearer Token")
+    )
+    @GetMapping(UrlConstant.Order.GET_ALL_ORDERS)
+    public ResponseEntity<?> getAllOrders(
+                    @RequestParam(defaultValue = "1") Integer pageNum,
+                    @RequestParam(defaultValue = "10") Integer pageSize,
+                    @RequestParam(required = false) String status) {
 
-                PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
-                return ResponseUtil.success(
-                                SuccessMessage.Order.GET_ORDER_SUCCESS,
-                                orderService.getAllOrders(paginationRequest, status));
-        }
+            PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
+            return ResponseUtil.success(
+                            SuccessMessage.Order.GET_ORDER_SUCCESS,
+                            orderService.getAllOrders(paginationRequest, status));
+    }
 
-        @Tag(name = "admin-order-controller", description = "Admin Order APIs")
-        @Operation(
-                summary = "Lấy đơn hàng theo ID",
-                description = "Dùng để lấy đơn hàng theo id",
-                security = @SecurityRequirement(name = "Bearer Token")
-        )
-        @GetMapping(UrlConstant.Order.GET_ORDER_BY_ID)
-        public ResponseEntity<?> getOrderById(
-                        @PathVariable Long id) {
-                return ResponseUtil.success(
-                                SuccessMessage.Order.GET_ORDER_SUCCESS,
-                                orderService.getOrderById(id));
-        }
+
     @Operation(
             summary = "Lấy chi tiết và xuất hóa đơn",
             description = "Truy vấn toàn bộ dữ liệu đơn hàng, sản phẩm, và người dùng để tạo hóa đơn."
@@ -166,27 +154,7 @@ public class OrderController {
                 SuccessMessage.Order.GET_ORDER_SUCCESS,
                 orderService.getOrderById(id));
     }
-    @Operation(
-            summary = "Lấy tất đơn hàng (admin)",
-            description = "Lấy danh sách tất cả đơn hàng với phân trang và filter theo trạng thái",
-            parameters = {
-                    @Parameter(name = "status", description = "Order status để filter (optional)",
-                            schema = @Schema(allowableValues = {
-                                    "pending", "confirmed", "processing", "delivered",
-                                    "completed", "returned", "cancelled", "refunded",}), example = "pending")
-            }, security = @SecurityRequirement(name = "Bearer Token")
-    )
-    @GetMapping(UrlConstant.Order.GET_ALL_ORDERS)
-    public ResponseEntity<?> getAllOrders(
-            @RequestParam(defaultValue = "1") Integer pageNum,
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(required = false) String status) {
 
-        PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
-        return ResponseUtil.success(
-                SuccessMessage.Order.GET_ORDER_SUCCESS,
-                orderService.getAllOrders(paginationRequest, status));
-    }
 
     @Operation(
             summary = "Cập nhật trạng thái đơn hàng theo ID(Admin)",

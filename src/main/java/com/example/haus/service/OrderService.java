@@ -28,7 +28,4 @@ public interface OrderService {
 
     byte[] generateInvoicePdf(Long orderId) throws DocumentException, IOException;
 
-    OrderResponseDto checkoutFromCart(String username, CheckoutRequest request);
-
-    OrderResponseDto buyNow(String username, BuyNowRequest request);
 }
