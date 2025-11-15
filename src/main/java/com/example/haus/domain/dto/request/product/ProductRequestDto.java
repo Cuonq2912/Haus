@@ -48,4 +48,7 @@ public class ProductRequestDto {
     @NotEmpty(message = ErrorMessage.NOT_EMPTY_FIELD)
     List<String> categories;
 
+    @Schema(description = "Chất liệu sản phẩm", example = "wood")
+    String material;
+
 }

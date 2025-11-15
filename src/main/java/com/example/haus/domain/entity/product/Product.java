@@ -45,6 +45,9 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     Integer inventoryQuantity;
 
+    @Column(length = 100)
+    String material;
+
     @Column(nullable = false)
     @Builder.Default
     Integer soldQuantity = 0;

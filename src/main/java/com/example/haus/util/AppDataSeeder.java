@@ -116,6 +116,7 @@ public class AppDataSeeder implements ApplicationRunner {
                     .description(dto.description)
                     .detailDescription(dto.detailDescription)
                     .inventoryQuantity(dto.inventoryQuantity)
+                    .material(dto.material)
                     .soldQuantity(dto.soldQuantity)
                     .isDeleted(false)
                     .build();
@@ -136,6 +137,7 @@ public class AppDataSeeder implements ApplicationRunner {
         public String detailDescription;
         public Integer soldQuantity;
         public Integer inventoryQuantity;
+        public String material;
         public List<String> categories;
     }
 
