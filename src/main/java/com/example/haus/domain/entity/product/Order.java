@@ -68,6 +68,9 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "promotion_id")
     Promotion promotion;
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    List<Address> addresses;
+
     // ---------------- Helper methods ----------------
 
     public void addOrderItem(OrderItem orderItem) {

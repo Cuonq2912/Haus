@@ -1,10 +1,9 @@
 package com.example.haus.domain.mapper;
 
+import com.example.haus.domain.dto.order.PaymentRequestDto;
 import com.example.haus.domain.dto.response.payment.PaymentResponseDto;
 import com.example.haus.domain.entity.product.payment.Payment;
-import org.mapstruct.Mapper;
-import org.mapstruct.NullValueCheckStrategy;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
@@ -13,4 +12,10 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 public interface PaymentMapper {
 
     PaymentResponseDto paymentToPaymentResponseDto(Payment payment);
+
+    @Mappings({
+            @Mapping(target = "gateway", source = "paymentGateway"),
+            @Mapping(target = "type", source = "paymentType")
+    })
+    Payment paymentRequestDtoToPayment(PaymentRequestDto paymentRequestDto);
 }

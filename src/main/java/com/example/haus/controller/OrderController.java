@@ -4,7 +4,11 @@ import com.example.haus.base.ResponseUtil;
 import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
+import com.example.haus.domain.dto.order.OrderAllRequestDto;
+import com.example.haus.domain.dto.order.OrderItemRequestDto;
+import com.example.haus.domain.dto.order.OrderRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
+import com.example.haus.domain.entity.product.OrderItem;
 import com.example.haus.domain.dto.request.order.BuyNowRequest;
 import com.example.haus.domain.dto.request.order.CheckoutRequest;
 import com.example.haus.domain.dto.response.product.OrderResponseDto;
@@ -25,6 +29,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
@@ -33,6 +39,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @RestApiV1
 @Validated
@@ -45,39 +52,57 @@ public class OrderController {
     OrderService orderService;
 
     @Operation(
-            summary = "Checkout từ giỏ hàng",
-            description = "Chuyển đổi các sản phẩm đã chọn trong giỏ hàng thành đơn hàng. Chỉ những sản phẩm được chọn (thông qua cartItemIds) sẽ được tạo thành order, các sản phẩm còn lại vẫn ở trong giỏ hàng.",
+            summary = "Tạo đơn hàng mới",
+            description = "Giúp người dùng tạo đơn hàng mới.",
             security = @SecurityRequirement(name = "Bearer Token")
     )
-    @PostMapping(UrlConstant.Order.CHECKOUT_FROM_CART)
-    public ResponseEntity<?> checkoutFromCart(@Valid @RequestBody CheckoutRequest request) {
-        String username = getCurrentUserId();
-        OrderResponseDto response = orderService.checkoutFromCart(username, request);
-
+    @PostMapping("/api/v1/orders")
+    public ResponseEntity<?> createOrder(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody OrderAllRequestDto orderAllRequestDto) {
+        String username = userDetails.getUsername();
+        log.info("Username = {}", username);
         return ResponseUtil.success(
-                HttpStatus.CREATED,
-                SuccessMessage.Order.CHECKOUT_SUCCESS,
-                response
+                SuccessMessage.Order.CREATE_ORDER_SUCCESS,
+                orderService.createOrder(username, orderAllRequestDto)
         );
     }
 
-    @Operation(
-            summary = "Mua ngay",
-            description = "Tạo đơn hàng trực tiếp từ 1 sản phẩm mà không cần thêm vào giỏ hàng.",
-            security = @SecurityRequirement(name = "Bearer Token")
-    )
-    @PostMapping(UrlConstant.Order.BUY_NOW)
-    public ResponseEntity<?> buyNow(@Valid @RequestBody BuyNowRequest request) {
-        String username = getCurrentUserId();
-        OrderResponseDto response = orderService.buyNow(username, request);
 
-        return ResponseUtil.success(
-                HttpStatus.CREATED,
-                SuccessMessage.Order.BUY_NOW_SUCCESS,
-                response
-        );
-    }
+        @Tag(name = "public-order-controller", description = "Public Order APIs")
+        @Operation(
+                summary = "Lấy tất đơn hàng",
+                description = "Lấy danh sách tất cả đơn hàng với phân trang và filter theo trạng thái",
+                parameters = {
+                        @Parameter(name = "status", description = "Order status để filter (optional)",
+                                schema = @Schema(allowableValues = {
+                                        "pending", "confirmed", "processing", "delivered",
+                                        "completed", "returned", "cancelled", "refunded",}), example = "pending")
+                }, security = @SecurityRequirement(name = "Bearer Token")
+        )
+        @GetMapping(UrlConstant.Order.GET_ALL_ORDERS)
+        public ResponseEntity<?> getAllOrders(
+                        @RequestParam(defaultValue = "1") Integer pageNum,
+                        @RequestParam(defaultValue = "10") Integer pageSize,
+                        @RequestParam(required = false) String status) {
 
+                PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
+                return ResponseUtil.success(
+                                SuccessMessage.Order.GET_ORDER_SUCCESS,
+                                orderService.getAllOrders(paginationRequest, status));
+        }
+
+        @Tag(name = "admin-order-controller", description = "Admin Order APIs")
+        @Operation(
+                summary = "Lấy đơn hàng theo ID",
+                description = "Dùng để lấy đơn hàng theo id",
+                security = @SecurityRequirement(name = "Bearer Token")
+        )
+        @GetMapping(UrlConstant.Order.GET_ORDER_BY_ID)
+        public ResponseEntity<?> getOrderById(
+                        @PathVariable Long id) {
+                return ResponseUtil.success(
+                                SuccessMessage.Order.GET_ORDER_SUCCESS,
+                                orderService.getOrderById(id));
+        }
     @Operation(
             summary = "Lấy chi tiết và xuất hóa đơn",
             description = "Truy vấn toàn bộ dữ liệu đơn hàng, sản phẩm, và người dùng để tạo hóa đơn."
@@ -130,7 +155,7 @@ public class OrderController {
         }
     }
     @Operation(
-            summary = "Lấy đơn hàng theo ID(admin)",
+            summary = "Lấy đơn hàng theo ID",
             description = "Dùng để lấy đơn hàng theo id",
             security = @SecurityRequirement(name = "Bearer Token")
     )

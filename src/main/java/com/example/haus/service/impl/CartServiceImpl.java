@@ -167,7 +167,7 @@ public class CartServiceImpl implements CartService {
             }
         }
 
-        var currentVariantInCart = updateCartRequest.newVariantId() != null ? updateCartRequest.newVariantId() : updateCartRequest.newVariantId();
+        var currentVariantInCart = updateCartRequest.newVariantId() != null ? updateCartRequest.newVariantId() : updateCartRequest.oldVariantId();
 
         ProductVariation productVariation = productVariationRepository.findByIdAndIsDeletedFalse(currentVariantInCart)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
@@ -187,7 +187,7 @@ public class CartServiceImpl implements CartService {
     }
 
     private CartResponseDto getAllProductVariantInCart(CartResponseDto cartResponseDto) {
-        if (cartResponseDto == null || cartResponseDto.getCartItems().isEmpty()) { // Sửa getCartItems() -> getProducts()
+        if (cartResponseDto == null) {
             throw new ResourceNotFoundException(ErrorMessage.Cart.ERR_CART_NOT_FOUND);
         }
 
@@ -195,7 +195,7 @@ public class CartServiceImpl implements CartService {
             Product product = productRepository.findByIdWithActiveVariations(item.getId());
 
             if (product != null) {
-                List<Long> existingVariantIds = item.getProductVariants().stream()
+                List<Long> existingVariantIds = item.getProductVariations().stream()
                         .map(com.example.haus.domain.dto.response.cart.ProductVariationInCartResponseDto::getId)
                         .toList();
 
@@ -207,7 +207,7 @@ public class CartServiceImpl implements CartService {
                 for (var variant : missingVariations) {
                     ProductVariationInCartResponseDto productVariationInCartResponseDto = ProductVariationMapper.INSTANCE.productVariationToProductVariationInCartDto(variant);
                     productVariationInCartResponseDto.setIsSelected(false);
-                    item.getProductVariants().add(
+                    item.getProductVariations().add(
                             productVariationInCartResponseDto
                     );
                 }

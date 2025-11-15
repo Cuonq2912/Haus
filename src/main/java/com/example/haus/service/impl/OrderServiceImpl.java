@@ -2,6 +2,10 @@ package com.example.haus.service.impl;
 
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.OrderStatus;
+import com.example.haus.domain.dto.order.OrderAllRequestDto;
+import com.example.haus.domain.dto.order.OrderItemRequestDto;
+import com.example.haus.domain.dto.order.OrderRequestDto;
+import com.example.haus.domain.dto.order.PaymentRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.order.BuyNowRequest;
@@ -10,6 +14,11 @@ import com.example.haus.domain.dto.response.invoice.InvoiceItemDto;
 import com.example.haus.domain.dto.response.invoice.InvoiceResponseDto;
 import com.example.haus.domain.dto.response.product.OrderResponseDto;
 import com.example.haus.domain.dto.response.user.UserResponseDto;
+import com.example.haus.domain.entity.address.Address;
+import com.example.haus.domain.entity.product.Order;
+import com.example.haus.domain.entity.product.OrderItem;
+import com.example.haus.domain.entity.product.ProductVariation;
+import com.example.haus.domain.entity.product.Promotion;
 import com.example.haus.domain.entity.address.Address;
 import com.example.haus.domain.entity.product.*;
 import com.example.haus.domain.entity.product.payment.Payment;
@@ -43,8 +52,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
+
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
@@ -53,6 +66,12 @@ import java.util.function.BiConsumer;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j(topic = "ORDER-SERVICE")
 public class OrderServiceImpl implements OrderService {
+
+    AddressMapper addressMapper;
+
+    AddressRepository addressRepository;
+
+    OrderItemMapper orderItemMapper;
 
     OrderRepository orderRepository;
     CartRepository cartRepository;
@@ -74,6 +93,16 @@ public class OrderServiceImpl implements OrderService {
     PromotionMapper promotionMapper;
 
     MediaMapper mediaMapper;
+
+    UserRepository userRepository;
+
+    PaymentRepository paymentRepository;
+
+    OrderItemRepository orderItemRepository;
+
+    ProductVariationRepository productVariationRepository;
+
+    PromotionRepository promotionRepository;
 
     private static double totalPrice = 0;
 
@@ -215,6 +244,58 @@ public class OrderServiceImpl implements OrderService {
                 .type(payment.getType())
                 .status(payment.getStatus())
                 .build();
+    }
+
+    @Override
+    public Long createOrder(String username, OrderAllRequestDto orderAllRequestDto) {
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
+                () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED)
+        );
+
+        Order order = orderMapper.orderRequestDtoToOrder(orderAllRequestDto.getOrder());
+        order.setStatus(OrderStatus.PENDING);
+
+        List<OrderItem> orderItems = orderAllRequestDto.getOrderItems().stream().map(orderItemRequestDto -> {
+            ProductVariation productVariation = productVariationRepository.findByIdAndIsDeletedFalse(orderItemRequestDto.getProductVariationId())
+                    .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
+
+            OrderItem orderItem = orderItemMapper.orderItemRequestDtoToOrderItem(orderItemRequestDto);
+            orderItem.setProductVariation(productVariation);
+
+            orderItem.setOrder(order); // Gán Order cho OrderItem
+
+            return orderItem;
+        }).toList();
+
+
+        Payment payment = paymentMapper.paymentRequestDtoToPayment(orderAllRequestDto.getPayment());
+        payment.setStatus(PaymentStatus.PENDING);
+        payment.setAmount(orderAllRequestDto.getOrder().getTotalAmount());
+        payment.setExpireAt(new Date(System.currentTimeMillis() + 1000 * 60 * 20));
+
+        payment.setOrder(order);
+
+
+        Promotion promotion = promotionRepository.findByIdAndIsDeletedFalse(orderAllRequestDto.getOrder().getPromotionId())
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
+
+        List<Address> addresses = orderAllRequestDto.getOrder().getAddresses().stream().map(addressRequestDto -> {
+            Address address = addressRepository.findByIdAndIsDeletedFalse(addressRequestDto.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Address.ERR_ADDRESS_NOT_FOUND));
+            address.setIsSelected(addressRequestDto.getIsSelected());
+
+            return address;
+        }).toList();
+
+        order.setUser(user);
+        order.setOrderItems(orderItems);
+        order.setPayment(payment);
+        order.setPromotion(promotion);
+        order.setAddresses(addresses);
+
+        Order savedOrder = orderRepository.save(order);
+
+        return savedOrder.getId();
     }
 
     @Override
@@ -704,7 +785,7 @@ public class OrderServiceImpl implements OrderService {
 
         for (CartItem cartItem : selectedCartItems) {
             ProductVariation variation = cartItem.getProductVariation();
-            
+
             if (variation.getInventoryQuantity() < cartItem.getQuantity()) {
                 throw new InvalidDataException(
                     ErrorMessage.Order.ERR_INSUFFICIENT_STOCK + ": " + variation.getProduct().getProductName()
@@ -719,7 +800,7 @@ public class OrderServiceImpl implements OrderService {
                     .quantity(cartItem.getQuantity())
                     .priceAtSale(variation.getPrice())
                     .build();
-            
+
             orderItems.add(orderItem);
 
             variation.setInventoryQuantity(variation.getInventoryQuantity() - cartItem.getQuantity());
@@ -731,7 +812,7 @@ public class OrderServiceImpl implements OrderService {
         if (request.getPromotionCode() != null && !request.getPromotionCode().trim().isEmpty()) {
             promotion = promotionRepository.findByPromotionCodeAndIsDeletedFalse(request.getPromotionCode())
                     .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
-            
+
             discount = subtotal * (promotion.getDiscountPercent() / 100.0);
         }
 
@@ -765,7 +846,7 @@ public class OrderServiceImpl implements OrderService {
                 .status(PaymentStatus.PENDING)
                 .order(order)
                 .build();
-        
+
         order.setPayment(payment);
 
         Order savedOrder = orderRepository.save(order);
@@ -806,7 +887,7 @@ public class OrderServiceImpl implements OrderService {
         if (request.getPromotionCode() != null && !request.getPromotionCode().trim().isEmpty()) {
             promotion = promotionRepository.findByPromotionCodeAndIsDeletedFalse(request.getPromotionCode())
                     .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
-            
+
             discount = subtotal * (promotion.getDiscountPercent() / 100.0);
         }
 
@@ -844,7 +925,7 @@ public class OrderServiceImpl implements OrderService {
                 .status(PaymentStatus.PENDING)
                 .order(order)
                 .build();
-        
+
         order.setPayment(payment);
 
         variation.setInventoryQuantity(variation.getInventoryQuantity() - request.getQuantity());

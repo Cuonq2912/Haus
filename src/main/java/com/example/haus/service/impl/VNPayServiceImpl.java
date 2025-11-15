@@ -244,7 +244,7 @@ public class VNPayServiceImpl implements VNPayService {
             paymentRepository.save(payment);
             orderRepository.save(order);
             
-            log.info("IPN: Database updated successfully for order {}", orderId);
+            log.info("IPN: Database updated successfully for order{}", orderId);
 
             response.put("RspCode", "00");
             response.put("Message", "Confirm Success");
@@ -265,20 +265,15 @@ public class VNPayServiceImpl implements VNPayService {
             return result;
         }
         String responseCode = params.get("vnp_ResponseCode");
-        String txnRef = params.get("vnp_TxnRef");
-        String transactionNo = params.get("vnp_TransactionNo");
-        String bankCode = params.get("vnp_BankCode");
 
-        Boolean isSuccess = (Boolean) SUCCESS_CODE.equals(responseCode) && checkIpnList.get(params.get("vnp_TxnRef").split("-")[0]);
-        result.put("success", isSuccess);
-        result.put("orderId", txnRef.split("-")[0]);
-        result.put("transactionNo", transactionNo);
-        result.put("bankCode", bankCode);
+        Boolean isSuccess = (Boolean)(SUCCESS_CODE.equals(responseCode)
+                && Boolean.TRUE.equals(checkIpnList.get(params.get("vnp_TxnRef").split("-")[0])));
+
         result.put("message", isSuccess ? "Thanh toán thành công" : "Thanh toán thất bại");
 
         checkIpnList.remove(params.get("vnp_TxnRef").split("-")[0]);
 
-        log.info("Return: Transaction {}, Success: {}", transactionNo, isSuccess);
+        log.info("Response code = {} and success = {}", responseCode, isSuccess);
 
         return result;
     }
@@ -296,7 +291,7 @@ public class VNPayServiceImpl implements VNPayService {
     }
 
     public void updateInventoryForCompletedOrder(Order order) {
-        if (order == null || order.getOrderItems() == null || order.getOrderItems().isEmpty()) {
+        if (order == null) {
             log.warn("Attempted to update inventory for a null or empty order.");
             throw new InvalidDataException(ErrorMessage.Order.ERR_ORDER_ITEMS_EMPTY);
         }
@@ -331,8 +326,12 @@ public class VNPayServiceImpl implements VNPayService {
 
             productIdsToUpdate.add(variation.getProduct().getId());
         }
+        totalAmountCheck += order.getShippingFee();
 
-        if (totalAmountCheck != order.getTotalAmount()) {
+        log.info("totalCheck = {}", totalAmountCheck);
+        log.info("totaorder.getTotalAmount()lCheck = {}", order.getTotalAmount());
+
+        if (!(totalAmountCheck.toString().equals(order.getTotalAmount().toString()))) {
             throw new InvalidDataException(ErrorMessage.Payment.ERR_ORDER_TOTAL_AMOUNT_NOT_MATCH);
         }
 

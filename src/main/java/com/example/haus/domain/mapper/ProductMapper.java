@@ -15,6 +15,7 @@ import org.mapstruct.factory.Mappers;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         uses = {CategoryMapper.class, MediaMapper.class, ProductVariationMapper.class}
 )
+
 public interface ProductMapper {
     ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
 
@@ -24,10 +25,11 @@ public interface ProductMapper {
             expression = "java(product.getCategories().stream()" +
                     "    .map(com.example.haus.domain.entity.product.Category::getPromotion)" +
                     "    .filter(java.util.Objects::nonNull)" +
+                    "    .filter(p -> com.example.haus.constant.promotion.PromotionStatus.ACTIVE.equals(p.getStatus()))" +
                     "    .map(com.example.haus.domain.entity.product.Promotion::getDiscountPercent)" +
                     "    .filter(java.util.Objects::nonNull)" +
                     "    .max(java.util.Comparator.naturalOrder())" +
-                    "    .orElse(0.0f))")
+                    "    .orElse(null))")
     @Mapping(target = "daysRemaining",
             expression = "java(product.getCategories().stream()" +
                     "    .map(com.example.haus.domain.entity.product.Category::getPromotion)" +
@@ -48,7 +50,7 @@ public interface ProductMapper {
 
     @Mapping(target = "productName", source = "productName")
     @Mapping(target = "id", source = "id")
-    @Mapping(target = "productVariants", ignore = true)
+    @Mapping(target = "productVariations", ignore = true)
     //CartItemResponse === ProductInCart
     ProductInCartResponseDto toProductInCartResponseDto(Product product);
 }

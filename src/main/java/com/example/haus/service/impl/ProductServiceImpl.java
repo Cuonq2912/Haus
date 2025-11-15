@@ -284,7 +284,10 @@ public class ProductServiceImpl implements ProductService {
         Page<Product> productsPage = getProductsPageByFilter(null, paginationRequest, sortBy, search);
 
         List<ProductResponseDto> productResponseDtoList = productsPage.getContent().stream()
-                .map(productMapper::productToProductResponse)
+                .map(product -> {
+                    return productMapper.productToProductResponse(product);
+
+                })
                 .toList();
 
         PaginationCustom paginationCustom = createPagination(paginationRequest, sortBy, productsPage);

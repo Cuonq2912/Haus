@@ -1,13 +1,15 @@
 package com.example.haus.domain.entity.product.payment;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
+@JsonFormat(shape = JsonFormat.Shape.STRING)
 public enum PaymentType {
-    @JsonProperty("cash_on_delivery")
+    @JsonProperty("CASH_ON_DELIVERY")
     COD,
 
-    @JsonProperty("online_payment")
+    @JsonProperty("ONLINE_PAYMENT")
     ONLINE_PAYMENT;
 }

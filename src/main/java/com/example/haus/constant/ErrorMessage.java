@@ -120,7 +120,7 @@ public class ErrorMessage {
         public static final String ERR_PRODUCT_ALREADY_DELETED = "exception.product.already.deleted";
         public static final String ERR_PRODUCT_VARIATION_NOT_EXISTED = "exception.product.variation.not.existed";
         public static final String ERR_PRODUCT_VARIATION_ALREADY_DELETED = "exception.product.variation.already.deleted";
-        public static final String ERR_PRODUCT_INVENTORY_QUANTITY_LESS_THAN_1 = "exception.product.inventory.quantity.less.than.1";
+        public static final String ERR_PRODUCT_FAVORITE_FAILED = "exception.product.favorite.failed";
     }
 
     public static class Order {
@@ -141,6 +141,20 @@ public class ErrorMessage {
         public static final String ERR_PRODUCT_OUT_OF_STOCK = "exception.order.product.out.of.stock";
         public static final String ERR_INSUFFICIENT_STOCK = "exception.order.insufficient.stock";
         public static final String ERR_INVALID_QUANTITY = "exception.order.invalid.quantity";
+
+        //request
+        public static final String ERR_PRODUCTS_EMPTY = "exception.products.empty";
+        public static final String ERR_ORDER_NUMBER_EMPTY = "exception.order.number.empty";
+        public static final String ERR_SHIPPING_FEE_EMPTY = "exception.shipping.fee.empty";
+        public static final String ERR_TOTAL_AMOUNT_EMPTY = "exception.total.amount.empty";
+        public static final String ERR_ORDER_DATE_EMPTY = "exception.order.date.empty";
+        public static final String ERR_ADDRESS_ID_EMPTY = "exception.address.id.empty";
+        public static final String ERR_PROMOTION_ID_EMPTY = "exception.promotion.id.empty";
+        public static final String ERR_PAYMENT_TYPE_EMPTY = "exception.promotion.type.empty";
+        public static final String ERR_PRODUCT_VARIATION_ID_EMPTY = "exception.product.variation.id.empty";
+        public static final String ERR_QUANTITY_EMPTY = "exception.quantity.empty";
+        public static final String ERR_PRICE_AT_SALE_EMPTY = "exception.price.at.sale.empty";
+        public static final String ERR_NUMBER_INVALID = "exception.number.invalid";
 
     }
 
@@ -185,12 +199,16 @@ public class ErrorMessage {
 
         private Address() {}
 
+        public static final String ERR_RECIPIENT_NAME_EMPTY = "exception.recipient.name.empty";
+        public static final String ERR_PHONE_NUMBER_EMPTY = "exception.phone.number.empty";
         public static final String ERR_COUNTRY_EMPTY = "exception.country.empty";
         public static final String ERR_CITY_EMPTY = "exception.city.empty";
         public static final String ERR_DISTRICT_EMPTY = "exception.district.empty";
         public static final String ERR_COMMUNE_EMPTY = "exception.commune.empty";
         public static final String ERR_DETAIL_ADDRESS_NULL = "exception.detail.address.null";
         public static final String ERR_ADDRESS_NOT_FOUND = "exception.address.not.found";
+        public static final String ERR_ID_EMPTY = "exception.id.found";
+        public static final String ERR_IS_SELECTED_NULL = "exception.is.selected.found";
     }
 
     public static class Review {

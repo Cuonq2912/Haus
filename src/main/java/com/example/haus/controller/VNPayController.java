@@ -73,6 +73,7 @@ public class VNPayController {
     @GetMapping(UrlConstant.Payment.VNPAY_RETURN)
     public ResponseEntity<?> vnPayReturn(@RequestParam Map<String, String> allParams) {
         Map<String, Object> result = vnPayService.handleVNPayReturn(allParams);
+        log.info("success = {}", result.get("success"));
         boolean success = (boolean) result.get("success");
         return success
                 ? ResponseUtil.success(HttpStatus.OK, SuccessMessage.Payment.CALLBACK_VNPAY_SUCCESS, result)

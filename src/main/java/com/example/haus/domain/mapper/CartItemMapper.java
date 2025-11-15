@@ -34,7 +34,7 @@ public interface CartItemMapper {
 
                     ProductInCartResponseDto productInCartResponseDto = ProductMapper.INSTANCE.toProductInCartResponseDto(product);
 
-                    productInCartResponseDto.setProductVariants(
+                    productInCartResponseDto.setProductVariations(
                             ProductVariationMapper.INSTANCE.cartItemListToProductVariationInCartDtoList(items)
                     );
                     return productInCartResponseDto;
