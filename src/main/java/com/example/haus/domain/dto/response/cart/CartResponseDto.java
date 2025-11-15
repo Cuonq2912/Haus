@@ -1,6 +1,5 @@
 package com.example.haus.domain.dto.response.cart;
 
-import com.example.haus.domain.entity.product.CartItem;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -15,9 +14,9 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CartResponse {
-    List<CartItemResponse> items;
+public class CartResponseDto {
+    List<ProductInCartResponseDto> cartItems;
 
-    @UpdateTimestamp
-    LocalDateTime lastUpdated;
+    @Builder.Default
+    LocalDateTime lastUpdated = LocalDateTime.now();
 }

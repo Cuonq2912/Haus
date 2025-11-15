@@ -24,6 +24,4 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "WHERE o.id = :orderId")
     Optional<Order> findOrderDetailsForInvoice(@Param("orderId") Long orderId);
 
-    // Có thể thêm các phương thức khác tại đây, ví dụ:
-    // Optional<Order> findByOrderNumber(String orderNumber);
 }

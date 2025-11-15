@@ -3,7 +3,10 @@ package com.example.haus.service.impl;
 import com.example.haus.config.VNPayConfig;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.OrderStatus;
+import com.example.haus.domain.dto.request.auth.otp.PendingResetPasswordRequestDto;
 import com.example.haus.domain.entity.product.Order;
+import com.example.haus.domain.entity.product.OrderItem;
+import com.example.haus.domain.entity.product.ProductVariation;
 import com.example.haus.domain.entity.product.payment.Payment;
 import com.example.haus.domain.entity.product.payment.PaymentGateway;
 import com.example.haus.domain.entity.product.payment.PaymentStatus;
@@ -12,8 +15,10 @@ import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.OrderRepository;
 import com.example.haus.repository.PaymentRepository;
+import com.example.haus.repository.ProductVariationRepository;
 import com.example.haus.service.VNPayService;
 import com.example.haus.util.PaymentUtil;
+import com.example.haus.util.UpdateSoldQuantityUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -39,6 +45,12 @@ public class VNPayServiceImpl implements VNPayService {
     final VNPayConfig vnPayConfig;
 
     final PaymentRepository paymentRepository;
+
+    final ProductVariationRepository productVariationRepository;
+
+    final UpdateSoldQuantityUtil updateSoldQuantityUtil;
+
+    Map<String, Boolean> checkIpnList = new ConcurrentHashMap<>();
 
     @Value("${payment.vnPay.maxTime}")
     int maxPaymentTime;
@@ -177,7 +189,7 @@ public class VNPayServiceImpl implements VNPayService {
     @Transactional
     public Map<String, String> processVNPayIPN(Map<String, String> params) {
         Map<String, String> response = new HashMap<>();
-        try{
+
             log.info("IPN: Received params: {}", params);
             
             if (!verifySignature(params)) {  // ✅ ĐÚNG: Nếu signature KHÔNG hợp lệ
@@ -219,6 +231,7 @@ public class VNPayServiceImpl implements VNPayService {
             }
 
             if (SUCCESS_CODE.equals(responseCode)) {
+                updateInventoryForCompletedOrder(order);
                 payment.setStatus(PaymentStatus.COMPLETED);
                 order.setStatus(OrderStatus.COMPLETED);
                 log.info("IPN: Order {} marked as COMPLETED", orderId);
@@ -231,16 +244,11 @@ public class VNPayServiceImpl implements VNPayService {
             paymentRepository.save(payment);
             orderRepository.save(order);
             
-            log.info("IPN: Database updated successfully for order {}", orderId);
+            log.info("IPN: Database updated successfully for order{}", orderId);
 
             response.put("RspCode", "00");
             response.put("Message", "Confirm Success");
-
-        } catch (Exception e){
-            log.error("IPN: Error processing payment: ", e);
-            response.put("RspCode", "99");
-            response.put("Message", "Unknown error");
-        }
+            checkIpnList.put(params.get("vnp_TxnRef").split("-")[0], true);
 
         return response;
     }
@@ -257,18 +265,15 @@ public class VNPayServiceImpl implements VNPayService {
             return result;
         }
         String responseCode = params.get("vnp_ResponseCode");
-        String txnRef = params.get("vnp_TxnRef");
-        String transactionNo = params.get("vnp_TransactionNo");
-        String bankCode = params.get("vnp_BankCode");
 
-        boolean isSuccess = SUCCESS_CODE.equals(responseCode);
-        result.put("success", isSuccess);
-        result.put("orderId", txnRef.split("-")[0]);
-        result.put("transactionNo", transactionNo);
-        result.put("bankCode", bankCode);
+        Boolean isSuccess = (Boolean)(SUCCESS_CODE.equals(responseCode)
+                && Boolean.TRUE.equals(checkIpnList.get(params.get("vnp_TxnRef").split("-")[0])));
+
         result.put("message", isSuccess ? "Thanh toán thành công" : "Thanh toán thất bại");
 
-        log.info("Return: Transaction {}, Success: {}", transactionNo, isSuccess);
+        checkIpnList.remove(params.get("vnp_TxnRef").split("-")[0]);
+
+        log.info("Response code = {} and success = {}", responseCode, isSuccess);
 
         return result;
     }
@@ -283,5 +288,55 @@ public class VNPayServiceImpl implements VNPayService {
         String calculatedHash = PaymentUtil.hashAllFields(fieldsToHash, vnPayConfig.getVnp_HashSecret());
 
         return calculatedHash.equalsIgnoreCase(receivedHash);  // ✅ ĐÚNG: TRUE = valid, FALSE = invalid
+    }
+
+    public void updateInventoryForCompletedOrder(Order order) {
+        if (order == null) {
+            log.warn("Attempted to update inventory for a null or empty order.");
+            throw new InvalidDataException(ErrorMessage.Order.ERR_ORDER_ITEMS_EMPTY);
+        }
+
+//        order.getOrderItems().size();
+
+        Set<Long> productIdsToUpdate = new HashSet<>();
+        Double totalAmountCheck = 0.0;
+
+        for (OrderItem item : order.getOrderItems()) {
+            ProductVariation variation = item.getProductVariation();
+            int purchasedQuantity = item.getQuantity();
+
+            if (variation == null) {
+                log.error("Order Item {} is missing Product Variation.", item.getId());
+                continue;
+            }
+
+            int currentInventory = variation.getInventoryQuantity();
+
+            if (currentInventory < purchasedQuantity) {
+                throw new InvalidDataException("Insufficient inventory for product variation " + variation.getId());
+            }
+
+            variation.setInventoryQuantity(currentInventory - purchasedQuantity);
+            variation.setSoldQuantity(variation.getSoldQuantity() + purchasedQuantity);
+
+            variation.setUpdatedAt(new Date());
+            totalAmountCheck += item.getPriceAtSale() * item.getQuantity();
+
+            productVariationRepository.save(variation);
+
+            productIdsToUpdate.add(variation.getProduct().getId());
+        }
+        totalAmountCheck += order.getShippingFee();
+
+        log.info("totalCheck = {}", totalAmountCheck);
+        log.info("totaorder.getTotalAmount()lCheck = {}", order.getTotalAmount());
+
+        if (!(totalAmountCheck.toString().equals(order.getTotalAmount().toString()))) {
+            throw new InvalidDataException(ErrorMessage.Payment.ERR_ORDER_TOTAL_AMOUNT_NOT_MATCH);
+        }
+
+        for (Long productId : productIdsToUpdate) {
+            updateSoldQuantityUtil.updateProductTotalInventoryAndSoldQuantity(productId);
+        }
     }
 }

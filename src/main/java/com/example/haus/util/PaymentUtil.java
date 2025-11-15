@@ -1,5 +1,9 @@
 package com.example.haus.util;
 
+import com.example.haus.constant.ErrorMessage;
+import com.example.haus.domain.entity.product.Product;
+import com.example.haus.domain.entity.product.ProductVariation;
+import com.example.haus.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;

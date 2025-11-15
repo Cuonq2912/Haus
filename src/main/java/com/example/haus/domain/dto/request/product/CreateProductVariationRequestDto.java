@@ -14,9 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateProductVariationRequestDto {
 
-    @Schema(description = "File ảnh sản phẩm")
-    MultipartFile imageFile;
-
     @Schema(description = "Màu sắc sản phẩm", example = "Đỏ")
     @NotBlank(message = ErrorMessage.NOT_BLANK_FIELD)
     String color;

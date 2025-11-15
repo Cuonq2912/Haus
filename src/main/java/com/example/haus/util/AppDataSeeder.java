@@ -75,24 +75,27 @@ public class AppDataSeeder implements ApplicationRunner {
             log.info("Start seeding product from JSON...");
 
             List<Product> productsFromDB = productRepository.findAll();
+            List<ProductJsonDto> productDtosFromJson = objectMapper.readValue(is, new TypeReference<>() {});
 
-            List<ProductJsonDto> productDtosFromJson = objectMapper.readValue(is, new TypeReference<>() {
-            });
-
-            if (productsFromDB.isEmpty()) {
-                for (ProductJsonDto dto : productDtosFromJson) {
+            for (ProductJsonDto dto : productDtosFromJson) {
+                // Chỉ chèn nếu DB rỗng HOẶC sản phẩm chưa tồn tại
+                if (productsFromDB.isEmpty() || !productRepository.existsByProductCode(dto.productCode)) {
                     Product product = convertToProduct(dto);
                     if (product != null) {
-                        productRepository.save(product);
-                    }
-                }
-            } else {
-                for (ProductJsonDto dto : productDtosFromJson) {
-                    if (!productRepository.existsByProductCode(dto.productCode)) {
-                        Product product = convertToProduct(dto);
-                        if (product != null) {
-                            productRepository.save(product);
+                        if (dto.categories != null) {
+                            for (String categoryName : dto.categories) {
+                                Optional<Category> categoryOpt = categoryRepository.findByCategoryNameIgnoreCase(categoryName);
+
+                                if (categoryOpt.isPresent()) {
+                                    product.addCategory(categoryOpt.get());
+                                } else {
+                                    log.warn("Category '{}' not found for Product: {}", categoryName, dto.productCode);
+                                }
+                            }
                         }
+                        // -----------------------------------------------------------
+
+                        productRepository.save(product);
                     }
                 }
             }
@@ -114,6 +117,7 @@ public class AppDataSeeder implements ApplicationRunner {
                     .detailDescription(dto.detailDescription)
                     .inventoryQuantity(dto.inventoryQuantity)
                     .material(dto.material)
+                    .soldQuantity(dto.soldQuantity)
                     .isDeleted(false)
                     .build();
 
@@ -131,6 +135,7 @@ public class AppDataSeeder implements ApplicationRunner {
         public Double price;
         public String description;
         public String detailDescription;
+        public Integer soldQuantity;
         public Integer inventoryQuantity;
         public String material;
         public List<String> categories;
@@ -192,6 +197,7 @@ public class AppDataSeeder implements ApplicationRunner {
                     .size(dto.size)
                     .price(dto.price)
                     .inventoryQuantity(dto.inventoryQuantity)
+                    .soldQuantity(dto.soldQuantity)
                     .isDeleted(dto.isDeleted != null ? dto.isDeleted : false)
                     .product(productOpt.get())
                     .build();
@@ -209,6 +215,7 @@ public class AppDataSeeder implements ApplicationRunner {
         public String size;
         public Double price;
         public Integer inventoryQuantity;
+        public Integer soldQuantity;
         public Boolean isDeleted;
         public Long productId;
     }

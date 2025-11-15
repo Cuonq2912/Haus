@@ -284,7 +284,10 @@ public class ProductServiceImpl implements ProductService {
         Page<Product> productsPage = getProductsPageByFilter(null, paginationRequest, sortBy, search);
 
         List<ProductResponseDto> productResponseDtoList = productsPage.getContent().stream()
-                .map(productMapper::productToProductResponse)
+                .map(product -> {
+                    return productMapper.productToProductResponse(product);
+
+                })
                 .toList();
 
         PaginationCustom paginationCustom = createPagination(paginationRequest, sortBy, productsPage);
@@ -351,29 +354,26 @@ public class ProductServiceImpl implements ProductService {
             predicate = cb.and(predicate, categoryPredicate);
         }
 
-        if (searchCriteriaList.stream().anyMatch(c -> c.getKey().equalsIgnoreCase("material"))) {
-            List<String> materialValues = searchCriteriaList.stream()
-                    .filter(c -> c.getKey().equalsIgnoreCase("material"))
-                    .map(SearchCriteria::getValue)
-                    .map(Object::toString)
-                    .toList();
-            if (materialValues.size() > 1) {
-                predicate = cb.and(predicate, root.get("material").in(materialValues));
-            }
-        }
+        Predicate deletedPredicate = cb.equal(root.get("isDeleted"), false);
+        predicate = cb.and(predicate, deletedPredicate);
 
         query.where(predicate);
 
         if (sortBy != null) {
             if ("asc".equalsIgnoreCase(sortBy)) {
                 query.orderBy(cb.asc(root.get("price")));
-                requestDto.setSortBy("price");
-                requestDto.setSortType(sortBy);
             } else if ("desc".equalsIgnoreCase(sortBy)) {
                 query.orderBy(cb.desc(root.get("price")));
-                requestDto.setSortBy("price");
-                requestDto.setSortType(sortBy);
-            } else if ("discount_asc".equalsIgnoreCase(sortBy) || "discount_desc".equalsIgnoreCase(sortBy)) {
+            } else if ("sold_quantity_asc".equalsIgnoreCase(sortBy)) {
+                query.orderBy(cb.asc(root.get("soldQuantity")));
+            } else if ("sold_quantity_desc".equalsIgnoreCase(sortBy)) {
+                query.orderBy(cb.desc(root.get("soldQuantity")));
+            } else if ("created_at_asc".equalsIgnoreCase(sortBy)) {
+                query.orderBy(cb.asc(root.get("createdAt")));
+            } else if ("created_at_desc".equalsIgnoreCase(sortBy)) {
+                query.orderBy(cb.desc(root.get("createdAt")));
+            }
+            else if ("discount_asc".equalsIgnoreCase(sortBy) || "discount_desc".equalsIgnoreCase(sortBy)) {
                 Join<Product, Category> categoryJoin = root.join("categories", JoinType.LEFT);
                 Join<Category, Promotion> promotionJoin = categoryJoin.join("promotion", JoinType.LEFT);
 
@@ -382,8 +382,6 @@ public class ProductServiceImpl implements ProductService {
                 } else {
                     query.orderBy(cb.desc(promotionJoin.get("discountPercent")));
                 }
-                requestDto.setSortBy("discount");
-                requestDto.setSortType(sortBy.substring(9));
             }
         }
 
@@ -412,21 +410,16 @@ public class ProductServiceImpl implements ProductService {
             predicate = cb.and(predicate, categoryPredicate);
         }
 
+        Predicate deletedPredicate = cb.equal(root.get("isDeleted"), false);
+        predicate = cb.and(predicate, deletedPredicate);
+
         if (searchCriteriaList.stream().anyMatch(c -> c.getKey().equalsIgnoreCase("color"))) {
             List<String> colorValues = searchCriteriaList.stream()
                     .filter(c -> c.getKey().equalsIgnoreCase("color"))
                     .map(SearchCriteria::getValue)
                     .map(Object::toString)
                     .toList();
-        }
-
-        if (searchCriteriaList.stream().anyMatch(c -> c.getKey().equalsIgnoreCase("material"))) {
-            List<String> materialValues = searchCriteriaList.stream()
-                    .filter(c -> c.getKey().equalsIgnoreCase("material"))
-                    .map(SearchCriteria::getValue)
-                    .map(Object::toString)
-                    .toList();
-            predicate = cb.and(predicate, root.get("material").in(materialValues));
+            predicate = cb.and(predicate, variantsJoin.get("color").in(colorValues));
         }
 
         countQuery.select(cb.countDistinct(root));
@@ -442,6 +435,11 @@ public class ProductServiceImpl implements ProductService {
             return "price";
         } else if ("discount_asc".equalsIgnoreCase(sortBy) || "discount_desc".equalsIgnoreCase(sortBy)) {
             return "discountPercent";
+        } else if ("sold_quantity_asc".equalsIgnoreCase(sortBy) || "sold_quantity_desc".equalsIgnoreCase(sortBy)) {
+            return "sold_quantity";
+        }
+        else if ("created_at_asc".equalsIgnoreCase(sortBy) || "created_at_desc".equalsIgnoreCase(sortBy)) {
+            return "created_at";
         }
         return null;
     }

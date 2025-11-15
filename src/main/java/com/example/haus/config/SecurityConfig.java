@@ -95,6 +95,8 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
                 "https://ahistorical-undelusory-soren.ngrok-free.dev",
+                "https://nonrestrained-karima-unexclaiming.ngrok-free.dev/",
+                "https://83fj4w28-5173.asse.devtunnels.ms/",
                 "https://sandbox.vnpayment.vn",
                 "https://test-payment.momo.vn")); // domain FE + ngrok + VNPay + MoMo
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));

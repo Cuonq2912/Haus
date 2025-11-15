@@ -1,18 +1,19 @@
 package com.example.haus.service;
 
 import com.example.haus.domain.dto.request.cart.CartRequest;
-import com.example.haus.domain.dto.response.cart.CartResponse;
+import com.example.haus.domain.dto.request.cart.UpdateCartRequest;
+import com.example.haus.domain.dto.response.cart.CartResponseDto;
 
 public interface CartService {
 
-    CartResponse addToCart(String email, CartRequest cartRequest);
+    CartResponseDto addToCart(String email, CartRequest cartRequest);
 
-    CartResponse getCart(String email);
+    CartResponseDto getCart(String email);
 
-    CartResponse removeItem(String email, Long productVariationId);
+    CartResponseDto removeItem(String email, Long productVariationId);
 
     void clearCart(String email);
 
-    CartResponse updateQuantity(String email, CartRequest cartRequest);
+    CartResponseDto updateCart(String email, UpdateCartRequest updateCartRequest);
 
 }

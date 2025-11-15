@@ -4,6 +4,7 @@
     "size": "200x180x90cm",
     "price": 8500000.0,
     "inventoryQuantity": 15,
+    "soldQuantity": 34,
     "isDeleted": false,
     "productId": 1
   },
@@ -12,6 +13,7 @@
     "size": "200x180x90cm",
     "price": 8800000.0,
     "inventoryQuantity": 10,
+    "soldQuantity": 55,
     "isDeleted": false,
     "productId": 1
   },
@@ -20,6 +22,7 @@
     "size": "200x180x90cm",
     "price": 9200000.0,
     "inventoryQuantity": 8,
+    "soldQuantity": 24,
     "isDeleted": false,
     "productId": 1
   },
@@ -28,6 +31,7 @@
     "size": "200x220x60cm",
     "price": 12000000.0,
     "inventoryQuantity": 8,
+    "soldQuantity": 64,
     "isDeleted": false,
     "productId": 2
   },
@@ -36,6 +40,7 @@
     "size": "200x220x60cm",
     "price": 12500000.0,
     "inventoryQuantity": 7,
+    "soldQuantity": 24,
     "isDeleted": false,
     "productId": 2
   },
@@ -44,6 +49,7 @@
     "size": "200x220x60cm",
     "price": 12300000.0,
     "inventoryQuantity": 5,
+    "soldQuantity": 76,
     "isDeleted": false,
     "productId": 2
   },
@@ -52,6 +58,7 @@
     "size": "100x40x150cm",
     "price": 3500000.0,
     "inventoryQuantity": 20,
+    "soldQuantity": 32,
     "isDeleted": false,
     "productId": 3
   },
@@ -60,6 +67,7 @@
     "size": "100x40x150cm",
     "price": 3600000.0,
     "inventoryQuantity": 10,
+    "soldQuantity": 53,
     "isDeleted": false,
     "productId": 3
   },
@@ -68,6 +76,7 @@
     "size": "280x200x85cm",
     "price": 18000000.0,
     "inventoryQuantity": 5,
+    "soldQuantity": 22,
     "isDeleted": false,
     "productId": 4
   },
@@ -76,6 +85,7 @@
     "size": "280x200x85cm",
     "price": 18500000.0,
     "inventoryQuantity": 3,
+    "soldQuantity": 45,
     "isDeleted": false,
     "productId": 4
   },
@@ -84,6 +94,7 @@
     "size": "280x200x85cm",
     "price": 18200000.0,
     "inventoryQuantity": 2,
+    "soldQuantity": 24,
     "isDeleted": false,
     "productId": 4
   },
@@ -92,6 +103,7 @@
     "size": "120x60x45cm",
     "price": 4200000.0,
     "inventoryQuantity": 15,
+    "soldQuantity": 12,
     "isDeleted": false,
     "productId": 5
   },
@@ -100,6 +112,7 @@
     "size": "100x50x40cm",
     "price": 3800000.0,
     "inventoryQuantity": 5,
+    "soldQuantity": 56,
     "isDeleted": false,
     "productId": 5
   },
@@ -108,6 +121,7 @@
     "size": "180x40x55cm",
     "price": 6800000.0,
     "inventoryQuantity": 12,
+    "soldQuantity": 49,
     "isDeleted": false,
     "productId": 6
   },
@@ -116,6 +130,7 @@
     "size": "180x40x55cm",
     "price": 7000000.0,
     "inventoryQuantity": 6,
+    "soldQuantity": 24,
     "isDeleted": false,
     "productId": 6
   },
@@ -124,6 +139,7 @@
     "size": "80x85x95cm",
     "price": 5500000.0,
     "inventoryQuantity": 10,
+    "soldQuantity": 98,
     "isDeleted": false,
     "productId": 7
   },
@@ -132,6 +148,7 @@
     "size": "80x85x95cm",
     "price": 5600000.0,
     "inventoryQuantity": 8,
+    "soldQuantity": 35,
     "isDeleted": false,
     "productId": 7
   },
@@ -140,6 +157,7 @@
     "size": "80x85x95cm",
     "price": 5700000.0,
     "inventoryQuantity": 7,
+    "soldQuantity": 12,
     "isDeleted": false,
     "productId": 7
   },
@@ -148,6 +166,7 @@
     "size": "Bàn: 120x70x75cm, Ghế: 60x60x85cm",
     "price": 9200000.0,
     "inventoryQuantity": 8,
+    "soldQuantity": 1,
     "isDeleted": false,
     "productId": 8
   },
@@ -156,6 +175,7 @@
     "size": "Bàn: 120x70x75cm, Ghế: 60x60x85cm",
     "price": 9500000.0,
     "inventoryQuantity": 4,
+    "soldQuantity": 2,
     "isDeleted": false,
     "productId": 8
   },
@@ -164,6 +184,7 @@
     "size": "170x110x165cm",
     "price": 7500000.0,
     "inventoryQuantity": 5,
+    "soldQuantity": 3,
     "isDeleted": false,
     "productId": 9
   },
@@ -172,6 +193,7 @@
     "size": "170x110x165cm",
     "price": 7600000.0,
     "inventoryQuantity": 3,
+    "soldQuantity": 5,
     "isDeleted": false,
     "productId": 9
   },
@@ -180,6 +202,7 @@
     "size": "3m",
     "price": 3200000.0,
     "inventoryQuantity": 8,
+    "soldQuantity": 10,
     "isDeleted": false,
     "productId": 10
   },
@@ -188,6 +211,7 @@
     "size": "3m",
     "price": 3200000.0,
     "inventoryQuantity": 4,
+    "soldQuantity": 55,
     "isDeleted": false,
     "productId": 10
   },
@@ -196,6 +220,7 @@
     "size": "3m",
     "price": 3200000.0,
     "inventoryQuantity": 3,
+    "soldQuantity": 12,
     "isDeleted": false,
     "productId": 10
   },
@@ -204,6 +229,7 @@
     "size": "Φ150x75cm",
     "price": 15000000.0,
     "inventoryQuantity": 5,
+    "soldQuantity": 14,
     "isDeleted": false,
     "productId": 11
   },
@@ -212,6 +238,7 @@
     "size": "Φ150x75cm",
     "price": 15500000.0,
     "inventoryQuantity": 3,
+    "soldQuantity": 18,
     "isDeleted": false,
     "productId": 11
   },
@@ -220,6 +247,7 @@
     "size": "120x40x180cm",
     "price": 8800000.0,
     "inventoryQuantity": 4,
+    "soldQuantity": 22,
     "isDeleted": false,
     "productId": 12
   },
@@ -228,6 +256,7 @@
     "size": "120x40x180cm",
     "price": 9000000.0,
     "inventoryQuantity": 2,
+    "soldQuantity": 33,
     "isDeleted": false,
     "productId": 12
   },
@@ -236,6 +265,7 @@
     "size": "45x50x82cm",
     "price": 2200000.0,
     "inventoryQuantity": 15,
+    "soldQuantity": 44,
     "isDeleted": false,
     "productId": 13
   },
@@ -244,6 +274,7 @@
     "size": "45x50x82cm",
     "price": 2250000.0,
     "inventoryQuantity": 12,
+    "soldQuantity": 32,
     "isDeleted": false,
     "productId": 13
   },
@@ -252,6 +283,7 @@
     "size": "45x50x82cm",
     "price": 2200000.0,
     "inventoryQuantity": 13,
+    "soldQuantity": 28,
     "isDeleted": false,
     "productId": 13
   },
@@ -260,6 +292,7 @@
     "size": "3.5x2.2x0.6m",
     "price": 35000000.0,
     "inventoryQuantity": 2,
+    "soldQuantity": 29,
     "isDeleted": false,
     "productId": 14
   },
@@ -268,6 +301,7 @@
     "size": "3.5x2.2x0.6m",
     "price": 36000000.0,
     "inventoryQuantity": 1,
+    "soldQuantity": 30,
     "isDeleted": false,
     "productId": 14
   },
@@ -276,6 +310,7 @@
     "size": "200x90x95cm",
     "price": 18000000.0,
     "inventoryQuantity": 3,
+    "soldQuantity": 31,
     "isDeleted": false,
     "productId": 15
   },
@@ -284,6 +319,7 @@
     "size": "200x90x95cm",
     "price": 18500000.0,
     "inventoryQuantity": 2,
+    "soldQuantity": 32,
     "isDeleted": false,
     "productId": 15
   },
@@ -292,6 +328,7 @@
     "size": "Bộ 7 món",
     "price": 3500000.0,
     "inventoryQuantity": 15,
+    "soldQuantity": 33,
     "isDeleted": false,
     "productId": 16
   },
@@ -300,6 +337,7 @@
     "size": "Bộ 7 món",
     "price": 3600000.0,
     "inventoryQuantity": 10,
+    "soldQuantity": 34,
     "isDeleted": false,
     "productId": 16
   },
@@ -308,6 +346,7 @@
     "size": "140x70x75cm",
     "price": 4500000.0,
     "inventoryQuantity": 12,
+    "soldQuantity": 35,
     "isDeleted": false,
     "productId": 17
   },
@@ -316,6 +355,7 @@
     "size": "140x70x75cm",
     "price": 4600000.0,
     "inventoryQuantity": 6,
+    "soldQuantity": 36,
     "isDeleted": false,
     "productId": 17
   },
@@ -324,6 +364,7 @@
     "size": "140x70x75cm",
     "price": 4550000.0,
     "inventoryQuantity": 4,
+    "soldQuantity": 37,
     "isDeleted": false,
     "productId": 17
   },
@@ -332,6 +373,7 @@
     "size": "Tiêu chuẩn",
     "price": 6200000.0,
     "inventoryQuantity": 10,
+    "soldQuantity": 38,
     "isDeleted": false,
     "productId": 18
   },
@@ -340,6 +382,7 @@
     "size": "Tiêu chuẩn",
     "price": 6250000.0,
     "inventoryQuantity": 8,
+    "soldQuantity": 39,
     "isDeleted": false,
     "productId": 18
   },
@@ -348,6 +391,7 @@
     "size": "46x71x132cm",
     "price": 3800000.0,
     "inventoryQuantity": 8,
+    "soldQuantity": 40,
     "isDeleted": false,
     "productId": 19
   },
@@ -356,6 +400,7 @@
     "size": "46x71x132cm",
     "price": 3850000.0,
     "inventoryQuantity": 4,
+    "soldQuantity": 41,
     "isDeleted": false,
     "productId": 19
   },
@@ -364,6 +409,7 @@
     "size": "46x71x132cm",
     "price": 3820000.0,
     "inventoryQuantity": 3,
+    "soldQuantity": 42,
     "isDeleted": false,
     "productId": 19
   },
@@ -372,6 +418,7 @@
     "size": "200x100x170cm",
     "price": 12000000.0,
     "inventoryQuantity": 6,
+    "soldQuantity": 44,
     "isDeleted": false,
     "productId": 20
   },
@@ -380,6 +427,7 @@
     "size": "200x100x170cm",
     "price": 12500000.0,
     "inventoryQuantity": 4,
+    "soldQuantity": 45,
     "isDeleted": false,
     "productId": 20
   },
@@ -388,6 +436,7 @@
     "size": "100x60cm (cao 54-76cm)",
     "price": 3200000.0,
     "inventoryQuantity": 18,
+    "soldQuantity": 46,
     "isDeleted": false,
     "productId": 21
   },
@@ -396,6 +445,7 @@
     "size": "100x60cm (cao 54-76cm)",
     "price": 3250000.0,
     "inventoryQuantity": 10,
+    "soldQuantity": 47,
     "isDeleted": false,
     "productId": 21
   },
@@ -404,6 +454,7 @@
     "size": "120x40x90cm",
     "price": 2800000.0,
     "inventoryQuantity": 15,
+    "soldQuantity": 48,
     "isDeleted": false,
     "productId": 22
   },
@@ -412,6 +463,7 @@
     "size": "120x40x90cm",
     "price": 2850000.0,
     "inventoryQuantity": 5,
+    "soldQuantity": 49,
     "isDeleted": false,
     "productId": 22
   },
@@ -420,6 +472,7 @@
     "size": "150x50x85cm",
     "price": 8500000.0,
     "inventoryQuantity": 8,
+    "soldQuantity": 50,
     "isDeleted": false,
     "productId": 23
   },
@@ -428,6 +481,7 @@
     "size": "150x50x85cm",
     "price": 8600000.0,
     "inventoryQuantity": 4,
+    "soldQuantity": 51,
     "isDeleted": false,
     "productId": 23
   },
@@ -436,6 +490,7 @@
     "size": "Tiêu chuẩn",
     "price": 4200000.0,
     "inventoryQuantity": 10,
+    "soldQuantity": 52,
     "isDeleted": false,
     "productId": 24
   },
@@ -444,6 +499,7 @@
     "size": "Tiêu chuẩn",
     "price": 4500000.0,
     "inventoryQuantity": 6,
+    "soldQuantity": 53,
     "isDeleted": false,
     "productId": 24
   },
@@ -452,6 +508,7 @@
     "size": "80x60cm",
     "price": 1800000.0,
     "inventoryQuantity": 20,
+    "soldQuantity": 53,
     "isDeleted": false,
     "productId": 25
   },
@@ -460,6 +517,7 @@
     "size": "80x60cm",
     "price": 1850000.0,
     "inventoryQuantity": 10,
+    "soldQuantity": 55,
     "isDeleted": false,
     "productId": 25
   },
@@ -468,6 +526,7 @@
     "size": "200x150cm",
     "price": 2500000.0,
     "inventoryQuantity": 20,
+    "soldQuantity": 56,
     "isDeleted": false,
     "productId": 26
   },
@@ -476,6 +535,7 @@
     "size": "200x150cm",
     "price": 2550000.0,
     "inventoryQuantity": 10,
+    "soldQuantity": 57,
     "isDeleted": false,
     "productId": 26
   },
@@ -484,6 +544,7 @@
     "size": "200x150cm",
     "price": 2600000.0,
     "inventoryQuantity": 5,
+    "soldQuantity": 58,
     "isDeleted": false,
     "productId": 26
   },
@@ -492,6 +553,7 @@
     "size": "15x15x25cm",
     "price": 850000.0,
     "inventoryQuantity": 30,
+    "soldQuantity": 59,
     "isDeleted": false,
     "productId": 27
   },
@@ -500,6 +562,7 @@
     "size": "15x15x25cm",
     "price": 900000.0,
     "inventoryQuantity": 20,
+    "soldQuantity": 60,
     "isDeleted": false,
     "productId": 27
   },
@@ -508,6 +571,7 @@
     "size": "Tiêu chuẩn",
     "price": 15000000.0,
     "inventoryQuantity": 5,
+    "soldQuantity": 22,
     "isDeleted": false,
     "productId": 28
   },
@@ -516,6 +580,7 @@
     "size": "Tiêu chuẩn",
     "price": 15200000.0,
     "inventoryQuantity": 3,
+    "soldQuantity": 23,
     "isDeleted": false,
     "productId": 28
   },
@@ -524,6 +589,7 @@
     "size": "80x30x180cm",
     "price": 3200000.0,
     "inventoryQuantity": 15,
+    "soldQuantity": 23,
     "isDeleted": false,
     "productId": 29
   },
@@ -532,6 +598,7 @@
     "size": "80x30x180cm",
     "price": 3250000.0,
     "inventoryQuantity": 6,
+    "soldQuantity": 24,
     "isDeleted": false,
     "productId": 29
   },
@@ -540,6 +607,7 @@
     "size": "80x30x180cm",
     "price": 3220000.0,
     "inventoryQuantity": 4,
+    "soldQuantity": 25,
     "isDeleted": false,
     "productId": 29
   },
@@ -548,6 +616,7 @@
     "size": "50x50cm (ngồi), 50x40cm (lưng)",
     "price": 1200000.0,
     "inventoryQuantity": 25,
+    "soldQuantity": 25,
     "isDeleted": false,
     "productId": 30
   },
@@ -556,6 +625,7 @@
     "size": "50x50cm (ngồi), 50x40cm (lưng)",
     "price": 1250000.0,
     "inventoryQuantity": 10,
+    "soldQuantity": 25,
     "isDeleted": false,
     "productId": 30
   },
@@ -564,6 +634,7 @@
     "size": "50x50cm (ngồi), 50x40cm (lưng)",
     "price": 1220000.0,
     "inventoryQuantity": 5,
+    "soldQuantity": 25,
     "isDeleted": false,
     "productId": 30
   }

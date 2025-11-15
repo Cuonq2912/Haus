@@ -48,7 +48,12 @@ public class Product extends BaseEntity {
     @Column(length = 100)
     String material;
 
+    @Column(nullable = false)
+    @Builder.Default
+    Integer soldQuantity = 0;
+
     @Column()
+    @Builder.Default
     Boolean isDeleted = CommonConstant.FALSE;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -77,14 +82,12 @@ public class Product extends BaseEntity {
         }
         if (!categories.contains(category)) {
             categories.add(category);
-            category.getProducts().add(this);
         }
     }
 
     public void removeCategory(Category category) {
         if (categories.contains(category)) {
             categories.remove(category);
-            category.getProducts().remove(this);
         }
     }
 

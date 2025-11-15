@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -73,13 +74,15 @@ public class ProductVariationController {
                 security = @SecurityRequirement(name = "Bearer Token")
         )
         public ResponseEntity<?> createProductVariation(
-                        @Valid @ModelAttribute CreateProductVariationRequestDto request) {
-                ProductVariationResponseDto createdVariation = productVariationService.createProductVariation(request);
+                @Valid @RequestPart("request") CreateProductVariationRequestDto request,
+                @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
+                ProductVariationResponseDto createdVariation = productVariationService.createProductVariation(request, imageFile);
                 return ResponseUtil.success(
-                                HttpStatus.CREATED,
-                                SuccessMessage.Product.CREATE_PRODUCT_VARIATION_SUCCESS,
-                                createdVariation);
+                        HttpStatus.CREATED,
+                        SuccessMessage.Product.CREATE_PRODUCT_VARIATION_SUCCESS,
+                        createdVariation);
         }
+
 
         @PutMapping(value = UrlConstant.Product.UPDATE_PRODUCT_VARIATION, consumes = "multipart/form-data")
         @Operation(
@@ -88,9 +91,11 @@ public class ProductVariationController {
                 security = @SecurityRequirement(name = "Bearer Token")
         )
         public ResponseEntity<?> updateProductVariation(
-                        @Valid @ModelAttribute UpdateProductVariationRequestDto request) {
+                        Long productVariantId,
+                        @Valid @RequestPart("request") UpdateProductVariationRequestDto request,
+                        @RequestPart(value = "imageFile", required = false) MultipartFile file) {
 
-                ProductVariationResponseDto updatedVariation = productVariationService.updateProductVariation(request);
+                ProductVariationResponseDto updatedVariation = productVariationService.updateProductVariation(productVariantId, request, file);
                 return ResponseUtil.success(
                                 HttpStatus.OK,
                                 SuccessMessage.Product.UPDATE_PRODUCT_VARIATION_SUCCESS,

@@ -28,6 +28,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +36,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -101,7 +103,6 @@ public class PromotionServiceImpl implements PromotionService {
         }
 
         Promotion saved = promotionRepository.save(promotion);
-        checkIsExpired(saved);
         return promotionMapper.promotionToPromotionResponseDto(saved);
     }
 
@@ -127,7 +128,6 @@ public class PromotionServiceImpl implements PromotionService {
         Promotion promotion = promotionRepository.findByPromotionCodeAndIsDeletedFalse(promotionCode)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
-        checkIsExpired(promotion);
         return promotionMapper.promotionToPromotionResponseDto(promotion);
     }
 
@@ -169,7 +169,6 @@ public class PromotionServiceImpl implements PromotionService {
 
         List<PromotionResponseDto> promotionResponseDtoList = pages.getContent().stream()
                 .map(promotion -> {
-                    checkIsExpired(promotion);
                     return promotionMapper.promotionToPromotionResponseDto(promotion);
                 })
                 .toList();
@@ -222,17 +221,11 @@ public class PromotionServiceImpl implements PromotionService {
         predicate = consumer.getPredicate();
         predicate = cb.and(predicate, cb.isFalse(root.get("isDeleted")));
 
+
         countQuery.select(cb.count(root));
         countQuery.where(predicate);
 
         return entityManager.createQuery(countQuery).getSingleResult();
-    }
-
-    private void checkIsExpired(Promotion promotion) {
-        if (promotion != null && promotion.getEndDate() != null
-                && promotion.getEndDate().isBefore(LocalDate.now())) {
-            promotion.setStatus(PromotionStatus.EXPIRED);
-        }
     }
 
     private void deleteSoft(Promotion promotion) {
