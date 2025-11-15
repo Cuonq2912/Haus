@@ -123,7 +123,7 @@ public class ProductController {
                     @RequestParam(defaultValue = "1") Integer pageNum,
                     @RequestParam(defaultValue = "10") Integer pageSize,
                     @RequestParam(required = false) @Schema(example = "asc or discount_asc or sold_quantity_asc or created_at_asc") String sortBy,
-                    @RequestParam(required = false) @Schema(example = "priceRange:under_1m&color:Nâu đậm&categoryId:1&keyword:a") String search) {
+                    @RequestParam(required = false) @Schema(example = "priceRange:under_1m&color:Nâu đậm&material:gỗ&categoryId:1&keyword:a") String search) {
             PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
             return ResponseUtil.success(
                             SuccessMessage.Product.GET_PRODUCT_SUCCESS,
@@ -141,7 +141,7 @@ public class ProductController {
             @RequestParam(defaultValue = "1", required = false) Integer pageNum,
             @RequestParam(defaultValue = "10", required = false) Integer pageSize,
             @RequestParam(required = false) @Schema(example = "asc or discount_asc or sold_quantity_asc or created_at_asc") String sortBy,
-            @RequestParam(required = false) @Schema(example = "priceRange:under_1m&color:Nâu đậm&categoryId:1&keyword:a") String search) {
+            @RequestParam(required = false) @Schema(example = "priceRange:under_1m&color:Nâu đậm&material:gỗ&categoryId:1&keyword:a") String search) {
             PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
             return ResponseUtil.success(
                             SuccessMessage.Product.GET_PRODUCT_SUCCESS,
