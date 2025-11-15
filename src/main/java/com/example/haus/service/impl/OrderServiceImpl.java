@@ -8,6 +8,8 @@ import com.example.haus.domain.dto.order.OrderRequestDto;
 import com.example.haus.domain.dto.order.PaymentRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
+import com.example.haus.domain.dto.request.order.BuyNowRequest;
+import com.example.haus.domain.dto.request.order.CheckoutRequest;
 import com.example.haus.domain.dto.response.invoice.InvoiceItemDto;
 import com.example.haus.domain.dto.response.invoice.InvoiceResponseDto;
 import com.example.haus.domain.dto.response.product.OrderResponseDto;
@@ -17,6 +19,8 @@ import com.example.haus.domain.entity.product.Order;
 import com.example.haus.domain.entity.product.OrderItem;
 import com.example.haus.domain.entity.product.ProductVariation;
 import com.example.haus.domain.entity.product.Promotion;
+import com.example.haus.domain.entity.address.Address;
+import com.example.haus.domain.entity.product.*;
 import com.example.haus.domain.entity.product.payment.Payment;
 import com.example.haus.domain.entity.product.payment.PaymentStatus;
 import com.example.haus.domain.entity.product.payment.PaymentType;
@@ -51,8 +55,10 @@ import java.time.LocalDate;
 
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 
 @Service
@@ -61,13 +67,17 @@ import java.util.function.BiConsumer;
 @Slf4j(topic = "ORDER-SERVICE")
 public class OrderServiceImpl implements OrderService {
 
-    AddressMapper addressMapper;
-
     AddressRepository addressRepository;
 
     OrderItemMapper orderItemMapper;
 
     OrderRepository orderRepository;
+
+    ProductVariationRepository productVariationRepository;
+
+    PromotionRepository promotionRepository;
+
+    UserRepository userRepository;
 
     OrderMapper orderMapper;
 
@@ -82,16 +92,6 @@ public class OrderServiceImpl implements OrderService {
     PromotionMapper promotionMapper;
 
     MediaMapper mediaMapper;
-
-    UserRepository userRepository;
-
-    PaymentRepository paymentRepository;
-
-    OrderItemRepository orderItemRepository;
-
-    ProductVariationRepository productVariationRepository;
-
-    PromotionRepository promotionRepository;
 
     private static double totalPrice = 0;
 
@@ -737,5 +737,10 @@ public class OrderServiceImpl implements OrderService {
         mainCell.setPaddingTop(5);
         mainCell.setPaddingRight(5);
         return mainCell;
+    }
+
+
+    private String generateOrderNumber() {
+        return "ORD-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 }

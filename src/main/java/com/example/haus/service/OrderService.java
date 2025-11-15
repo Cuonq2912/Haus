@@ -6,6 +6,8 @@ import com.example.haus.domain.dto.order.OrderRequestDto;
 import com.example.haus.domain.dto.order.PaymentRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
+import com.example.haus.domain.dto.request.order.BuyNowRequest;
+import com.example.haus.domain.dto.request.order.CheckoutRequest;
 import com.example.haus.domain.dto.response.product.OrderResponseDto;
 import com.example.haus.domain.dto.response.invoice.InvoiceResponseDto;
 import com.itextpdf.text.DocumentException;
@@ -25,4 +27,5 @@ public interface OrderService {
     OrderResponseDto updateStatusOrderById(Long id, String status);
 
     byte[] generateInvoicePdf(Long orderId) throws DocumentException, IOException;
+
 }
