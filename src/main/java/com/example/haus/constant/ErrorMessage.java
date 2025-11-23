@@ -137,6 +137,7 @@ public class ErrorMessage {
         public static final String ERR_ORDER_NOT_COMPLETED = "exception.order.not.completed";
         public static final String ERR_INVALID_ORDER_STATUS = "exception.order.status.incompatible";
         public static final String ERR_ORDER_ITEMS_EMPTY = "exception.order.items.empty";
+        public static final String ERR_PAYMENT_GATEWAY_INVALID = "exception.payment.gateway.invalid";
 
         //request
         public static final String ERR_PRODUCTS_EMPTY = "exception.products.empty";

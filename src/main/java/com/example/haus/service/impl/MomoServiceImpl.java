@@ -218,6 +218,10 @@ public class MomoServiceImpl implements MomoService {
 
     }
     private Payment getOrCreatePayment(Order order) {
+        if (!order.getPayment().getGateway().equals(PaymentGateway.VNPAY)) {
+            throw new InvalidDataException(ErrorMessage.Order.ERR_PAYMENT_GATEWAY_INVALID);
+        }
+
         Optional<Payment> existingPaymentOpt = paymentRepository.findByOrderId(
                 order.getId());
 
