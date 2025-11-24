@@ -1,6 +1,5 @@
 package com.example.haus.domain.dto.response.product;
 
-import jakarta.persistence.Column;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -37,6 +36,8 @@ public class ProductResponseDto {
     Long daysRemaining;
 
     Date createdAt;
+
+    String material;
 
     Date updatedAt;
 

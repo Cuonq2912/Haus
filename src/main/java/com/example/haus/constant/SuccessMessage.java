@@ -89,7 +89,7 @@ public class SuccessMessage {
         public static final String CREATE_PRODUCT_VARIATION_SUCCESS = "Create product variation successful";
         public static final String UPDATE_PRODUCT_VARIATION_SUCCESS = "Update product variation successful";
         public static final String DELETE_PRODUCT_VARIATION_SUCCESS = "Delete product variation successful";
-        
+
         // Favorite Messages
         public static final String ADD_FAVORITE_SUCCESS = "Added product to favorite list";
         public static final String REMOVE_FAVORITE_SUCCESS = "Deleted product to favorite list";
@@ -121,8 +121,28 @@ public class SuccessMessage {
         public static final String GET_ORDER_SUCCESS = "Get all order successfully";
         public static final String UPDATE_STATUS_ORDER_SUCCESS = "Update status order successfully";
         public static final String GET_INVOICE_SUCCESS = "Get invoice success";
+        public static final String CHECKOUT_SUCCESS = "Checkout successfully";
+        public static final String BUY_NOW_SUCCESS = "Buy now successfully";
+        public static final String CREATE_ORDER_SUCCESS = "Create order successfully";
+
+    }
         public static final String CREATE_ORDER_SUCCESS = "Create order success";
 
+    public static class Review {
+
+        private Review() {}
+
+        public static final String CREATE_REVIEW_SUCCESS = "Review created successfully";
+        public static final String UPDATE_REVIEW_SUCCESS = "Review updated successfully";
+        public static final String DELETE_REVIEW_SUCCESS = "Review deleted successfully";
+        public static final String GET_REVIEW_SUCCESS = "Review retrieved successfully";
+        public static final String GET_REVIEWS_SUCCESS = "Reviews retrieved successfully";
+        public static final String GET_REVIEWS_WITH_IMAGES_SUCCESS = "Reviews with images retrieved successfully";
+        public static final String GET_RATING_STATISTICS_SUCCESS = "Rating statistics retrieved successfully";
+        public static final String REPORT_REVIEW_SUCCESS = "Review reported successfully";
+        public static final String HIDE_REVIEW_SUCCESS = "Review hidden successfully";
+        public static final String SHOW_REVIEW_SUCCESS = "Review shown successfully";
+        public static final String GET_MY_REVIEWS_SUCCESS = "Your reviews retrieved successfully";
     }
 
 }

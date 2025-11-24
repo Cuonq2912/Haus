@@ -138,6 +138,10 @@ public class ErrorMessage {
         public static final String ERR_INVALID_ORDER_STATUS = "exception.order.status.incompatible";
         public static final String ERR_ORDER_ITEMS_EMPTY = "exception.order.items.empty";
         public static final String ERR_PAYMENT_GATEWAY_INVALID = "exception.payment.gateway.invalid";
+        public static final String ERR_CART_EMPTY = "exception.order.cart.empty";
+        public static final String ERR_PRODUCT_OUT_OF_STOCK = "exception.order.product.out.of.stock";
+        public static final String ERR_INSUFFICIENT_STOCK = "exception.order.insufficient.stock";
+        public static final String ERR_INVALID_QUANTITY = "exception.order.invalid.quantity";
 
         //request
         public static final String ERR_PRODUCTS_EMPTY = "exception.products.empty";
@@ -206,6 +210,20 @@ public class ErrorMessage {
         public static final String ERR_ADDRESS_NOT_FOUND = "exception.address.not.found";
         public static final String ERR_ID_EMPTY = "exception.id.found";
         public static final String ERR_IS_SELECTED_NULL = "exception.is.selected.found";
+    }
+
+    public static class Review {
+
+        private Review() {
+        }
+
+        public static final String ERR_REVIEW_NOT_FOUND = "exception.review.not.found";
+        public static final String ERR_REVIEW_CAN_NOT_BEFORE_BUY = "exception.review.not.review.before.buy";
+        public static final String ERR_REVIEW_YOU_REVIEWED_THIS_ORDER = "exception.review.reviewed.this.order";
+        public static final String ERR_REVIEW_UNAUTHORIZED_UPDATE = "exception.review.unauthorized.update";
+        public static final String ERR_REVIEW_UNAUTHORIZED_DELETE = "exception.review.unauthorized.delete";
+        public static final String ERR_REVIEW_RATING_INVALID = "exception.review.rating.invalid";
+        public static final String ERR_REVIEW_TAG_INVALID = "exception.review.tag.invalid";
     }
 
 }

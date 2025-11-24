@@ -49,6 +49,13 @@ public class SearchQueryCriteriaConsumer<T> implements Consumer<SearchCriteria> 
             return;
         }
 
+        // --- Filter material ---
+        if ("material".equals(searchCriteria.getKey()) && typedValue != null) {
+            log.info("Consumer material");
+            predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("material"), typedValue));
+            return;
+        }
+
         // --- Filter PriceRange ---
         if ("priceRange".equalsIgnoreCase(searchCriteria.getKey()) && typedValue != null) {
             log.info("Consumer price range");

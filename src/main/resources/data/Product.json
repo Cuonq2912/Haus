@@ -6,6 +6,7 @@
     "description": "Giường ngủ cao cấp làm từ gỗ sồi tự nhiên, thiết kế hiện đại",
     "detailDescription": "Giường ngủ gỗ sồi tự nhiên với thiết kế tối giản, phù hợp cho phòng ngủ hiện đại.\nKích thước: 200x180x90cm\nChất liệu: Gỗ sồi tự nhiên\nBảo hành: 2 năm\nMàu sắc: Nâu gỗ tự nhiên",
     "inventoryQuantity": 25,
+    "material": "gỗ",
     "soldQuantity": 1503,
     "categories": [
       "Phòng ngủ"
@@ -18,6 +19,7 @@
     "description": "Tủ quần áo 4 cánh rộng rãi với nhiều ngăn chứa tiện lợi",
     "detailDescription": "Tủ quần áo 4 cánh với thiết kế thông minh, tối ưu hóa không gian lưu trữ.\nKích thước: 200x220x60cm\nChất liệu: Gỗ MDF phủ melamine\nMàu sắc: Trắng/Nâu\nTrang bị: Ray trượt êm, gương soi trong",
     "inventoryQuantity": 15,
+    "material": "gỗ",
     "soldQuantity": 3009,
     "categories": [
       "Phòng ngủ"
@@ -30,6 +32,7 @@
     "description": "Bàn trang điểm nhỏ gọn với gương LED và ngăn kéo",
     "detailDescription": "Bàn trang điểm hiện đại với gương LED và nhiều ngăn chứa tiện ích.\nKích thước: 100x40x150cm\nTính năng: Đèn LED, 3 ngăn kéo\nChất liệu: Gỗ công nghiệp cao cấp\nMàu sắc: Trắng tinh khôi",
     "inventoryQuantity": 30,
+    "material": "gỗ",
     "soldQuantity": 4509,
     "categories": [
       "Phòng ngủ"
@@ -42,6 +45,7 @@
     "description": "Sofa góc L bọc da thật, thiết kế sang trọng cho phòng khách",
     "detailDescription": "Sofa góc L cao cấp bọc da thật 100%, khung gỗ thông chắc chắn.\nKích thước: 280x200x85cm\nChất liệu: Da thật, khung gỗ thông\nMàu sắc: Nâu đậm, Đen, Trắng kem\nTính năng: Có thể tháo rời để vệ sinh",
     "inventoryQuantity": 10,
+    "material": "da",
     "soldQuantity": 2287,
     "categories": [
       "Phòng khách"
@@ -54,6 +58,7 @@
     "description": "Bàn trà hiện đại với mặt kính cường lực và chân inox",
     "detailDescription": "Bàn trà thiết kế hiện đại với mặt kính cường lực 12mm an toàn.\nKích thước: 120x60x45cm\nChất liệu: Kính cường lực, chân inox 304\nTính năng: Chống trầy xước, dễ vệ sinh\nBảo hành: 1 năm",
     "inventoryQuantity": 20,
+    "material": "đá",
     "soldQuantity": 9007,
     "categories": [
       "Phòng khách"
@@ -66,6 +71,7 @@
     "description": "Kệ tivi làm từ gỗ walnut cao cấp với ngăn chứa đa năng",
     "detailDescription": "Kệ tivi gỗ walnut tự nhiên với thiết kế tối giản, phù hợp TV từ 55-75 inch.\nKích thước: 180x40x55cm\nChất liệu: Gỗ walnut tự nhiên\nTính năng: 2 ngăn kéo, 2 ngăn mở\nMàu sắc: Nâu walnut tự nhiên",
     "inventoryQuantity": 18,
+    "material": "gỗ",
     "soldQuantity": 8886,
     "categories": [
       "Phòng khách"
@@ -78,6 +84,7 @@
     "description": "Ghế armchair êm ái bọc vải cao cấp với thiết kế ergonomic",
     "detailDescription": "Ghế armchair với thiết kế ergonomic, bọc vải cao cấp chống bụi bẩn.\nKích thước: 80x85x95cm\nChất liệu: Vải polyester cao cấp, khung gỗ sồi\nMàu sắc: Xám, Be, Xanh navy\nTính năng: Có thể xoay 360 độ",
     "inventoryQuantity": 25,
+    "material": "vải",
     "soldQuantity": 2206,
     "categories": [
       "Phòng khách",
@@ -92,6 +99,7 @@
     "description": "Bộ bàn ghế sân vườn bằng mây rattan tự nhiên, chống thấm nước",
     "detailDescription": "Bộ bàn ghế sân vườn rattan cao cấp gồm 1 bàn và 4 ghế.\nKích thước bàn: 120x70x75cm\nKích thước ghế: 60x60x85cm\nChất liệu: Rattan tự nhiên, đệm chống nước\nBảo hành: 1 năm",
     "inventoryQuantity": 12,
+    "material": "gỗ",
     "soldQuantity": 2925,
     "categories": [
       "Ngoài trời"
@@ -104,6 +112,7 @@
     "description": "Ghế xích đu đôi cho sân vườn với khung thép sơn tĩnh điện",
     "detailDescription": "Ghế xích đu đôi cho 2 người với mái che chống tia UV.\nKích thước: 170x110x165cm\nTải trọng: 200kg\nChất liệu: Khung thép sơn tĩnh điện, vải polyester\nTính năng: Mái che có thể điều chỉnh",
     "inventoryQuantity": 8,
+    "material": "vải",
     "soldQuantity": 5427,
     "categories": [
       "Ngoài trời"
@@ -116,6 +125,7 @@
     "description": "Ô dù lớn chống tia UV cho khu vực ngoài trời",
     "detailDescription": "Ô dù sân vườn cao cấp với chức năng chống tia UV 98%.\nĐường kính: 3m\nChất liệu: Vải polyester chống tia UV, cần nhôm\nTính năng: Có thể nghiêng, tự động mở/đóng\nMàu sắc: Xanh navy, Be, Xám",
     "inventoryQuantity": 15,
+    "material": "vải",
     "soldQuantity": 9258,
     "categories": [
       "Ngoài trời"
@@ -128,6 +138,7 @@
     "description": "Bộ bàn ăn gỗ cao cấp cho 6 người với thiết kế cổ điển",
     "detailDescription": "Bộ bàn ăn gồm 1 bàn tròn và 6 ghế, phù hợp cho gia đình 6 người.\nKích thước bàn: Φ150x75cm\nChất liệu: Gỗ sồi tự nhiên\nGhế có đệm êm, bọc da PU\nMàu sắc: Nâu gỗ tự nhiên",
     "inventoryQuantity": 8,
+    "material": "gỗ",
     "soldQuantity": 2125,
     "categories": [
       "Phòng ăn"
@@ -140,6 +151,7 @@
     "description": "Tủ rượu cao cấp với kệ kính và đèn LED trang trí",
     "detailDescription": "Tủ rượu gỗ walnut với thiết kế sang trọng, có thể chứa 50 chai rượu.\nKích thước: 120x40x180cm\nTính năng: Kệ kính, đèn LED, khóa an toàn\nChất liệu: Gỗ walnut tự nhiên\nBảo hành: 2 năm",
     "inventoryQuantity": 6,
+    "material": "gỗ",
     "soldQuantity": 1245,
     "categories": [
       "Phòng ăn"
@@ -152,6 +164,7 @@
     "description": "Ghế ăn cao cấp bọc vải velvet mềm mại với chân inox",
     "detailDescription": "Ghế ăn thiết kế hiện đại với vải velvet cao cấp và chân inox sáng bóng.\nKích thước: 45x50x82cm\nChất liệu: Vải velvet, chân inox 304\nMàu sắc: Xanh navy, Hồng, Xám\nĐệm mút cao cấp êm ái",
     "inventoryQuantity": 40,
+    "material": "vải",
     "soldQuantity": 9521,
     "categories": [
       "Phòng ăn",
@@ -165,6 +178,7 @@
     "description": "Tủ bếp hoàn chỉnh gỗ sồi với thiết bị nhập khẩu",
     "detailDescription": "Tủ bếp hoàn chỉnh gỗ sồi tự nhiên theo phong cách hiện đại.\nKích thước: 3.5x2.2x0.6m (L-shape)\nBao gồm: Tủ trên, tủ dưới, bàn đảo, chậu rửa inox\nThiết bị: Bếp từ, máy hút mùi, lò vi sóng\nBảo hành: 5 năm",
     "inventoryQuantity": 3,
+    "material": "gỗ",
     "soldQuantity": 2542,
     "categories": [
       "Nhà bếp và thiết bị"
@@ -177,6 +191,7 @@
     "description": "Bàn đảo bếp với mặt đá marble tự nhiên và tủ chứa",
     "detailDescription": "Bàn đảo bếp cao cấp với mặt đá marble trắng Ý và tủ chứa đa năng.\nKích thước: 200x90x95cm\nChất liệu: Đá marble tự nhiên, tủ gỗ MFC\nTính năng: 4 ngăn kéo, 2 tủ mở\nBảo hành: 3 năm",
     "inventoryQuantity": 5,
+    "material": "đá",
     "soldQuantity": 1237,
     "categories": [
       "Nhà bếp và thiết bị"
@@ -189,6 +204,7 @@
     "description": "Bộ dao kéo nhà bếp chuyên nghiệp với giá đỡ gỗ",
     "detailDescription": "Bộ dao kéo nhà bếp gồm 7 món với lưỡi dao thép carbon cao cấp.\nGồm: 1 dao chặt, 1 dao thái, 1 dao gọt, 1 dao bánh mì, 1 kéo, 1 thanh mài dao, 1 giá đỡ gỗ\nChất liệu: Thép carbon Nhật Bản\nBảo hành: 10 năm",
     "inventoryQuantity": 25,
+    "material": "gỗ",
     "soldQuantity": 7777,
     "categories": [
       "Nhà bếp và thiết bị",
@@ -202,6 +218,7 @@
     "description": "Bàn làm việc hiện đại với ngăn kéo và kệ sách tích hợp",
     "detailDescription": "Bàn làm việc đa năng với thiết kế tối ưu cho văn phòng tại nhà.\nKích thước: 140x70x75cm\nTính năng: 3 ngăn kéo, kệ sách bên cạnh\nChất liệu: Gỗ MDF phủ melamine chống trầy\nMàu sắc: Trắng, Nâu, Xám",
     "inventoryQuantity": 22,
+    "material": "gỗ",
     "soldQuantity": 4442,
     "categories": [
       "Văn phòng tại nhà̉"
@@ -214,6 +231,7 @@
     "description": "Ghế văn phòng cao cấp với thiết kế ergonomic hỗ trợ lưng",
     "detailDescription": "Ghế văn phòng cao cấp với tính năng điều chỉnh đa chiều.\nTính năng: Nâng hạ, nghiêng lưng, tựa đầu có thể điều chỉnh\nChất liệu: Lưới thoáng khí, đệm mút memory foam\nTải trọng: 150kg\nBảo hành: 3 năm",
     "inventoryQuantity": 18,
+    "material": "vải",
     "soldQuantity": 2521,
     "categories": [
       "Văn phòng tại nhà̉"
@@ -226,6 +244,7 @@
     "description": "Tủ hồ sơ thép với 4 ngăn kéo và khóa an toàn",
     "detailDescription": "Tủ hồ sơ văn phòng chuyên nghiệp với hệ thống khóa tập trung.\nKích thước: 46x71x132cm\nChất liệu: Thép sơn tĩnh điện\nTính năng: Ray trượt êm, khóa tập trung\nMàu sắc: Xám, Trắng, Đen",
     "inventoryQuantity": 15,
+    "material": "đá",
     "soldQuantity": 5235,
     "categories": [
       "Văn phòng tại nhà̉"
@@ -238,6 +257,7 @@
     "description": "Giường tầng an toàn cho trẻ em với thang leo và lan can",
     "detailDescription": "Giường tầng trẻ em với thiết kế an toàn và thú vị.\nKích thước: 200x100x170cm\nTính năng: Lan can cao, thang leo an toàn, ngăn kéo chứa đồ\nChất liệu: Gỗ thông tự nhiên sơn không độc hại\nPhù hợp: Trẻ từ 6-16 tuổi",
     "inventoryQuantity": 10,
+    "material": "gỗ",
     "soldQuantity": 6433,
     "categories": [
       "Phòng trẻ em"
@@ -250,6 +270,7 @@
     "description": "Bàn học có thể điều chỉnh độ cao phù hợp với lứa tuổi",
     "detailDescription": "Bàn học thông minh có thể điều chỉnh theo chiều cao của trẻ.\nKích thước: 100x60cm, cao từ 54-76cm\nTính năng: Điều chỉnh độ cao và nghiêng mặt bàn\nChất liệu: Gỗ MDF và khung thép\nPhù hợp: Trẻ từ 3-15 tuổi",
     "inventoryQuantity": 28,
+    "material": "gỗ",
     "soldQuantity": 1242,
     "categories": [
       "Phòng trẻ em",
@@ -263,6 +284,7 @@
     "description": "Tủ đồ chơi với nhiều ngăn chứa và màu sắc tươi sáng",
     "detailDescription": "Tủ đồ chơi với thiết kế nhiều màu sắc, giúp trẻ học cách sắp xếp.\nKích thước: 120x40x90cm\nTính năng: 9 ngăn nhựa có thể tháo rời\nMàu sắc: Đa màu tươi sáng\nChất liệu: Gỗ MDF và nhựa ABS an toàn",
     "inventoryQuantity": 20,
+    "material": "gỗ",
     "soldQuantity": 2523,
     "categories": [
       "Phòng trẻ em"
@@ -275,6 +297,7 @@
     "description": "Tủ lavabo đôi với chậu sứ và gương LED tích hợp",
     "detailDescription": "Tủ lavabo đôi cao cấp với thiết kế hiện đại cho phòng tắm lớn.\nKích thước: 150x50x85cm\nBao gồm: 2 chậu lavabo sứ, gương LED 150cm\nChất liệu: Gỗ chống ẩm, chậu sứ cao cấp\nTính năng: Đèn LED, 4 ngăn kéo",
     "inventoryQuantity": 12,
+    "material": "gỗ",
     "soldQuantity": 5125,
     "categories": [
       "Phòng tắm"
@@ -287,6 +310,7 @@
     "description": "Vòi sen cây với chức năng massage và điều chỉnh nhiệt độ",
     "detailDescription": "Vòi sen cây cao cấp với nhiều chế độ xịt nước và màn hình LED hiển thị nhiệt độ.\nChất liệu: Inox 304, đầu sen ABS\nTính năng: 5 chế độ xịt, màn hình LED nhiệt độ\nBảo hành: 5 năm\nXuất xứ: Đức",
     "inventoryQuantity": 16,
+    "material": "đá",
     "soldQuantity": 1576,
     "categories": [
       "Phòng tắm"
@@ -300,6 +324,7 @@
     "detailDescription": "Gương phòng tắm cao cấp với công nghệ chống mù sương và đèn LED tiết kiệm điện.\nKích thước: 80x60cm\nTính năng: Đèn LED, chống mù sương, cảm ứng bật/tắt\nChất liệu: Kính silver cao cấp\nBảo hành: 2 năm",
     "inventoryQuantity": 30,
     "soldQuantity": 7465,
+    "material": "đá",
     "categories": [
       "Phòng tắm",
       "Phòng ngủ",
@@ -314,6 +339,7 @@
     "detailDescription": "Thảm len tự nhiên cao cấp từ New Zealand với họa tiết geometric hiện đại.\nKích thước: 200x150cm\nChất liệu: 100% len tự nhiên\nHọa tiết: Geometric, Abstract\nMàu sắc: Xám, Be, Xanh mint\nBảo hành: 1 năm",
     "inventoryQuantity": 35,
     "soldQuantity": 2492,
+    "material": "vải",
     "categories": [
       "Phòng khách",
       "Phòng ngủ",
@@ -328,6 +354,7 @@
     "detailDescription": "Đèn ngủ thông minh với công nghệ LED tiết kiệm điện.\nTính năng: Điều chỉnh độ sáng, đổi màu ánh sáng, hẹn giờ tắt\nKích thước: 15x15x25cm\nNguồn: Sạc USB-C\nThời gian sử dụng: 12 giờ liên tục\nBảo hành: 1 năm",
     "inventoryQuantity": 50,
     "soldQuantity": 2567,
+    "material": "đá",
     "categories": [
       "Phòng ngủ",
       "Phòng trẻ em",
@@ -342,6 +369,7 @@
     "detailDescription": "Máy pha cà phê tự động cao cấp của thương hiệu Ý với công nghệ hiện đại.\nTính năng: Màn hình cảm ứng, xay hạt tự động, tạo bọt sữa\nDung tích: Bình nước 1.8L, hộp hạt 250g\nCông suất: 1350W\nBảo hành: 2 năm tại Việt Nam",
     "inventoryQuantity": 8,
     "soldQuantity": 2228,
+    "material": "đá",
     "categories": [
       "Nhà bếp và thiết bị",
       "Văn phòng tại nhà̉",
@@ -356,6 +384,7 @@
     "detailDescription": "Kệ sách kim loại với thiết kế hiện đại và khả năng chịu tải cao.\nKích thước: 80x30x180cm\nChất liệu: Thép sơn tĩnh điện, kệ gỗ MDF\nTải trọng mỗi tầng: 30kg\nMàu sắc: Trắng, Đen, Xám\nLắp ráp dễ dàng",
     "inventoryQuantity": 25,
     "soldQuantity": 3338,
+    "material": "gỗ",
     "categories": [
       "Văn phòng tại nhà̉",
       "Phòng khách",
@@ -370,6 +399,7 @@
     "detailDescription": "Bộ đệm ghế ngoài trời gồm đệm lưng và đệm ngồi với chất liệu chống thời tiết.\nKích thước: 50x50cm (ngồi), 50x40cm (lưng)\nChất liệu: Vải polyester chống nước, ruột bông tổng hợp\nMàu sắc: Xanh navy, Đỏ gạch, Xám\nBảo hành: 6 tháng",
     "inventoryQuantity": 40,
     "soldQuantity": 4442,
+    "material": "vải",
     "categories": [
       "Ngoài trời"
     ]
