@@ -35,7 +35,7 @@ import java.util.Map;
 @Slf4j(topic = "USER-SERVICE")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class UserServiceImpl implements UserService {
+public class    UserServiceImpl implements UserService {
 
     UserRepository userRepository;
 
