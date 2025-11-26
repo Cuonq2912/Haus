@@ -43,7 +43,6 @@ public class OrderRequestDto {
     @Schema(example = "[{\"id\": 1, \"isSelected\": true}]")
     List<AddressRequestDto> addresses;
 
-    @NotEmpty(message = ErrorMessage.Order.ERR_PROMOTION_ID_EMPTY)
     @Min(value = 1, message = ErrorMessage.Order.ERR_NUMBER_INVALID)
     @Schema(example = "1")
     Long promotionId;

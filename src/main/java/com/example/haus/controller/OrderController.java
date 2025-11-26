@@ -56,7 +56,8 @@ public class OrderController {
             description = "Giúp người dùng tạo đơn hàng mới.",
             security = @SecurityRequirement(name = "Bearer Token")
     )
-    @PostMapping("/api/v1/orders")
+    @PostMapping("" +
+            "/orders")
     public ResponseEntity<?> createOrder(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody OrderAllRequestDto orderAllRequestDto) {
         String username = userDetails.getUsername();
         log.info("Username = {}", username);

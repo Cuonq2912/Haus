@@ -66,6 +66,10 @@ public class VNPayServiceImpl implements VNPayService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
 
+        if (!order.getPayment().getGateway().equals(PaymentGateway.VNPAY) || !order.getPayment().getType().equals(PaymentType.ONLINE_PAYMENT)) {
+            throw new InvalidDataException("Payment type invalid");
+        }
+
         Payment payment = getOrCreatePayment(order);
 
         Map<String, String> params = vnPayConfig.getConfig();

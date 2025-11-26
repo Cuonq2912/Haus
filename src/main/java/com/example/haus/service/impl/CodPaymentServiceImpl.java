@@ -39,6 +39,10 @@ public class CodPaymentServiceImpl implements CodPaymentService {
         Order order = orderRepository.findById(request.getOrderId())
                 .orElseThrow(() ->  new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
 
+        if (!order.getPayment().getType().equals(PaymentType.COD)) {
+            throw new InvalidDataException("Payment type invalid");
+        }
+
         if (order.getStatus() == OrderStatus.COMPLETED) {
             throw new InvalidDataException(ErrorMessage.Payment.COD_ORDER_ALREADY_COMPLETED);
         }

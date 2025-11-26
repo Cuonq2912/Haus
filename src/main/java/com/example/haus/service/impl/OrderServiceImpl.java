@@ -54,11 +54,9 @@ import java.io.InputStream;
 import java.time.LocalDate;
 
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.UUID;
 import java.util.function.BiConsumer;
 
 @Service
@@ -265,8 +263,7 @@ public class OrderServiceImpl implements OrderService {
         payment.setOrder(order);
 
 
-        Promotion promotion = promotionRepository.findByIdAndIsDeletedFalse(orderAllRequestDto.getOrder().getPromotionId())
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
+        Optional<Promotion> promotion = promotionRepository.findByIdAndIsDeletedFalse(orderAllRequestDto.getOrder().getPromotionId());
 
         List<Address> addresses = orderAllRequestDto.getOrder().getAddresses().stream().map(addressRequestDto -> {
             Address address = addressRepository.findByIdAndIsDeletedFalse(addressRequestDto.getId())
@@ -279,7 +276,7 @@ public class OrderServiceImpl implements OrderService {
         order.setUser(user);
         order.setOrderItems(orderItems);
         order.setPayment(payment);
-        order.setPromotion(promotion);
+        promotion.ifPresent(order::setPromotion);
         order.setAddresses(addresses);
 
         Order savedOrder = orderRepository.save(order);

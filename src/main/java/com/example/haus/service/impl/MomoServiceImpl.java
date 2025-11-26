@@ -68,6 +68,10 @@ public class MomoServiceImpl implements MomoService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
 
+        if (!order.getPayment().getGateway().equals(PaymentGateway.MOMO) || !order.getPayment().getType().equals(PaymentType.ONLINE_PAYMENT)) {
+            throw new InvalidDataException("Payment gateway | type invalid");
+        }
+
         long amount = order.getTotalAmount().longValue();
 
         // validate

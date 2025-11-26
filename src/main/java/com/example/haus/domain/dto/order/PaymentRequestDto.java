@@ -7,6 +7,7 @@ import com.example.haus.domain.validator.EnumValue;
 import com.example.haus.domain.validator.ValidPromotionDates;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -24,5 +25,6 @@ public class PaymentRequestDto {
 
     @EnumValue(name = "paymentType", enumClass = PaymentType.class)
     @Schema(example = "ONLINE_PAYMENT")
+    @NotNull(message = "Payment type must be not null")
     PaymentType paymentType;
 }

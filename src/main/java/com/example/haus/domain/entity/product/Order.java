@@ -55,7 +55,7 @@ public class Order extends BaseEntity {
     User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shipping_address_id", nullable = false)
+    @JoinColumn(name = "shipping_address_id")
     Address shippingAddress;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
