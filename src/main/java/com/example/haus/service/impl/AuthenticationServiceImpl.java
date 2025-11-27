@@ -79,7 +79,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public LoginResponseDto authentication(LoginRequestDto request) {
         User user = userRepository
-            .findByEmailAndIsDeletedFalse(request.getUsername())
+            .findByUsernameAndIsDeletedFalse(request.getUsername())
             .orElseThrow(() ->
                 new ResourceNotFoundException(
                     ErrorMessage.User.ERR_USER_NOT_EXISTED
