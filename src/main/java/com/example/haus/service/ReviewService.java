@@ -3,6 +3,7 @@ package com.example.haus.service;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.product.ReviewRequestDto;
+import com.example.haus.domain.dto.response.dashboard.TopReviewDto;
 import com.example.haus.domain.dto.response.product.RatingStatisticsDto;
 import com.example.haus.domain.dto.response.product.ReviewResponseDto;
 
@@ -23,4 +24,6 @@ public interface ReviewService {
     RatingStatisticsDto getProductRatingStatistics(Long productId);
     
     PaginationResponseDto<ReviewResponseDto> getMyReviews(String userId, PaginationRequestDto paginationRequest);
+
+    PaginationResponseDto<TopReviewDto> getTopReviews(PaginationRequestDto paginationRequest);
 }

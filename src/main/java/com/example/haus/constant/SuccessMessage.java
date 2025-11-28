@@ -143,6 +143,7 @@ public class SuccessMessage {
         public static final String HIDE_REVIEW_SUCCESS = "Review hidden successfully";
         public static final String SHOW_REVIEW_SUCCESS = "Review shown successfully";
         public static final String GET_MY_REVIEWS_SUCCESS = "Your reviews retrieved successfully";
+        public static final String GET_TOP_REVIEWS_SUCCESS = "Top reviews retrieved successfully";
     }
 
 }

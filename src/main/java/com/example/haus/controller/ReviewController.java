@@ -172,4 +172,20 @@ public class ReviewController {
                 reviewService.getMyReviews(userId, paginationRequest)
         );
     }
+    @Tag(name = "public-review-controller", description = "Public Review APIs")
+    @Operation(
+            summary = "Lấy danh sách đánh giá có số sao cao nhất",
+            description = "Lấy danh sách đánh giá được sắp xếp theo số sao giảm dần. Không phân biệt sản phẩm."
+    )
+    @GetMapping(UrlConstant.Review.GET_TOP_REVIEWS)
+    public ResponseEntity<?> getTopReviewsByRating(
+            @RequestParam(defaultValue = "0") @Parameter(description = "Số trang", example = "1") Integer pageNum,
+            @RequestParam(defaultValue = "15") @Parameter(description = "Số items trên mỗi trang", example = "15") Integer pageSize
+    ) {
+        PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
+        return ResponseUtil.success(
+                SuccessMessage.Review.GET_TOP_REVIEWS_SUCCESS,
+                reviewService.getTopReviews(paginationRequest)
+        );
+    }
 }
