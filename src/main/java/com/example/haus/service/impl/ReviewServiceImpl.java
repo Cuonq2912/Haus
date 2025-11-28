@@ -5,6 +5,7 @@ import com.example.haus.constant.OrderStatus;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.product.ReviewRequestDto;
+import com.example.haus.domain.dto.response.dashboard.TopReviewDto;
 import com.example.haus.domain.dto.response.product.RatingStatisticsDto;
 import com.example.haus.domain.dto.response.product.ReviewResponseDto;
 import com.example.haus.domain.entity.product.Product;
@@ -263,6 +264,30 @@ public class ReviewServiceImpl implements ReviewService {
         return PaginationUtil.createPaginationResponse(reviewPage, paginationRequest, reviews);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public PaginationResponseDto<TopReviewDto> getTopReviews(PaginationRequestDto paginationRequest) {
+        Pageable pageable = PageRequest.of(
+                paginationRequest.getPageNum(),
+                paginationRequest.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "rating", "createdAt")
+        );
+
+        Page<Review> reviewPage = reviewRepository.findTopReviewsByRating(pageable);
+
+        List<TopReviewDto> reviews = reviewPage
+                .getContent()
+                .stream()
+                .map(this::mapToTopReviewDto)
+                .toList();
+
+        return PaginationUtil.createPaginationResponse(
+                reviewPage,
+                paginationRequest,
+                reviews
+        );
+    }
+
     private ReviewResponseDto mapToResponseDto(Review review) {
         return ReviewResponseDto.builder()
                 .id(review.getId())
@@ -281,4 +306,33 @@ public class ReviewServiceImpl implements ReviewService {
                 .updatedAt(review.getUpdatedAt())
                 .build();
     }
+
+    private TopReviewDto mapToTopReviewDto(Review review) {
+        String reviewerName = buildReviewerName(review.getUser());
+
+        return TopReviewDto.builder()
+                .rating(review.getRating())
+                .content(review.getContent())
+                .reviewerName(reviewerName)
+                .build();
+    }
+
+    private String buildReviewerName(User user) {
+        String firstName = user.getFirstName() != null
+                ? user.getFirstName()
+                : "";
+        String lastName = user.getLastName() != null ? user.getLastName() : "";
+
+        if(!firstName.isEmpty() && !lastName.isEmpty()){
+            return firstName + " " + lastName;
+        } else if (!firstName.isEmpty()) {
+            return firstName;
+        } else if (!lastName.isEmpty()) {
+            return lastName;
+        } else {
+            return user.getUsername();
+        }
+    }
+
+
 }

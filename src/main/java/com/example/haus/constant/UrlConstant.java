@@ -171,6 +171,7 @@ public class UrlConstant {
         public static final String REPORT_REVIEW = PRE_FIX + "/{reviewId}/report";
         public static final String HIDE_REVIEW = "/admin" + PRE_FIX + "/{reviewId}/hide";
         public static final String SHOW_REVIEW = "/admin" + PRE_FIX + "/{reviewId}/show";
+        public static final String GET_TOP_REVIEWS = PRE_FIX + "/top";
 
         private Review() {
         }
