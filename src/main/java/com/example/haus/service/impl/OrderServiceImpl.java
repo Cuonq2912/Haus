@@ -3,13 +3,8 @@ package com.example.haus.service.impl;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.OrderStatus;
 import com.example.haus.domain.dto.order.OrderAllRequestDto;
-import com.example.haus.domain.dto.order.OrderItemRequestDto;
-import com.example.haus.domain.dto.order.OrderRequestDto;
-import com.example.haus.domain.dto.order.PaymentRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
-import com.example.haus.domain.dto.request.order.BuyNowRequest;
-import com.example.haus.domain.dto.request.order.CheckoutRequest;
 import com.example.haus.domain.dto.response.invoice.InvoiceItemDto;
 import com.example.haus.domain.dto.response.invoice.InvoiceResponseDto;
 import com.example.haus.domain.dto.response.product.CreateOrderResponseDto;
@@ -20,8 +15,6 @@ import com.example.haus.domain.entity.product.Order;
 import com.example.haus.domain.entity.product.OrderItem;
 import com.example.haus.domain.entity.product.ProductVariation;
 import com.example.haus.domain.entity.product.Promotion;
-import com.example.haus.domain.entity.address.Address;
-import com.example.haus.domain.entity.product.*;
 import com.example.haus.domain.entity.product.payment.Payment;
 import com.example.haus.domain.entity.product.payment.PaymentStatus;
 import com.example.haus.domain.entity.product.payment.PaymentType;
@@ -33,7 +26,6 @@ import com.example.haus.repository.*;
 import com.example.haus.service.OrderService;
 import com.example.haus.util.PaginationUtil;
 import com.example.haus.util.PdfUtil;
-import com.google.zxing.WriterException;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -54,10 +46,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
 @Service
@@ -82,15 +72,13 @@ public class OrderServiceImpl implements OrderService {
 
     PaymentMapper paymentMapper;
 
-    ProductMapper productMapper;
-
     UserMapper userMapper;
-
-    ProductVariationMapper productVariationMapper;
 
     PromotionMapper promotionMapper;
 
     MediaMapper mediaMapper;
+
+    AddressMapper addressMapper;
 
     private static double totalPrice = 0;
 
@@ -192,8 +180,9 @@ public class OrderServiceImpl implements OrderService {
                 .updatedAt(order.getUpdatedAt())
                 .build();
 
-        if (order.getUser() != null) {
-            dto.setUser(convertToUserInfo(order.getUser()));
+        if(order.getShippingAddress() != null) {
+            dto.setUser(addressMapper.addressToAddressResponseDto(order.getShippingAddress())
+            );
         }
 
         if (order.getPromotion() != null) {
@@ -205,16 +194,6 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return dto;
-    }
-
-    private OrderResponseDto.UserInfo convertToUserInfo(User user) {
-        return OrderResponseDto.UserInfo.builder()
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .phone(user.getPhone())
-                .build();
     }
 
     private OrderResponseDto.PromotionInfo convertToPromotionInfo(Promotion promotion) {
@@ -233,6 +212,7 @@ public class OrderServiceImpl implements OrderService {
                 .status(payment.getStatus())
                 .build();
     }
+
 
     @Override
     public CreateOrderResponseDto createOrder(String username, OrderAllRequestDto orderAllRequestDto) {

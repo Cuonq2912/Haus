@@ -6,13 +6,15 @@ import com.example.haus.domain.entity.product.Order;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring",
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+    nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
+    uses = { AddressMapper.class }
 )
 public interface OrderMapper {
-
+    @Mapping(target = "user", source = "shippingAddress")
     OrderResponseDto orderToOrderResponseDto(Order order);
 
+    @Mapping(target = "user", source = "shippingAddress")
     OrderResponseDto orderToOrderResponse(Order order);
 
     @Mappings({
