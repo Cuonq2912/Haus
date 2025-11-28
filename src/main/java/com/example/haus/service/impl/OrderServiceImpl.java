@@ -12,6 +12,7 @@ import com.example.haus.domain.dto.request.order.BuyNowRequest;
 import com.example.haus.domain.dto.request.order.CheckoutRequest;
 import com.example.haus.domain.dto.response.invoice.InvoiceItemDto;
 import com.example.haus.domain.dto.response.invoice.InvoiceResponseDto;
+import com.example.haus.domain.dto.response.product.CreateOrderResponseDto;
 import com.example.haus.domain.dto.response.product.OrderResponseDto;
 import com.example.haus.domain.dto.response.user.UserResponseDto;
 import com.example.haus.domain.entity.address.Address;
@@ -234,7 +235,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Long createOrder(String username, OrderAllRequestDto orderAllRequestDto) {
+    public CreateOrderResponseDto createOrder(String username, OrderAllRequestDto orderAllRequestDto) {
         User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
                 () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED)
         );
@@ -273,6 +274,13 @@ public class OrderServiceImpl implements OrderService {
             return address;
         }).toList();
 
+        Address selectedAddress = addresses
+                .stream()
+                .filter(Address::getIsSelected)
+                .findFirst()
+                .orElseThrow(() -> new InvalidDataException("No shipping address selected"));
+        order.setShippingAddress(selectedAddress);
+
         order.setUser(user);
         order.setOrderItems(orderItems);
         order.setPayment(payment);
@@ -281,7 +289,9 @@ public class OrderServiceImpl implements OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        return savedOrder.getId();
+        return CreateOrderResponseDto.builder()
+                .orderId(savedOrder.getId())
+                .build();
     }
 
     @Override
