@@ -8,7 +8,6 @@ import com.example.haus.domain.dto.response.product.CreateOrderResponseDto;
 import com.example.haus.domain.dto.response.product.OrderResponseDto;
 import com.itextpdf.text.DocumentException;
 import java.io.IOException;
-import java.util.List;
 
 public interface OrderService {
     CreateOrderResponseDto createOrder(String username, OrderAllRequestDto orderAllRequestDto);
@@ -18,6 +17,8 @@ public interface OrderService {
     PaginationResponseDto<OrderResponseDto> getAllOrders(PaginationRequestDto paginationRequest, String status);
 
     OrderResponseDto getOrderById(Long id);
+
+    OrderResponseDto getOrderByOrderNumber(String orderNumber);
 
     OrderResponseDto updateStatusOrderById(Long id, String status);
 

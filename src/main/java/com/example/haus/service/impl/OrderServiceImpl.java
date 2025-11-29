@@ -727,7 +727,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-    private String generateOrderNumber() {
-        return "ORD-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    @Override
+    public OrderResponseDto getOrderByOrderNumber(String orderNumber) {
+        Order order = orderRepository.findByOrderNumber(orderNumber)
+            .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
+
+            return orderMapper.orderToOrderResponse(order);
     }
 }

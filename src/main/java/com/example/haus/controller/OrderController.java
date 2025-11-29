@@ -5,13 +5,7 @@ import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.order.OrderAllRequestDto;
-import com.example.haus.domain.dto.order.OrderItemRequestDto;
-import com.example.haus.domain.dto.order.OrderRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
-import com.example.haus.domain.entity.product.OrderItem;
-import com.example.haus.domain.dto.request.order.BuyNowRequest;
-import com.example.haus.domain.dto.request.order.CheckoutRequest;
-import com.example.haus.domain.dto.response.product.OrderResponseDto;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.service.OrderService;
 import com.itextpdf.text.DocumentException;
@@ -40,6 +34,9 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestApiV1
 @Validated
@@ -67,7 +64,6 @@ public class OrderController {
     }
 
 
-    @Tag(name = "public-order-controller", description = "Public Order APIs")
     @Operation(
             summary = "Lấy tất đơn hàng",
             description = "Lấy danh sách tất cả đơn hàng với phân trang và filter theo trạng thái",
@@ -142,6 +138,7 @@ public class OrderController {
             throw new RuntimeException(e);
         }
     }
+
     @Operation(
             summary = "Lấy đơn hàng theo ID",
             description = "Dùng để lấy đơn hàng theo id",
@@ -166,7 +163,7 @@ public class OrderController {
             },
             security = @SecurityRequirement(name = "Bearer Token")
     )
-    @PostMapping(UrlConstant.Order.UPDATE_STATUS_ORDER_BY_ID)
+    @PatchMapping(UrlConstant.Order.UPDATE_STATUS_ORDER_BY_ID)
     public ResponseEntity<?> updateStatusOrderById(
             @PathVariable Long id,
             @RequestParam String status) {
@@ -175,11 +172,16 @@ public class OrderController {
                 orderService.updateStatusOrderById(id, status));
     }
 
-    private String getCurrentUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new RuntimeException("User not authenticated");
-        }
-        return authentication.getName();
+    @Operation(
+            summary = "Lấy đơn hàng theo order number",
+            description = "Dùng để lấy đơn hàng theo order number",
+            security = @SecurityRequirement(name = "Bearer Token")
+    )
+    @GetMapping(UrlConstant.Order.GET_ORDER_BY_ORDER_NUMBER)
+    public ResponseEntity<?> getOrderByOrderNumber(@PathVariable("orderNumber") String orderNumber) {
+        return ResponseUtil.success(
+                SuccessMessage.Order.GET_ORDER_SUCCESS,
+                orderService.getOrderByOrderNumber(orderNumber)
+        );
     }
 }

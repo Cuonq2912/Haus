@@ -30,6 +30,7 @@ public class ProductController {
 
     ProductService productService;
 
+    @Tag(name = "admin-product-controller", description = "Admin Product Management APIs")
     @Operation(
             summary = "Lấy sản phẩm theo id",
             description = "Dùng để lấy ra sản phẩm theo id",
@@ -113,6 +114,7 @@ public class ProductController {
     }
 
 
+    @Tag(name = "admin-product-controller", description = "Admin Product Management APIs")
     @Operation(
             summary = "Lấy sản phẩm theo ID category",
             description = "Dùng để lấy danh sách sản phẩm thuộc category có phân trang"

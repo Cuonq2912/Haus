@@ -143,6 +143,7 @@ public class UrlConstant {
 
         public static final String GET_ALL_ORDERS = PRE_FIX;
         public static final String GET_ORDER_BY_ID = PRE_FIX + "/{id}";
+        public static final String GET_ORDER_BY_ORDER_NUMBER = PRE_FIX + "/search/{orderNumber}";
         public static final String UPDATE_STATUS_ORDER_BY_ID = PRE_FIX + "/{id}";
         public static final String CHECKOUT_FROM_CART = PRE_FIX + "/checkout";
         public static final String BUY_NOW = PRE_FIX + "/buy-now";
