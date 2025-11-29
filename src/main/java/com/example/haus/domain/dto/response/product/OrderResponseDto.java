@@ -10,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -49,6 +50,9 @@ public class OrderResponseDto {
 
     @Schema(description = "Thông tin thanh toán")
     PaymentInfo payment;
+
+    @Schema(description = "Danh sách sản phẩm trong đơn hàng")
+    List<OrderItemResponseDto> products;
 
     @Schema(description = "Ngày tạo")
     Date createdAt;

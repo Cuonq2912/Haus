@@ -18,6 +18,21 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT o FROM Order o " +
             "LEFT JOIN FETCH o.orderItems oi " +
+            "LEFT JOIN FETCH oi.productVariation pv " +
+            "LEFT JOIN FETCH pv.product p " +
+            "LEFT JOIN FETCH pv.media " +
+            "WHERE o.id = :orderId")
+    Optional<Order> findByIdWithOrderItems(@Param("orderId") Long orderId);
+
+    @Query("SELECT DISTINCT o FROM Order o " +
+            "LEFT JOIN FETCH o.orderItems oi " +
+            "LEFT JOIN FETCH oi.productVariation pv " +
+            "LEFT JOIN FETCH pv.product p " +
+            "LEFT JOIN FETCH pv.media")
+    Page<Order> findAllWithOrderItems(Pageable pageable);
+
+    @Query("SELECT o FROM Order o " +
+            "LEFT JOIN FETCH o.orderItems oi " +
             "LEFT JOIN FETCH o.user u " +
             "LEFT JOIN FETCH o.payment p " +
             "LEFT JOIN FETCH o.promotion prom " +

@@ -102,11 +102,11 @@ public class OrderServiceImpl implements OrderService {
             }
             orderPage = orderRepository.findByStatus(orderStatus, pageable);
         } else {
-            orderPage = orderRepository.findAll(pageable);
+            orderPage = orderRepository.findAllWithOrderItems(pageable);
         }
 
         List<OrderResponseDto> orderResponseList = orderPage.getContent().stream()
-                .map(this::convertToOrderResponseDto)
+                .map(orderMapper::orderToOrderResponseDto)
                 .toList();
 
         return PaginationUtil.createPaginationResponse(orderPage, paginationRequest, orderResponseList);
@@ -119,14 +119,13 @@ public class OrderServiceImpl implements OrderService {
             throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
         }
 
-        Order order = orderRepository.findById(id)
+        Order order = orderRepository.findByIdWithOrderItems(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
 
         User currentUser = userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
         
-        // If user is not admin, check if the order belongs to them
-        if (!"ADMIN".equals(currentUser.getRole().name()) && 
+        if (!"ADMIN".equals(currentUser.getRole().name()) &&
             !order.getUser().getId().equals(currentUser.getId())) {
             throw new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED);
         }
@@ -343,7 +342,6 @@ public class OrderServiceImpl implements OrderService {
         return builder.build();
     }
 
-    // Trong OrderServiceImpl.java
 
     @Override
     @jakarta.transaction.Transactional
