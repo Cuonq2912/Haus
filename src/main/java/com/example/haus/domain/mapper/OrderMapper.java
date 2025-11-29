@@ -11,10 +11,10 @@ import org.mapstruct.*;
     uses = { AddressMapper.class }
 )
 public interface OrderMapper {
-    @Mapping(target = "user", source = "shippingAddress")
+    @Mapping(target = "recipientInfo", source = "shippingAddress")
     OrderResponseDto orderToOrderResponseDto(Order order);
 
-    @Mapping(target = "user", source = "shippingAddress")
+    @Mapping(target = "recipientInfo", source = "shippingAddress")
     OrderResponseDto orderToOrderResponse(Order order);
 
     @Mappings({

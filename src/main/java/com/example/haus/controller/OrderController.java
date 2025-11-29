@@ -89,23 +89,31 @@ public class OrderController {
 
     @Operation(
             summary = "Lấy chi tiết và xuất hóa đơn",
-            description = "Truy vấn toàn bộ dữ liệu đơn hàng, sản phẩm, và người dùng để tạo hóa đơn."
+            description = "Truy vấn toàn bộ dữ liệu đơn hàng, sản phẩm, và người dùng để tạo hóa đơn.",
+            security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping("/orders/{orderId}/invoice")
-    public ResponseEntity<?> getInvoiceDetails(@PathVariable Long orderId) {
+    public ResponseEntity<?> getInvoiceDetails(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long orderId) {
+        String username = userDetails.getUsername();
         return ResponseUtil.success(
                 SuccessMessage.Order.GET_INVOICE_SUCCESS,
-                orderService.getInvoiceDetails(orderId)
+                orderService.getInvoiceDetails(orderId, username)
         );
     }
     @Operation(
-            summary = "Xuất hóa đơn PDF",
-            description = "Truy vấn toàn bộ dữ liệu đơn hàng, sản phẩm, và người dùng để xuất hóa đơn."
+            summary = "Xuất hóa đơn PDF",
+            description = "Truy vấn toàn bộ dữ liệu đơn hàng, sản phẩm, và người dùng để xuất hóa đơn.",
+            security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping("/orders/{orderId}/invoice/pdf")
-    public ResponseEntity<?> exportPdf(@PathVariable Long orderId) {
+    public ResponseEntity<?> exportPdf(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long orderId) {
         try {
-            byte[] pdfBytes = orderService.generateInvoicePdf(orderId);
+            String username = userDetails.getUsername();
+            byte[] pdfBytes = orderService.generateInvoicePdf(orderId, username);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
@@ -146,10 +154,12 @@ public class OrderController {
     )
     @GetMapping(UrlConstant.Order.GET_ORDER_BY_ID)
     public ResponseEntity<?> getOrderById(
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long id) {
+        String username = userDetails.getUsername();
         return ResponseUtil.success(
                 SuccessMessage.Order.GET_ORDER_SUCCESS,
-                orderService.getOrderById(id));
+                orderService.getOrderById(id, username));
     }
 
 
@@ -178,10 +188,13 @@ public class OrderController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping(UrlConstant.Order.GET_ORDER_BY_ORDER_NUMBER)
-    public ResponseEntity<?> getOrderByOrderNumber(@PathVariable("orderNumber") String orderNumber) {
+    public ResponseEntity<?> getOrderByOrderNumber(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable("orderNumber") String orderNumber) {
+        String username = userDetails.getUsername();
         return ResponseUtil.success(
                 SuccessMessage.Order.GET_ORDER_SUCCESS,
-                orderService.getOrderByOrderNumber(orderNumber)
+                orderService.getOrderByOrderNumber(orderNumber, username)
         );
     }
 }

@@ -12,16 +12,16 @@ import java.io.IOException;
 public interface OrderService {
     CreateOrderResponseDto createOrder(String username, OrderAllRequestDto orderAllRequestDto);
 
-    InvoiceResponseDto getInvoiceDetails(Long orderId);
+    InvoiceResponseDto getInvoiceDetails(Long orderId, String username);
 
     PaginationResponseDto<OrderResponseDto> getAllOrders(PaginationRequestDto paginationRequest, String status);
 
-    OrderResponseDto getOrderById(Long id);
+    OrderResponseDto getOrderById(Long id, String username);
 
-    OrderResponseDto getOrderByOrderNumber(String orderNumber);
+    OrderResponseDto getOrderByOrderNumber(String orderNumber, String username);
 
     OrderResponseDto updateStatusOrderById(Long id, String status);
 
-    byte[] generateInvoicePdf(Long orderId) throws DocumentException, IOException;
+    byte[] generateInvoicePdf(Long orderId, String username) throws DocumentException, IOException;
 
 }

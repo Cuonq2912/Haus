@@ -31,7 +31,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -79,7 +78,11 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/api/v1/product/filter/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/payment/momo/callback").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/payment/momo/ipn-handler").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/order/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/order").hasAnyAuthority(RoleConstant.ADMIN)
+                                .requestMatchers(HttpMethod.PATCH, "/api/v1/order/**").hasAnyAuthority(RoleConstant.ADMIN)
+                                .requestMatchers(HttpMethod.POST, "/api/v1/orders").hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
+                                .requestMatchers(HttpMethod.GET, "/api/v1/order/**").hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
+                                .requestMatchers(HttpMethod.GET, "/api/v1/orders/**").hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
                                 .requestMatchers(userEndpoints).hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
                                 .requestMatchers(adminEndpoints).hasAnyAuthority(RoleConstant.ADMIN)
                                 .anyRequest().authenticated())

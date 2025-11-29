@@ -42,7 +42,7 @@ public class OrderResponseDto {
     LocalDate deliveryDate;
 
     @Schema(description = "Thông tin người nhận và địa chỉ nhận")
-    AddressResponseDto user;
+    AddressResponseDto recipientInfo;
 
     @Schema(description = "Thông tin khuyến mãi")
     PromotionInfo promotion;

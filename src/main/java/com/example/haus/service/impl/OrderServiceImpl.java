@@ -113,7 +113,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderResponseDto getOrderById(Long id) {
+    public OrderResponseDto getOrderById(Long id, String username) {
 
         if (id == null || id <= 0) {
             throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
@@ -121,6 +121,15 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
+
+        User currentUser = userRepository.findByUsernameAndIsDeletedFalse(username)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+        
+        // If user is not admin, check if the order belongs to them
+        if (!"ADMIN".equals(currentUser.getRole().name()) && 
+            !order.getUser().getId().equals(currentUser.getId())) {
+            throw new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED);
+        }
 
         return orderMapper.orderToOrderResponse(order);
 
@@ -181,7 +190,7 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         if(order.getShippingAddress() != null) {
-            dto.setUser(addressMapper.addressToAddressResponseDto(order.getShippingAddress())
+            dto.setRecipientInfo(addressMapper.addressToAddressResponseDto(order.getShippingAddress())
             );
         }
 
@@ -276,10 +285,18 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @jakarta.transaction.Transactional
-    public InvoiceResponseDto getInvoiceDetails(Long orderId) {
+    public InvoiceResponseDto getInvoiceDetails(Long orderId, String username) {
 
         Order order = orderRepository.findOrderDetailsForInvoice(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
+
+        User currentUser = userRepository.findByUsernameAndIsDeletedFalse(username)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+        
+        if (!"ADMIN".equals(currentUser.getRole().name()) &&
+            !order.getUser().getId().equals(currentUser.getId())) {
+            throw new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED);
+        }
 
         if (order.getStatus() != OrderStatus.COMPLETED) {
             throw new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_COMPLETED);
@@ -330,8 +347,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @jakarta.transaction.Transactional
-    public byte[] generateInvoicePdf(Long orderId) throws DocumentException, IOException {
-        InvoiceResponseDto invoiceData = getInvoiceDetails(orderId);
+    public byte[] generateInvoicePdf(Long orderId, String username) throws DocumentException, IOException {
+        InvoiceResponseDto invoiceData = getInvoiceDetails(orderId, username);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         // Kích thước A4
         Document document = new Document(PageSize.A4, 30, 30, 15, 15);
@@ -728,10 +745,18 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public OrderResponseDto getOrderByOrderNumber(String orderNumber) {
+    public OrderResponseDto getOrderByOrderNumber(String orderNumber, String username) {
         Order order = orderRepository.findByOrderNumber(orderNumber)
             .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
 
-            return orderMapper.orderToOrderResponse(order);
+        User currentUser = userRepository.findByUsernameAndIsDeletedFalse(username)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+        
+        if (!"ADMIN".equals(currentUser.getRole().name()) &&
+            !order.getUser().getId().equals(currentUser.getId())) {
+            throw new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED);
+        }
+
+        return orderMapper.orderToOrderResponse(order);
     }
 }
