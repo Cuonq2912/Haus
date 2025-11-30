@@ -266,8 +266,8 @@ public class VNPayServiceImpl implements VNPayService {
         }
         String responseCode = params.get("vnp_ResponseCode");
 
-        Boolean isSuccess = (Boolean)(SUCCESS_CODE.equals(responseCode)
-                && Boolean.TRUE.equals(checkIpnList.get(params.get("vnp_TxnRef").split("-")[0])));
+        boolean isSuccess = SUCCESS_CODE.equals(responseCode)
+                && Boolean.TRUE.equals(checkIpnList.get(params.get("vnp_TxnRef").split("-")[0]));
 
         result.put("message", isSuccess ? "Thanh toán thành công" : "Thanh toán thất bại");
 
