@@ -1,6 +1,7 @@
 package com.example.haus.domain.dto.response.product;
 
 import com.example.haus.constant.OrderStatus;
+import com.example.haus.domain.dto.response.address.AddressResponseDto;
 import com.example.haus.domain.entity.product.payment.PaymentStatus;
 import com.example.haus.domain.entity.product.payment.PaymentType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -9,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -40,8 +42,8 @@ public class OrderResponseDto {
     @Schema(description = "Ngày giao hàng dự kiến", example = "2023-10-20")
     LocalDate deliveryDate;
 
-    @Schema(description = "Thông tin khách hàng")
-    UserInfo user;
+    @Schema(description = "Thông tin người nhận và địa chỉ nhận")
+    AddressResponseDto recipientInfo;
 
     @Schema(description = "Thông tin khuyến mãi")
     PromotionInfo promotion;
@@ -49,35 +51,14 @@ public class OrderResponseDto {
     @Schema(description = "Thông tin thanh toán")
     PaymentInfo payment;
 
+    @Schema(description = "Danh sách sản phẩm trong đơn hàng")
+    List<OrderItemResponseDto> products;
+
     @Schema(description = "Ngày tạo")
     Date createdAt;
 
     @Schema(description = "Ngày cập nhật cuối")
     Date updatedAt;
-
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    @FieldDefaults(level = AccessLevel.PRIVATE)
-    public static class UserInfo {
-
-        @Schema(description = "Username")
-        String username;
-
-        @Schema(description = "Email")
-        String email;
-
-        @Schema(description = "Họ")
-        String firstName;
-
-        @Schema(description = "Tên")
-        String lastName;
-
-        @Schema(description = "Số điện thoại")
-        String phone;
-    }
 
     @Getter
     @Setter

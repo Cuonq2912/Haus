@@ -5,10 +5,9 @@ import com.example.haus.constant.OrderStatus;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.product.ReviewRequestDto;
+import com.example.haus.domain.dto.response.dashboard.TopReviewDto;
 import com.example.haus.domain.dto.response.product.RatingStatisticsDto;
 import com.example.haus.domain.dto.response.product.ReviewResponseDto;
-import com.example.haus.domain.entity.product.Order;
-import com.example.haus.domain.entity.product.OrderItem;
 import com.example.haus.domain.entity.product.Product;
 import com.example.haus.domain.entity.product.Review;
 import com.example.haus.domain.entity.user.User;
@@ -58,33 +57,24 @@ public class ReviewServiceImpl implements ReviewService {
             throw new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED);
         }
 
-        OrderItem orderItem = orderItemRepository.findById(request.getOrderItemId())
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
+        boolean hasPurchased =
+            orderItemRepository.existsByUserIdAndProductIdAndOrderStatus(userId, productId, OrderStatus.COMPLETED);
 
-        if (!orderItem.getOrder().getUser().getId().equals(userId)) {
-            throw new ForBiddenException(ErrorMessage.Review.ERR_REVIEW_CAN_NOT_BEFORE_BUY);
-        }
-
-        Order order = orderItem.getOrder();
-        if (order.getStatus() != OrderStatus.COMPLETED) {
+        if(!hasPurchased){
             throw new InvalidDataException(ErrorMessage.Review.ERR_REVIEW_CAN_NOT_BEFORE_BUY);
         }
 
-        if (!orderItem.getProductVariation().getProduct().getId().equals(productId)) {
-            throw new InvalidDataException(ErrorMessage.Review.ERR_REVIEW_CAN_NOT_BEFORE_BUY);
-        }
-
-        if (reviewRepository.existsByOrderItemIdAndUserId(request.getOrderItemId(), userId)) {
+        if (reviewRepository.existsByUserIdAndProductId(userId, productId)) {
             throw new InvalidDataException(ErrorMessage.Review.ERR_REVIEW_YOU_REVIEWED_THIS_ORDER);
         }
 
         Review review = Review.builder()
-                .rating(request.getRating())
-                .content(request.getContent())
-                .user(user)
-                .product(product)
-                .orderItem(orderItem)
-                .build();
+            .rating(request.getRating())
+            .content(request.getContent())
+            .user(user)
+            .product(product)
+            .orderItem(null)
+            .build();
 
         Review savedReview = reviewRepository.save(review);
         
@@ -274,6 +264,30 @@ public class ReviewServiceImpl implements ReviewService {
         return PaginationUtil.createPaginationResponse(reviewPage, paginationRequest, reviews);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public PaginationResponseDto<TopReviewDto> getTopReviews(PaginationRequestDto paginationRequest) {
+        Pageable pageable = PageRequest.of(
+                paginationRequest.getPageNum(),
+                paginationRequest.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "rating", "createdAt")
+        );
+
+        Page<Review> reviewPage = reviewRepository.findTopReviewsByRating(pageable);
+
+        List<TopReviewDto> reviews = reviewPage
+                .getContent()
+                .stream()
+                .map(this::mapToTopReviewDto)
+                .toList();
+
+        return PaginationUtil.createPaginationResponse(
+                reviewPage,
+                paginationRequest,
+                reviews
+        );
+    }
+
     private ReviewResponseDto mapToResponseDto(Review review) {
         return ReviewResponseDto.builder()
                 .id(review.getId())
@@ -292,4 +306,33 @@ public class ReviewServiceImpl implements ReviewService {
                 .updatedAt(review.getUpdatedAt())
                 .build();
     }
+
+    private TopReviewDto mapToTopReviewDto(Review review) {
+        String reviewerName = buildReviewerName(review.getUser());
+
+        return TopReviewDto.builder()
+                .rating(review.getRating())
+                .content(review.getContent())
+                .reviewerName(reviewerName)
+                .build();
+    }
+
+    private String buildReviewerName(User user) {
+        String firstName = user.getFirstName() != null
+                ? user.getFirstName()
+                : "";
+        String lastName = user.getLastName() != null ? user.getLastName() : "";
+
+        if(!firstName.isEmpty() && !lastName.isEmpty()){
+            return firstName + " " + lastName;
+        } else if (!firstName.isEmpty()) {
+            return firstName;
+        } else if (!lastName.isEmpty()) {
+            return lastName;
+        } else {
+            return user.getUsername();
+        }
+    }
+
+
 }

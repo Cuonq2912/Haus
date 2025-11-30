@@ -3,15 +3,11 @@ package com.example.haus.service.impl;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.OrderStatus;
 import com.example.haus.domain.dto.order.OrderAllRequestDto;
-import com.example.haus.domain.dto.order.OrderItemRequestDto;
-import com.example.haus.domain.dto.order.OrderRequestDto;
-import com.example.haus.domain.dto.order.PaymentRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
-import com.example.haus.domain.dto.request.order.BuyNowRequest;
-import com.example.haus.domain.dto.request.order.CheckoutRequest;
 import com.example.haus.domain.dto.response.invoice.InvoiceItemDto;
 import com.example.haus.domain.dto.response.invoice.InvoiceResponseDto;
+import com.example.haus.domain.dto.response.product.CreateOrderResponseDto;
 import com.example.haus.domain.dto.response.product.OrderResponseDto;
 import com.example.haus.domain.dto.response.user.UserResponseDto;
 import com.example.haus.domain.entity.address.Address;
@@ -19,8 +15,6 @@ import com.example.haus.domain.entity.product.Order;
 import com.example.haus.domain.entity.product.OrderItem;
 import com.example.haus.domain.entity.product.ProductVariation;
 import com.example.haus.domain.entity.product.Promotion;
-import com.example.haus.domain.entity.address.Address;
-import com.example.haus.domain.entity.product.*;
 import com.example.haus.domain.entity.product.payment.Payment;
 import com.example.haus.domain.entity.product.payment.PaymentStatus;
 import com.example.haus.domain.entity.product.payment.PaymentType;
@@ -32,7 +26,6 @@ import com.example.haus.repository.*;
 import com.example.haus.service.OrderService;
 import com.example.haus.util.PaginationUtil;
 import com.example.haus.util.PdfUtil;
-import com.google.zxing.WriterException;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -53,10 +46,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
 @Service
@@ -81,15 +72,13 @@ public class OrderServiceImpl implements OrderService {
 
     PaymentMapper paymentMapper;
 
-    ProductMapper productMapper;
-
     UserMapper userMapper;
-
-    ProductVariationMapper productVariationMapper;
 
     PromotionMapper promotionMapper;
 
     MediaMapper mediaMapper;
+
+    AddressMapper addressMapper;
 
     private static double totalPrice = 0;
 
@@ -113,25 +102,33 @@ public class OrderServiceImpl implements OrderService {
             }
             orderPage = orderRepository.findByStatus(orderStatus, pageable);
         } else {
-            orderPage = orderRepository.findAll(pageable);
+            orderPage = orderRepository.findAllWithOrderItems(pageable);
         }
 
         List<OrderResponseDto> orderResponseList = orderPage.getContent().stream()
-                .map(this::convertToOrderResponseDto)
+                .map(orderMapper::orderToOrderResponseDto)
                 .toList();
 
         return PaginationUtil.createPaginationResponse(orderPage, paginationRequest, orderResponseList);
     }
 
     @Override
-    public OrderResponseDto getOrderById(Long id) {
+    public OrderResponseDto getOrderById(Long id, String username) {
 
         if (id == null || id <= 0) {
             throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
         }
 
-        Order order = orderRepository.findById(id)
+        Order order = orderRepository.findByIdWithOrderItems(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
+
+        User currentUser = userRepository.findByUsernameAndIsDeletedFalse(username)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+
+        if (!"ADMIN".equals(currentUser.getRole().name()) &&
+            !order.getUser().getId().equals(currentUser.getId())) {
+            throw new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED);
+        }
 
         return orderMapper.orderToOrderResponse(order);
 
@@ -191,8 +188,9 @@ public class OrderServiceImpl implements OrderService {
                 .updatedAt(order.getUpdatedAt())
                 .build();
 
-        if (order.getUser() != null) {
-            dto.setUser(convertToUserInfo(order.getUser()));
+        if(order.getShippingAddress() != null) {
+            dto.setRecipientInfo(addressMapper.addressToAddressResponseDto(order.getShippingAddress())
+            );
         }
 
         if (order.getPromotion() != null) {
@@ -204,16 +202,6 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return dto;
-    }
-
-    private OrderResponseDto.UserInfo convertToUserInfo(User user) {
-        return OrderResponseDto.UserInfo.builder()
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .phone(user.getPhone())
-                .build();
     }
 
     private OrderResponseDto.PromotionInfo convertToPromotionInfo(Promotion promotion) {
@@ -233,8 +221,9 @@ public class OrderServiceImpl implements OrderService {
                 .build();
     }
 
+
     @Override
-    public Long createOrder(String username, OrderAllRequestDto orderAllRequestDto) {
+    public CreateOrderResponseDto createOrder(String username, OrderAllRequestDto orderAllRequestDto) {
         User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
                 () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED)
         );
@@ -273,6 +262,13 @@ public class OrderServiceImpl implements OrderService {
             return address;
         }).toList();
 
+        Address selectedAddress = addresses
+                .stream()
+                .filter(Address::getIsSelected)
+                .findFirst()
+                .orElseThrow(() -> new InvalidDataException("No shipping address selected"));
+        order.setShippingAddress(selectedAddress);
+
         order.setRecipientName(username);
         order.setUser(user);
         order.setOrderItems(orderItems);
@@ -282,15 +278,25 @@ public class OrderServiceImpl implements OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        return savedOrder.getId();
+        return CreateOrderResponseDto.builder()
+                .orderId(savedOrder.getId())
+                .build();
     }
 
     @Override
     @jakarta.transaction.Transactional
-    public InvoiceResponseDto getInvoiceDetails(Long orderId) {
+    public InvoiceResponseDto getInvoiceDetails(Long orderId, String username) {
 
         Order order = orderRepository.findOrderDetailsForInvoice(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
+
+        User currentUser = userRepository.findByUsernameAndIsDeletedFalse(username)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+
+        if (!"ADMIN".equals(currentUser.getRole().name()) &&
+            !order.getUser().getId().equals(currentUser.getId())) {
+            throw new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED);
+        }
 
         if (order.getStatus() != OrderStatus.COMPLETED) {
             throw new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_COMPLETED);
@@ -337,12 +343,11 @@ public class OrderServiceImpl implements OrderService {
         return builder.build();
     }
 
-    // Trong OrderServiceImpl.java
 
     @Override
     @jakarta.transaction.Transactional
-    public byte[] generateInvoicePdf(Long orderId) throws DocumentException, IOException {
-        InvoiceResponseDto invoiceData = getInvoiceDetails(orderId);
+    public byte[] generateInvoicePdf(Long orderId, String username) throws DocumentException, IOException {
+        InvoiceResponseDto invoiceData = getInvoiceDetails(orderId, username);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         // Kích thước A4
         Document document = new Document(PageSize.A4, 30, 30, 15, 15);
@@ -738,7 +743,19 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-    private String generateOrderNumber() {
-        return "ORD-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    @Override
+    public OrderResponseDto getOrderByOrderNumber(String orderNumber, String username) {
+        Order order = orderRepository.findByOrderNumber(orderNumber)
+            .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
+
+        User currentUser = userRepository.findByUsernameAndIsDeletedFalse(username)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+
+        if (!"ADMIN".equals(currentUser.getRole().name()) &&
+            !order.getUser().getId().equals(currentUser.getId())) {
+            throw new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED);
+        }
+
+        return orderMapper.orderToOrderResponse(order);
     }
 }

@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface AddressRepository extends JpaRepository<Address, String> {
+public interface AddressRepository extends JpaRepository<Address, Long> {
 
     @Query("SELECT u FROM Address u WHERE u.user.id = :userId AND u.isDeleted = false")
     List<Address> getAddressByUserId(String userId);

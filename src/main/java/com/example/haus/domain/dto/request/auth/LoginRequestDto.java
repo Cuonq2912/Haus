@@ -16,7 +16,6 @@ public class LoginRequestDto {
 
     @Schema(description = "Username", example = "quanducbui2017@gmail.com")
     @NotBlank(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
-    @Email
     String username;
 
     @Schema(description = "Mật khẩu", example = "Quankane1905@")

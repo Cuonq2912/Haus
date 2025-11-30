@@ -5,13 +5,7 @@ import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.order.OrderAllRequestDto;
-import com.example.haus.domain.dto.order.OrderItemRequestDto;
-import com.example.haus.domain.dto.order.OrderRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
-import com.example.haus.domain.entity.product.OrderItem;
-import com.example.haus.domain.dto.request.order.BuyNowRequest;
-import com.example.haus.domain.dto.request.order.CheckoutRequest;
-import com.example.haus.domain.dto.response.product.OrderResponseDto;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.service.OrderService;
 import com.itextpdf.text.DocumentException;
@@ -40,6 +34,9 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestApiV1
 @Validated
@@ -56,8 +53,7 @@ public class OrderController {
             description = "Giúp người dùng tạo đơn hàng mới.",
             security = @SecurityRequirement(name = "Bearer Token")
     )
-    @PostMapping("" +
-            "/orders")
+    @PostMapping("/orders")
     public ResponseEntity<?> createOrder(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody OrderAllRequestDto orderAllRequestDto) {
         String username = userDetails.getUsername();
         log.info("Username = {}", username);
@@ -68,7 +64,6 @@ public class OrderController {
     }
 
 
-    @Tag(name = "public-order-controller", description = "Public Order APIs")
     @Operation(
             summary = "Lấy tất đơn hàng",
             description = "Lấy danh sách tất cả đơn hàng với phân trang và filter theo trạng thái",
@@ -94,23 +89,31 @@ public class OrderController {
 
     @Operation(
             summary = "Lấy chi tiết và xuất hóa đơn",
-            description = "Truy vấn toàn bộ dữ liệu đơn hàng, sản phẩm, và người dùng để tạo hóa đơn."
+            description = "Truy vấn toàn bộ dữ liệu đơn hàng, sản phẩm, và người dùng để tạo hóa đơn.",
+            security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping("/orders/{orderId}/invoice")
-    public ResponseEntity<?> getInvoiceDetails(@PathVariable Long orderId) {
+    public ResponseEntity<?> getInvoiceDetails(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long orderId) {
+        String username = userDetails.getUsername();
         return ResponseUtil.success(
                 SuccessMessage.Order.GET_INVOICE_SUCCESS,
-                orderService.getInvoiceDetails(orderId)
+                orderService.getInvoiceDetails(orderId, username)
         );
     }
     @Operation(
-            summary = "Xuất hóa đơn PDF",
-            description = "Truy vấn toàn bộ dữ liệu đơn hàng, sản phẩm, và người dùng để xuất hóa đơn."
+            summary = "Xuất hóa đơn PDF",
+            description = "Truy vấn toàn bộ dữ liệu đơn hàng, sản phẩm, và người dùng để xuất hóa đơn.",
+            security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping("/orders/{orderId}/invoice/pdf")
-    public ResponseEntity<?> exportPdf(@PathVariable Long orderId) {
+    public ResponseEntity<?> exportPdf(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long orderId) {
         try {
-            byte[] pdfBytes = orderService.generateInvoicePdf(orderId);
+            String username = userDetails.getUsername();
+            byte[] pdfBytes = orderService.generateInvoicePdf(orderId, username);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
@@ -143,6 +146,7 @@ public class OrderController {
             throw new RuntimeException(e);
         }
     }
+
     @Operation(
             summary = "Lấy đơn hàng theo ID",
             description = "Dùng để lấy đơn hàng theo id",
@@ -150,10 +154,12 @@ public class OrderController {
     )
     @GetMapping(UrlConstant.Order.GET_ORDER_BY_ID)
     public ResponseEntity<?> getOrderById(
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long id) {
+        String username = userDetails.getUsername();
         return ResponseUtil.success(
                 SuccessMessage.Order.GET_ORDER_SUCCESS,
-                orderService.getOrderById(id));
+                orderService.getOrderById(id, username));
     }
 
 
@@ -167,7 +173,7 @@ public class OrderController {
             },
             security = @SecurityRequirement(name = "Bearer Token")
     )
-    @PostMapping(UrlConstant.Order.UPDATE_STATUS_ORDER_BY_ID)
+    @PatchMapping(UrlConstant.Order.UPDATE_STATUS_ORDER_BY_ID)
     public ResponseEntity<?> updateStatusOrderById(
             @PathVariable Long id,
             @RequestParam String status) {
@@ -176,11 +182,19 @@ public class OrderController {
                 orderService.updateStatusOrderById(id, status));
     }
 
-    private String getCurrentUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new RuntimeException("User not authenticated");
-        }
-        return authentication.getName();
+    @Operation(
+            summary = "Lấy đơn hàng theo order number",
+            description = "Dùng để lấy đơn hàng theo order number",
+            security = @SecurityRequirement(name = "Bearer Token")
+    )
+    @GetMapping(UrlConstant.Order.GET_ORDER_BY_ORDER_NUMBER)
+    public ResponseEntity<?> getOrderByOrderNumber(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable("orderNumber") String orderNumber) {
+        String username = userDetails.getUsername();
+        return ResponseUtil.success(
+                SuccessMessage.Order.GET_ORDER_SUCCESS,
+                orderService.getOrderByOrderNumber(orderNumber, username)
+        );
     }
 }
