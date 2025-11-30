@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -23,5 +24,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "LEFT JOIN FETCH o.promotion prom " +
             "WHERE o.id = :orderId")
     Optional<Order> findOrderDetailsForInvoice(@Param("orderId") Long orderId);
+
+
+    @Query("""
+        SELECT o FROM Order o
+        WHERE (FLOOR((MONTH(o.orderDate) - 1) / 3) + 1) = :quarter
+          AND YEAR(o.orderDate) = :year
+    """)
+    List<Order> findByQuarter(@Param("quarter") int quarter,
+                              @Param("year") int year);
 
 }

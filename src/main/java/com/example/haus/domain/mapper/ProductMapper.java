@@ -2,6 +2,7 @@ package com.example.haus.domain.mapper;
 
 import com.example.haus.domain.dto.response.cart.CartItemResponseDto;
 import com.example.haus.domain.dto.response.cart.ProductInCartResponseDto;
+import com.example.haus.domain.dto.response.product.ProductStatisticResponseDto;
 import com.example.haus.domain.entity.product.Product;
 import com.example.haus.domain.dto.request.product.ProductRequestDto;
 import com.example.haus.domain.dto.request.product.UpdateProductRequestDto;
@@ -53,4 +54,21 @@ public interface ProductMapper {
     @Mapping(target = "productVariations", ignore = true)
     //CartItemResponse === ProductInCart
     ProductInCartResponseDto toProductInCartResponseDto(Product product);
+
+    @Mapping(target = "discountPercent",
+            expression = "java(product.getCategories().stream()" +
+                    "    .map(com.example.haus.domain.entity.product.Category::getPromotion)" +
+                    "    .filter(java.util.Objects::nonNull)" +
+                    "    .filter(p -> com.example.haus.constant.promotion.PromotionStatus.ACTIVE.equals(p.getStatus()))" +
+                    "    .map(com.example.haus.domain.entity.product.Promotion::getDiscountPercent)" +
+                    "    .filter(java.util.Objects::nonNull)" +
+                    "    .max(java.util.Comparator.naturalOrder())" +
+                    "    .orElse(null))")
+    @Mapping(
+            target = "image",
+            expression = "java( product.getProductVariations().isEmpty() ? null : " +
+                    "product.getProductVariations().iterator().next().getMedia() == null ? null : " +
+                    "product.getProductVariations().iterator().next().getMedia().getUrl() )"
+    )
+    ProductStatisticResponseDto toProductStatisticResponseDto(Product product);
 }

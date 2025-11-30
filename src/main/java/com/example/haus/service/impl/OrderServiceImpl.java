@@ -273,6 +273,7 @@ public class OrderServiceImpl implements OrderService {
             return address;
         }).toList();
 
+        order.setRecipientName(username);
         order.setUser(user);
         order.setOrderItems(orderItems);
         order.setPayment(payment);

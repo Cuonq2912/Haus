@@ -114,6 +114,12 @@ public class SuccessMessage {
 
     }
 
+    public static class Statistic {
+        private Statistic() {}
+
+        public static final String GET_STATISTIC_SUCCESS = "Get statistics successful";
+    }
+
     public static class Order {
 
         private Order() {}
