@@ -22,7 +22,11 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Map;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.Claim;
+import com.auth0.jwt.interfaces.DecodedJWT;
 @Component
 @Slf4j(topic = "CUSTOMIZE-PRE-FILTER")
 @RequiredArgsConstructor
@@ -40,59 +44,6 @@ public class CustomizePreFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         log.info("{} {}", request.getMethod(), request.getRequestURI());
-
-        final String authHeader = request.getHeader("Authorization");
-
-        if (StringUtils.isBlank(authHeader) || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        final String token = authHeader.substring(7);
-        try {
-            String username = jwtService.extractUserName(token, TokenType.ACCESS_TOKEN);
-
-            if (!username.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
-
-                if (jwtService.isValid(token, TokenType.ACCESS_TOKEN, userDetails.getUsername())) {
-                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities());
-                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                    SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-                    securityContext.setAuthentication(authenticationToken);
-                    SecurityContextHolder.setContext(securityContext);
-                }
-            }
-        } catch (Exception e) {
-            log.error("Invalid token = {}, message = {}", e.getClass(), e.getMessage());
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            String json = buildErrorJson(HttpServletResponse.SC_UNAUTHORIZED, request.getRequestURI(), "Unauthorized", "Invalid or missing JWT Token");
-            response.getWriter().write(json);
-            return;
-        }
-
         filterChain.doFilter(request, response);
-    }
-
-    private String buildErrorJson(int status, String path, String error, String message) {
-        return String.format("""
-        {
-            "timestamp": "%s",
-            "status": %d,
-            "path": "%s",
-            "error": "%s",
-            "message": "%s"
-        }
-        """,
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMM d, yyyy, h:mm:ss a", Locale.ENGLISH)),
-                status,
-                path,
-                error,
-                message
-        );
     }
 }

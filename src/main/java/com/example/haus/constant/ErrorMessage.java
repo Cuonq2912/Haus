@@ -48,11 +48,18 @@ public class ErrorMessage {
         public static final String EXPIRED_REFRESH_TOKEN = "exception.auth.expired.refresh.token";
         public static final String ERR_TOKEN_INVALIDATED = "exception.auth.token.invalidated";
         public static final String ERR_MALFORMED_TOKEN = "exception.auth.malformed.token";
+        public static final String ERR_CAN_NOT_CREATE_USER = "exception.can.not.create.user";
+        public static final String ERR_CAN_NOT_SEND_RESET_PASSWORD_EMAIL = "exception.can.not.send.reset.password.email";
+        public static final String ERR_RESET_PASSWORD_FAILED_IN_KEYCLOAK = "exception.reset.password.failed.in.keycloak";
+        public static final String ERR_REFRESH_TOKEN_FAILED_IN_KEYCLOAK = "exception.refresh.token.failed.in.keycloak";
         // OTP
         public static final String ERR_PENDING_RESET_REQUEST_NULL = "exception.auth.pending.reset.request.null";
         public static final String ERR_PENDING_REGISTER_REQUEST_NULL = "exception.auth.pending.register.request.null";
         public static final String ERR_OTP_EXPIRED = "exception.auth.otp.expired";
         public static final String ERR_OTP_NOT_MATCH = "exception.auth.otp.not.match";
+        public static final String ERR_VERIFY_FAILED_IN_KEYCLOAK = "exception.verify.failed.in.keycloak";
+        public static final String ERR_LOGIN_FAILED_IN_KEYCLOAK = "exception.login.failed.in.keycloak";
+        public static final String ERR_USERNAME_PASSWORD_INCORRECT = "exception.username.password.incorrect";
     }
 
     public static class User {
