@@ -11,11 +11,13 @@ import com.example.haus.domain.dto.request.user.profile.UpdatePasswordRequestDto
 import com.example.haus.domain.dto.request.user.profile.UpdateUserRequestDto;
 import com.example.haus.domain.dto.response.user.UserResponseDto;
 import com.example.haus.exception.InvalidDataException;
+import com.example.haus.exception.KeycloakException;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.exception.UploadFileException;
 import com.example.haus.helper.PersonalInformationHelper;
 import com.example.haus.repository.UserRepository;
 import com.example.haus.service.UserService;
+import com.example.haus.util.keycloak.KeycloakUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -44,6 +46,8 @@ public class UserServiceImpl implements UserService {
     PersonalInformationHelper personalInformationHelper;
 
     Cloudinary cloudinary;
+
+    KeycloakUtil keycloakUtil;
 
     @Override
     public void deleteAccount(Authentication authentication) {
@@ -95,25 +99,36 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updatePassword(UpdatePasswordRequestDto updatePasswordRequestDto, Authentication authentication) {
+    public void updatePassword(UpdatePasswordRequestDto request, Authentication authentication) {
 
         String username = authentication.getName();
 
-        User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
-                () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        PasswordEncoder encoder = new BCryptPasswordEncoder(10);
 
-        if(!passwordEncoder.matches(updatePasswordRequestDto.getCurrentPassword(), user.getPassword()))
+        if (!encoder.matches(request.getCurrentPassword(), user.getPassword())) {
             throw new InvalidDataException(ErrorMessage.User.ERR_INCORRECT_PASSWORD);
+        }
 
-        if(updatePasswordRequestDto.getNewPassword().equals(updatePasswordRequestDto.getCurrentPassword()))
+        if (encoder.matches(request.getNewPassword(), user.getPassword())) {
             throw new InvalidDataException(ErrorMessage.User.ERR_DUPLICATE_OLD_PASSWORD);
+        }
 
-        user.setPassword(passwordEncoder.encode(updatePasswordRequestDto.getNewPassword()));
+        String userId = keycloakUtil.getUserId(username);
+
+        boolean isUpdatedInKC = keycloakUtil.resetPassword(userId, request.getNewPassword());
+        if (!isUpdatedInKC) {
+            throw new KeycloakException(ErrorMessage.Auth.ERR_RESET_PASSWORD_FAILED_IN_KEYCLOAK);
+        }
+
+        user.setPassword(encoder.encode(request.getNewPassword()));
         userRepository.save(user);
 
+        log.info("Password updated successfully for user {}", username);
     }
+
 
     @Override
     public UserResponseDto uploadAvatar(MultipartFile file, Authentication authentication) throws IOException {

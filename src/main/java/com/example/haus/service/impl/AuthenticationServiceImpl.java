@@ -59,6 +59,9 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
@@ -138,19 +141,32 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void logout(LogoutRequestDto request) {
-        String jwtId = null;
-        Date expirationTime = null;
+        String url = keycloakProperties.serverUrl()
+                + "/realms/" + keycloakProperties.realm()
+                + "/protocol/openid-connect/logout";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("client_id", keycloakProperties.clientId());
+        body.add("client_secret", keycloakProperties.clientSecret());
+        body.add("refresh_token", request.getRefreshToken());
+
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
+
         try {
-            SignedJWT signedJwt = SignedJWT.parse(request.getToken());
+            ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
 
-            jwtId = signedJwt.getJWTClaimsSet().getJWTID();
-            expirationTime = signedJwt.getJWTClaimsSet().getExpirationTime();
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                log.error("Logout failed: {}", response.getBody());
+                throw new KeycloakException("Failed to logout");
+            }
 
-            invalidatedTokenRepository.save(new InvalidatedToken(jwtId, expirationTime));
+            log.info("Logout successfully from Keycloak");
 
-        } catch (ParseException ex) {
-            log.error("Signed Jwt parsed fail, message = {}", ex.getMessage());
-            throw new InvalidDataException(ErrorMessage.Auth.ERR_TOKEN_INVALIDATED);
+        } catch (Exception ex) {
+            throw new KeycloakException("Error calling Keycloak logout: " + ex.getMessage());
         }
     }
 
@@ -230,6 +246,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 }
                 throw new KeycloakException(ErrorMessage.Auth.ERR_CAN_NOT_CREATE_USER);
             }
+
+            String userId = keycloakUtil.getUserId(request.getUsername());
+
+            String roleId;
+
+            roleId = keycloakUtil.getRoleId("USER");
+            keycloakUtil.assignRoleToUser(userId, roleId);
+
+
         } catch (Exception ex) {
             throw new KeycloakException(ex.getMessage());
         }
@@ -326,16 +351,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public UserResponseDto resetPassword(ResetPasswordRequestDto request) {
 
+        PendingResetPasswordRequestDto pending = pendingResetPasswordMap.get(request.getEmail());
+        if (pending == null)
+            throw new InvalidDataException(ErrorMessage.Auth.ERR_PENDING_RESET_REQUEST_NULL);
+
+        if (pending.isExpired())
+            throw new InvalidDataException(ErrorMessage.Auth.ERR_OTP_EXPIRED);
+
         User user = userRepository.findByEmailAndIsDeletedFalse(request.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        PasswordEncoder encoder = new BCryptPasswordEncoder(10);
 
-        if (passwordEncoder.matches(request.getNewPassword(), user.getPassword()))
+        if (encoder.matches(request.getNewPassword(), user.getPassword()))
             throw new InvalidDataException(ErrorMessage.User.ERR_DUPLICATE_OLD_PASSWORD);
 
-        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        String userId = keycloakUtil.getUserId(request.getEmail());
 
+        boolean kcReset = keycloakUtil.resetPassword(userId, request.getNewPassword());
+        if (!kcReset)
+            throw new KeycloakException(ErrorMessage.Auth.ERR_CAN_NOT_SEND_RESET_PASSWORD_EMAIL);
+
+        user.setPassword(encoder.encode(request.getNewPassword()));
         userRepository.save(user);
 
         pendingResetPasswordMap.remove(request.getEmail());

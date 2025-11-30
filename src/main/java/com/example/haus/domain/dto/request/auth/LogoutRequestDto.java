@@ -13,6 +13,6 @@ import lombok.experimental.FieldDefaults;
 public class LogoutRequestDto {
 
     @NotBlank(message = ErrorMessage.NOT_BLANK_FIELD)
-    String token;
+    String refreshToken;
 
 }

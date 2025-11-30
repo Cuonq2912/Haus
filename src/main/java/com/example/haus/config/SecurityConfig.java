@@ -104,6 +104,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
+                "https://socko-stratagemical-abdullah.ngrok-free.dev/",
                 "http://localhost:5173",
                 "https://ahistorical-undelusory-soren.ngrok-free.dev",
                 "https://nonrestrained-karima-unexclaiming.ngrok-free.dev/",
