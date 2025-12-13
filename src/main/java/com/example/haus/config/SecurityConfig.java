@@ -83,6 +83,8 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/api/v1/product/filter/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/payment/momo/callback").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/payment/momo/ipn-handler").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/review/top").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/product/*/review/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/order").hasAnyAuthority(RoleConstant.ADMIN)
                                 .requestMatchers(HttpMethod.PATCH, "/api/v1/order/**").hasAnyAuthority(RoleConstant.ADMIN)
                                 .requestMatchers(HttpMethod.POST, "/api/v1/orders").hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
