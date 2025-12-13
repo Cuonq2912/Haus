@@ -29,7 +29,7 @@ public class StatisticsController {
             description = "Xuất hóa đơn theo quý (theo status).",
             security = @SecurityRequirement(name = "Bearer Token")
     )
-    @GetMapping("/api/v1/statistics/order-by-month")
+    @GetMapping("/statistics/order-by-month")
     public ResponseEntity<?> getOrderByMonth() {
         return ResponseUtil.success(
                 SuccessMessage.Statistic.GET_STATISTIC_SUCCESS,
@@ -42,7 +42,7 @@ public class StatisticsController {
             description = "Thống kê các đơn hàng gần đây.",
             security = @SecurityRequirement(name = "Bearer Token")
     )
-    @GetMapping("/api/v1/statistics/get-recent-order")
+    @GetMapping("/statistics/get-recent-order")
     public ResponseEntity<?> getRecentOrders(
             @RequestParam(defaultValue = "1") Integer pageNum,
             @RequestParam(defaultValue = "10") Integer pageSize) {
@@ -58,7 +58,7 @@ public class StatisticsController {
             description = "Thống kê các sản phẩm bán chạy gần đây.",
             security = @SecurityRequirement(name = "Bearer Token")
     )
-    @GetMapping("/api/v1/statistics/get-best-seller")
+    @GetMapping("/statistics/get-best-seller")
     public ResponseEntity<?> getBestSellers(
             @RequestParam(defaultValue = "1") Integer pageNum,
             @RequestParam(defaultValue = "10") Integer pageSize) {

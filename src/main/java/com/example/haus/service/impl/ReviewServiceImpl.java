@@ -47,20 +47,21 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional
     public ReviewResponseDto createReview(String userId, Long productId, ReviewRequestDto request) {
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED));
-        
+
         if (product.getIsDeleted()) {
             throw new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED);
         }
 
-        boolean hasPurchased =
-            orderItemRepository.existsByUserIdAndProductIdAndOrderStatus(userId, productId, OrderStatus.COMPLETED);
+        List<com.example.haus.domain.entity.product.OrderItem> orderItems =
+                orderItemRepository.findByUserIdAndProductIdAndOrderStatus(userId, productId, OrderStatus.COMPLETED);
 
-        if(!hasPurchased){
+        if(orderItems.isEmpty()){
             throw new InvalidDataException(ErrorMessage.Review.ERR_REVIEW_CAN_NOT_BEFORE_BUY);
         }
 
@@ -68,16 +69,27 @@ public class ReviewServiceImpl implements ReviewService {
             throw new InvalidDataException(ErrorMessage.Review.ERR_REVIEW_YOU_REVIEWED_THIS_ORDER);
         }
 
-        Review review = Review.builder()
-            .rating(request.getRating())
-            .content(request.getContent())
-            .user(user)
-            .product(product)
-            .orderItem(null)
-            .build();
+        com.example.haus.domain.entity.product.OrderItem orderItem = orderItems.get(0);
+
+        if (orderItem == null || orderItem.getId() == null) {
+            throw new InvalidDataException(ErrorMessage.Review.ERR_REVIEW_CAN_NOT_BEFORE_BUY);
+        }
+
+        Review review = new Review();
+        review.setRating(request.getRating());
+        review.setContent(request.getContent());
+        review.setUser(user);
+        review.setProduct(product);
+        review.setOrderItem(orderItem);
+        review.setIsHidden(false);
+
+        log.info("Review before save - orderItem: {}, orderItemId: {}",
+                review.getOrderItem(),
+                review.getOrderItem() != null ? review.getOrderItem().getId() : "NULL");
 
         Review savedReview = reviewRepository.save(review);
-        
+        log.info("savedReviewId: {}", savedReview.getId());
+
 
         return mapToResponseDto(savedReview);
     }
