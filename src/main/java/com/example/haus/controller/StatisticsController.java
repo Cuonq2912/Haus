@@ -11,11 +11,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @RestApiV1
 @RequiredArgsConstructor
@@ -61,12 +66,19 @@ public class StatisticsController {
     @GetMapping("/statistics/get-best-seller")
     public ResponseEntity<?> getBestSellers(
             @RequestParam(defaultValue = "1") Integer pageNum,
-            @RequestParam(defaultValue = "10") Integer pageSize) {
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate) {
 
         PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize, "orderDate", "desc");
         return ResponseUtil.success(
                 SuccessMessage.Statistic.GET_STATISTIC_SUCCESS,
-                statisticsService.getBestSellers(paginationRequest)
+                statisticsService.getBestSellers(paginationRequest, startDate, endDate)
         );
     }
 }

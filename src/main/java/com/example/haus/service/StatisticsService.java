@@ -9,6 +9,7 @@ import com.example.haus.domain.dto.response.statistic.RecentOrderResponseDto;
 import com.example.haus.domain.dto.response.statistic.RevenueDetailResponseDto;
 import com.example.haus.domain.dto.response.statistic.StatisticResponseDto;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,6 @@ public interface StatisticsService {
 
     PaginationResponseDto<RecentOrderResponseDto> getRecentOrders(PaginationRequestDto paginationRequest);
 
-    PaginationResponseDto<ProductStatisticResponseDto> getBestSellers(PaginationRequestDto paginationRequest);
+    PaginationResponseDto<ProductStatisticResponseDto> getBestSellers(PaginationRequestDto paginationRequest, LocalDate startDate, LocalDate endDate);
 
 }

@@ -2,22 +2,24 @@ package com.example.haus.service.impl;
 
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.OrderStatus;
+import com.example.haus.constant.promotion.PromotionStatus;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.response.invoice.InvoiceItemDto;
 import com.example.haus.domain.dto.response.invoice.InvoiceResponseDto;
 import com.example.haus.domain.dto.response.product.OrderResponseDto;
 import com.example.haus.domain.dto.response.product.ProductStatisticResponseDto;
+import com.example.haus.domain.dto.response.statistic.BestSellerRow;
 import com.example.haus.domain.dto.response.statistic.RecentOrderResponseDto;
 import com.example.haus.domain.dto.response.statistic.RevenueDetailResponseDto;
 import com.example.haus.domain.dto.response.statistic.StatisticResponseDto;
-import com.example.haus.domain.entity.product.Order;
-import com.example.haus.domain.entity.product.Product;
+import com.example.haus.domain.entity.product.*;
 import com.example.haus.domain.entity.product.payment.Payment;
 import com.example.haus.domain.entity.user.User;
 import com.example.haus.domain.mapper.*;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
+import com.example.haus.repository.OrderItemRepository;
 import com.example.haus.repository.OrderRepository;
 import com.example.haus.repository.ProductRepository;
 import com.example.haus.service.StatisticsService;
@@ -38,10 +40,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +54,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     private final OrderMapper orderMapper;
     private final ProductMapper productMapper;
     private final ProductRepository productRepository;
+    OrderItemRepository orderItemRepository;
 
 
     @Override
@@ -168,21 +170,53 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public PaginationResponseDto<ProductStatisticResponseDto> getBestSellers(PaginationRequestDto paginationRequest) {
-        Pageable pageable = PageRequest.of(
-                paginationRequest.getPageNum(),
-                paginationRequest.getPageSize(),
-                Sort.by("soldQuantity").descending());
+    public PaginationResponseDto<ProductStatisticResponseDto> getBestSellers(PaginationRequestDto paginationRequest, LocalDate startDate, LocalDate endDate) {
+        if (startDate.isAfter(endDate)) {
+            throw new InvalidDataException("startDate is after endDate");
+        }
 
-        Page<Product> products = productRepository.findAll(pageable);
+        Pageable pageable = PageRequest.of(paginationRequest.getPageNum(), paginationRequest.getPageSize());
 
+        Page<BestSellerRow> page = orderItemRepository.findBestSellers(startDate, endDate, pageable);
 
-        List<ProductStatisticResponseDto> productStatisticResponseDtoList = products.getContent().stream()
-                .map(product -> {
-                    return productMapper.toProductStatisticResponseDto(product);
+        List<Long> ids = page.getContent().stream()
+                .map(BestSellerRow::getProductId)
+                .toList();
+
+        Map<Long, Long> soldMap = page.getContent().stream()
+                .collect(Collectors.toMap(BestSellerRow::getProductId, BestSellerRow::getSoldQuantity));
+
+        List<Product> productList = productRepository.findByIdIn(ids);
+
+        Map<Long, Product> productMap = productList.stream()
+                .collect(Collectors.toMap(Product::getId, p -> p));
+
+        List<ProductStatisticResponseDto> dtos = ids.stream()
+                .map(id -> {
+                    Product product = productMap.get(id);
+                    Long sold = soldMap.getOrDefault(id, 0L);
+
+                    return ProductStatisticResponseDto.builder()
+                            .id(product.getId())
+                            .productName(product.getProductName())
+                            .price(product.getPrice())
+                            .image(product.getMedias().stream()
+                                    .findFirst()
+                                    .map(Media::getUrl)
+                                    .orElse(null))
+                            .soldQuantity(sold.intValue()) // hoặc đổi DTO sang Long cho chuẩn
+                            .discountPercent(product.getCategories().stream()
+                                    .map(Category::getPromotion)
+                                    .filter(Objects::nonNull)
+                                    .filter(p -> !p.getIsDeleted() && p.getStatus() == PromotionStatus.ACTIVE)
+                                    .max(Comparator.comparing(Promotion::getDiscountPercent))
+                                    .map(Promotion::getDiscountPercent)
+                                    .orElse(0.0f))
+                            .build();
                 })
                 .toList();
 
-        return PaginationUtil.createPaginationResponse(products, paginationRequest, productStatisticResponseDtoList);
+
+        return PaginationUtil.createPaginationResponse(page, paginationRequest, dtos);
     }
 }
