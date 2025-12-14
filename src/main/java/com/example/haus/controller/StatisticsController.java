@@ -50,12 +50,47 @@ public class StatisticsController {
     @GetMapping("/statistics/get-recent-order")
     public ResponseEntity<?> getRecentOrders(
             @RequestParam(defaultValue = "1") Integer pageNum,
-            @RequestParam(defaultValue = "10") Integer pageSize) {
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(required = false, defaultValue = "2024-01-01")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
 
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate
+            ) {
+
+        if (endDate == null) {
+            endDate = LocalDate.now();
+        }
         PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize, "orderDate", "desc");
         return ResponseUtil.success(
                 SuccessMessage.Order.GET_ORDER_SUCCESS,
-                statisticsService.getRecentOrders(paginationRequest));
+                statisticsService.getRecentOrders(paginationRequest, startDate, endDate));
+    }
+
+    @Operation(
+            summary = "Thống kê tổng tiền đơn hàng theo 4 tiêu chí",
+            description = "Thống kê tổng tiền đơn hàng theo 4 tiêu chí.",
+            security = @SecurityRequirement(name = "Bearer Token")
+    )
+    @GetMapping("/statistics/get-order-by-four-criteria")
+    public ResponseEntity<?> getStatisticalOrderByFourCriteria(
+            @RequestParam(required = false, defaultValue = "2024-01-01")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate
+    ) {
+
+        if (endDate == null) {
+            endDate = LocalDate.now();
+        }
+        return ResponseUtil.success(
+                SuccessMessage.Order.GET_ORDER_SUCCESS,
+                statisticsService.getSales(startDate, endDate));
     }
 
     @Operation(
@@ -67,7 +102,7 @@ public class StatisticsController {
     public ResponseEntity<?> getBestSellers(
             @RequestParam(defaultValue = "1") Integer pageNum,
             @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(required = false)
+            @RequestParam(required = false, defaultValue = "2024-01-01")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate startDate,
 
@@ -75,6 +110,9 @@ public class StatisticsController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate endDate) {
 
+        if (endDate == null) {
+            endDate = LocalDate.now();
+        }
         PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize, "orderDate", "desc");
         return ResponseUtil.success(
                 SuccessMessage.Statistic.GET_STATISTIC_SUCCESS,

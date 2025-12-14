@@ -2,6 +2,7 @@ package com.example.haus.repository;
 
 import com.example.haus.constant.OrderStatus;
 import com.example.haus.domain.entity.product.Order;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,11 +48,24 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         SELECT o FROM Order o
         WHERE (FLOOR((MONTH(o.orderDate) - 1) / 3) + 1) = :quarter
           AND YEAR(o.orderDate) = :year
+          AND ((o.orderDate >= :startDate) AND (o.orderDate <= :endDate))
     """)
     List<Order> findByQuarter(@Param("quarter") int quarter,
-                              @Param("year") int year);
+                              @Param("year") int year,
+                              @Param("startDate") LocalDate startDate,
+                              @Param("endDate") LocalDate endDate);
 
 
     Optional<Order> findByOrderNumber(String orderNumber);
 
+    @Query(
+            """
+            SELECT p
+            FROM Order p
+            WHERE (p.orderDate >= :startDate) AND (p.orderDate <= :endDate)
+            """
+    )
+    Page<Order> findByDateTime(@Param("startDate") LocalDate startDate,
+                               @Param("endDate") LocalDate endDate,
+                               Pageable pageable);
 }

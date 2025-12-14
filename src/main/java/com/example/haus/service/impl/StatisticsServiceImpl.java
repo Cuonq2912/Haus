@@ -61,25 +61,8 @@ public class StatisticsServiceImpl implements StatisticsService {
     public Map<String, Object> getOrderByMonth() {
         Map<String, Object> map = new HashMap<>();
 
-        LocalDateTime now = LocalDateTime.now();
-
-        int year = now.getYear();
-        int quarter = (now.getMonthValue() - 1) / 3 + 1;
-
-        List<Order> current = orderRepository.findByQuarter(quarter, year);
-
-        int prevQuarter = (quarter == 1) ? 4 : quarter - 1;
-        int prevYear = (quarter == 1) ? year - 1 : year;
-
-        List<Order> previous = orderRepository.findByQuarter(prevQuarter, prevYear);
 
         List <Order> sales = orderRepository.findAll();
-
-        final double[] total = {0.0, 0.0};
-        final double[] totalPending = {0.0, 0.0};
-        final double[] totalCompleted = {0.0, 0.0};
-        final double[] totalReturned = {0.0, 0.0};
-        final double[] totalSales = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
         Map<Integer, Double> monthlyRevenue = new HashMap<>();
         for (int i = 0; i < 12; i++) {
@@ -97,6 +80,37 @@ public class StatisticsServiceImpl implements StatisticsService {
         }
 
         map.put("saleGraph", monthlyRevenue);
+
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> getSales(LocalDate startDate, LocalDate endDate) {
+        Map<String, Object> map = new HashMap<>();
+        LocalDateTime now = LocalDateTime.now();
+
+        int year = now.getYear();
+        int quarter = (now.getMonthValue() - 1) / 3 + 1;
+
+        List<Order> current = orderRepository.findByQuarter(quarter, year, startDate, endDate);
+
+        int prevQuarter = (quarter == 1) ? 4 : quarter - 1;
+        int prevYear = (quarter == 1) ? year - 1 : year;
+
+        List<Order> previous = orderRepository.findByQuarter(prevQuarter, prevYear, startDate, endDate);
+
+        final double[] total = {0.0, 0.0};
+        final double[] totalPending = {0.0, 0.0};
+        final double[] totalCompleted = {0.0, 0.0};
+        final double[] totalReturned = {0.0, 0.0};
+
+        Function<double[], Double> calcPercent = arr -> {
+            double prev = arr[0];
+            double curr = arr[1];
+
+            if (prev == 0.0) return curr;
+            return Math.ceil((curr - prev) / prev * 100);
+        };
 
         current.forEach(order -> {
             switch (order.getStatus()) {
@@ -117,15 +131,6 @@ public class StatisticsServiceImpl implements StatisticsService {
             total[0] += order.getTotalAmount();
         });
 
-        Function<double[], Double> calcPercent = arr -> {
-            double prev = arr[0];
-            double curr = arr[1];
-
-            if (prev == 0.0) return curr;
-            return Math.ceil((curr - prev) / prev * 100);
-        };
-
-        log.info("Total pending orders : {} {} {} {}", total[1], totalPending[1], totalCompleted[1], totalReturned[1]);
         map.put("totalOrders", RevenueDetailResponseDto.builder()
                 .totalOrder(total[1])
                 .percentIncrease(calcPercent.apply(total))
@@ -152,14 +157,14 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     @Transactional(readOnly = true)
-    public PaginationResponseDto<RecentOrderResponseDto> getRecentOrders(PaginationRequestDto paginationRequest) {
+    public PaginationResponseDto<RecentOrderResponseDto> getRecentOrders(PaginationRequestDto paginationRequest, LocalDate startDate, LocalDate endDate) {
 
         Pageable pageable = PageRequest.of(
                 paginationRequest.getPageNum(),
                 paginationRequest.getPageSize(),
                 Sort.by("orderDate").descending());
 
-        Page<Order> orderPage = orderRepository.findAll(pageable);
+        Page<Order> orderPage = orderRepository.findByDateTime(startDate, endDate, pageable);
 
 
         List<RecentOrderResponseDto> orderResponseList = orderPage.getContent().stream()

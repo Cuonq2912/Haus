@@ -16,7 +16,9 @@ import java.util.Map;
 public interface StatisticsService {
     Map<String, Object> getOrderByMonth();
 
-    PaginationResponseDto<RecentOrderResponseDto> getRecentOrders(PaginationRequestDto paginationRequest);
+    Map<String, Object> getSales(LocalDate startDate, LocalDate endDate);
+
+    PaginationResponseDto<RecentOrderResponseDto> getRecentOrders(PaginationRequestDto paginationRequest, LocalDate startDate, LocalDate endDate);
 
     PaginationResponseDto<ProductStatisticResponseDto> getBestSellers(PaginationRequestDto paginationRequest, LocalDate startDate, LocalDate endDate);
 
