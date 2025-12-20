@@ -10,6 +10,7 @@ import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.response.invoice.InvoiceItemDto;
 import com.example.haus.domain.dto.response.invoice.InvoiceResponseDto;
 import com.example.haus.domain.dto.response.product.CreateOrderResponseDto;
+import com.example.haus.domain.dto.response.product.MediaResponseDto;
 import com.example.haus.domain.dto.response.product.OrderResponseDto;
 import com.example.haus.domain.dto.response.user.UserResponseDto;
 import com.example.haus.domain.entity.address.Address;
@@ -239,10 +240,21 @@ public class OrderServiceImpl implements OrderService {
             ProductVariation productVariation = productVariationRepository.findByIdAndIsDeletedFalse(orderItemRequestDto.getProductVariationId())
                     .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
 
-            OrderItem orderItem = orderItemMapper.orderItemRequestDtoToOrderItem(orderItemRequestDto);
-            orderItem.setProductVariation(productVariation);
+            var product = productVariation.getProduct();
 
-            orderItem.setOrder(order); // Gán Order cho OrderItem
+            OrderItem orderItem = OrderItem.builder()
+                    .quantity(orderItemRequestDto.getQuantity())
+                    .priceAtSale(productVariation.getPrice())
+                    .snapshotProductCode(product.getProductCode())
+                    .snapshotProductName(product.getProductName())
+                    .snapshotDescription(product.getDescription())
+                    .snapshotMaterial(product.getMaterial())
+                    .snapshotColor(productVariation.getColor())
+                    .snapshotSize(productVariation.getSize())
+                    .snapshotImageUrl(productVariation.getMedia() != null ? productVariation.getMedia().getUrl() : null)
+                    .productVariation(productVariation)
+                    .order(order)
+                    .build();
 
             return orderItem;
         }).toList();
@@ -314,20 +326,18 @@ public class OrderServiceImpl implements OrderService {
                     Double total = item.getQuantity() * item.getPriceAtSale();
 
                     return InvoiceItemDto.builder()
-                            //Product
-                            .productId(item.getProductVariation().getProduct().getId())
-                            .productCode(item.getProductVariation().getProduct().getProductCode())
-                            .productName(item.getProductVariation().getProduct().getProductName())
-                            .description(item.getProductVariation().getProduct().getDescription())
-
-                            //Product variant
-                            .productVariationId(item.getProductVariation().getId())
+                            .productId(item.getProductVariation() != null ? item.getProductVariation().getProduct().getId() : null)
+                            .productCode(item.getSnapshotProductCode())
+                            .productName(item.getSnapshotProductName())
+                            .description(item.getSnapshotDescription())
+                            .productVariationId(item.getProductVariation() != null ? item.getProductVariation().getId() : null)
                             .inventoryQuantity(item.getQuantity())
                             .total(total)
-                            .color(item.getProductVariation().getColor())
-                            .size(item.getProductVariation().getSize())
+                            .color(item.getSnapshotColor())
+                            .size(item.getSnapshotSize())
                             .price(item.getPriceAtSale())
-                            .media(mediaMapper.mediaToMediaResponse(item.getProductVariation().getMedia()))
+                            .media(item.getSnapshotImageUrl() != null ? 
+                                MediaResponseDto.builder().url(item.getSnapshotImageUrl()).build() : null)
                             .build();
                 })
                 .toList();
