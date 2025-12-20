@@ -5,8 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.UUID;
-
 @Schema(description = "Yêu cầu thêm sản phẩm vào giỏ hàng")
 public record CartRequest(
         @Schema(description = "ID của biến thể sản phẩm", example = "1")

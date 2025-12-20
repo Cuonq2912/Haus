@@ -33,6 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.example.haus.constant.CommonConstant.CREATED_AT;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -54,7 +56,7 @@ public class ReviewServiceImpl implements ReviewService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED));
 
-        if (product.getIsDeleted()) {
+        if (Boolean.TRUE.equals(product.getIsDeleted())) {
             throw new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED);
         }
 
@@ -142,14 +144,14 @@ public class ReviewServiceImpl implements ReviewService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED));
         
-        if (product.getIsDeleted()) {
+        if (Boolean.TRUE.equals(product.getIsDeleted())) {
             throw new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED);
         }
 
         Pageable pageable = PageRequest.of(
                 paginationRequest.getPageNum(),
                 paginationRequest.getPageSize(),
-                Sort.by(Sort.Direction.DESC, "createdAt")
+                Sort.by(Sort.Direction.DESC, CREATED_AT)
         );
 
         Page<Review> reviewPage = reviewRepository.findByProductId(productId, pageable);
@@ -167,7 +169,7 @@ public class ReviewServiceImpl implements ReviewService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED));
         
-        if (product.getIsDeleted()) {
+        if (Boolean.TRUE.equals(product.getIsDeleted())) {
             throw new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED);
         }
 
@@ -178,7 +180,7 @@ public class ReviewServiceImpl implements ReviewService {
         Pageable pageable = PageRequest.of(
                 paginationRequest.getPageNum(),
                 paginationRequest.getPageSize(),
-                Sort.by(Sort.Direction.DESC, "createdAt")
+                Sort.by(Sort.Direction.DESC, CREATED_AT)
         );
 
         Page<Review> reviewPage = reviewRepository.findByProductIdAndRating(productId, rating, pageable);
@@ -196,7 +198,7 @@ public class ReviewServiceImpl implements ReviewService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED));
         
-        if (product.getIsDeleted()) {
+        if (Boolean.TRUE.equals(product.getIsDeleted())) {
             throw new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED);
         }
 

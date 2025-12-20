@@ -3,13 +3,11 @@ package com.example.haus.domain.dto.request.promotion;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.promotion.PromotionStatus;
 import com.example.haus.constant.promotion.PromotionType;
-import com.example.haus.domain.entity.product.Promotion;
 import com.example.haus.domain.validator.PositiveOrNull;
 import com.example.haus.domain.validator.ValidPromotionDates;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
 

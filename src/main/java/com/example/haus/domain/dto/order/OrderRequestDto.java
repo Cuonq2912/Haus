@@ -1,9 +1,6 @@
 package com.example.haus.domain.dto.order;
 
 import com.example.haus.constant.ErrorMessage;
-import com.example.haus.domain.validator.ValidPromotionDates;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;

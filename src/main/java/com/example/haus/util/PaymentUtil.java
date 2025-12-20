@@ -1,14 +1,9 @@
 package com.example.haus.util;
 
-import com.example.haus.constant.ErrorMessage;
-import com.example.haus.domain.entity.product.Product;
-import com.example.haus.domain.entity.product.ProductVariation;
-import com.example.haus.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 import javax.crypto.Mac;
@@ -22,9 +17,6 @@ import java.util.stream.Collectors;
 @Configuration
 @RequiredArgsConstructor
 public class PaymentUtil {
-
-    @Value("${spring.profiles.active}")
-    static String activeProfile;
 
     public static String createPaymentUrl(Map<String, String> params) {
         return params.entrySet().stream()

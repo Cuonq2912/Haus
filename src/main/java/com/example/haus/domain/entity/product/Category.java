@@ -4,7 +4,6 @@ import com.example.haus.domain.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 

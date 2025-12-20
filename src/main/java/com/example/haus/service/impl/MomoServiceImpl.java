@@ -1,6 +1,7 @@
 package com.example.haus.service.impl;
 
 import com.example.haus.config.MomoConfig;
+import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.OrderStatus;
 import com.example.haus.domain.dto.request.product.momo.MomoIpnRequestDto;
@@ -37,6 +38,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
+import static com.example.haus.constant.CommonConstant.*;
 
 @Service
 @RequiredArgsConstructor
@@ -91,7 +94,7 @@ public class MomoServiceImpl implements MomoService {
         String orderIdMomo = "ORD_" + orderId + "_" + UUID.randomUUID().toString().substring(0, 8);
 
         Map<String, Object> extraDataMap = new HashMap<>();
-        extraDataMap.put("orderId", orderId);
+        extraDataMap.put(ORDER_ID, orderId);
         extraDataMap.put("userId", order.getUser().getId());
         String extraData = PaymentUtil.encodeExtraData(objectMapper, extraDataMap);
 
@@ -122,10 +125,10 @@ public class MomoServiceImpl implements MomoService {
 
         Map<String, String> result = new HashMap<>();
         result.put("payUrl", responseDto.getPayUrl());
-        result.put("orderId", String.valueOf(orderId));
+        result.put(ORDER_ID, String.valueOf(orderId));
         result.put("momoOrderId", responseDto.getOrderId());
-        result.put("resultCode", responseDto.getResultCode());
-        result.put("message", responseDto.getMessage());
+        result.put(RESULT_CODE, responseDto.getResultCode());
+        result.put(MESSAGE, responseDto.getMessage());
 
         log.info("MoMo order created successfully. Original orderId: {}, MoMo orderId: {}",
                 orderId, responseDto.getOrderId());
@@ -198,23 +201,23 @@ public class MomoServiceImpl implements MomoService {
         try {
             String orderId = params.get("orderId");
             String resultCode = params.get("resultCode");
-            String message = params.get("message");
+            String message = params.get(MESSAGE);
 
             result.put("orderId", orderId);
             result.put("resultCode", resultCode);
-            result.put("message", message != null ? message : "");
+            result.put(MESSAGE, message != null ? message : "");
 
             if ("0".equals(resultCode)) {
-                result.put("status", "success");
+                result.put(STATUS, "success");
                 log.info("MoMo payment successful for order: {}", orderId);
             } else {
-                result.put("status", "failed");
+                result.put(STATUS, "failed");
                 log.warn("MoMo payment failed for order: {} with result code: {}", orderId, resultCode);
             }
 
         } catch (Exception e) {
             log.error("Error handling MoMo redirect callback: ", e);
-            result.put("status", "error");
+            result.put(STATUS, "error");
             result.put("message", "Internal error");
         }
 

@@ -1,12 +1,8 @@
 package com.example.haus.domain.dto.request.address;
 
 import com.example.haus.constant.ErrorMessage;
-import com.example.haus.domain.entity.user.User;
 import com.example.haus.domain.validator.PhoneNumber;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;

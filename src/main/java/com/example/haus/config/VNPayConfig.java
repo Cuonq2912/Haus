@@ -13,43 +13,43 @@ import java.util.Map;
 public class VNPayConfig {
 
     @Value("${payment.vnPay.url}")
-    private String vnp_PayUrl;
+    private String vnPayUrl;
 
     @Value("${payment.vnPay.returnUrl}")
-    private String vnp_ReturnUrl;
+    private String vnPayReturnUrl;
 
     @Value("${payment.vnPay.tmnCode}")
-    private String vnp_TmnCode;
+    private String vnPayTmnCode;
 
     @Value("${payment.vnPay.hashSecret}")
-    private String vnp_HashSecret;
+    private String vnPayHashSecret;
 
     @Value("${payment.vnPay.version}")
-    private String vnp_Version;
+    private String vnPayVersion;
 
     @Value("${payment.vnPay.command:pay}")
-    private String vnp_Command;
+    private String vnPayCommand;
 
     @Value("${payment.vnPay.orderType}")
-    private String vnp_OrderType;
+    private String vnPayOrderType;
 
     @Value("${payment.vnPay.currCode:VND}")
-    private String vnp_CurrCode;
+    private String vnPayCurrCode;
 
     @Value("${payment.vnPay.locale:vn}")
-    private String vnp_Locale;
+    private String vnPayLocale;
 
 
 
     public Map<String, String> getConfig() {
         Map<String, String> vnpParamsMap = new HashMap<>();
-        vnpParamsMap.put("vnp_Version", this.vnp_Version);
-        vnpParamsMap.put("vnp_Command", this.vnp_Command);
-        vnpParamsMap.put("vnp_TmnCode", this.vnp_TmnCode);
-        vnpParamsMap.put("vnp_CurrCode", this.vnp_CurrCode);
-        vnpParamsMap.put("vnp_Locale", this.vnp_Locale);
-        vnpParamsMap.put("vnp_ReturnUrl", this.vnp_ReturnUrl);
-        vnpParamsMap.put("vnp_OrderType", this.vnp_OrderType);
+        vnpParamsMap.put("vnp_Version", this.vnPayVersion);
+        vnpParamsMap.put("vnp_Command", this.vnPayCommand);
+        vnpParamsMap.put("vnp_TmnCode", this.vnPayTmnCode);
+        vnpParamsMap.put("vnp_CurrCode", this.vnPayCurrCode);
+        vnpParamsMap.put("vnp_Locale", this.vnPayLocale);
+        vnpParamsMap.put("vnp_ReturnUrl", this.vnPayReturnUrl);
+        vnpParamsMap.put("vnp_OrderType", this.vnPayOrderType);
         return vnpParamsMap;
     }
 

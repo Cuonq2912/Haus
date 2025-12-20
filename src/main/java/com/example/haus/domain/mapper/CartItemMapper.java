@@ -1,7 +1,5 @@
 package com.example.haus.domain.mapper;
 
-import com.example.haus.domain.dto.response.cart.CartItemResponseDto;
-import com.example.haus.domain.dto.response.cart.CartResponseDto;
 import com.example.haus.domain.dto.response.cart.ProductInCartResponseDto;
 import com.example.haus.domain.entity.product.CartItem;
 import com.example.haus.domain.entity.product.Product;

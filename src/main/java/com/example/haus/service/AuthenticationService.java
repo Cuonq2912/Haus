@@ -9,8 +9,6 @@ import com.example.haus.domain.dto.response.user.UserResponseDto;
 public interface AuthenticationService {
     LoginResponseDto authentication(LoginRequestDto request);
 
-//    LoginResponseDto loginWithGoogle(OAuth2GoogleRequestDto request) throws GeneralSecurityException, IOException;
-
     void logout(LogoutRequestDto request);
 
     RefreshTokenResponseDto refresh(RefreshTokenRequestDto request);

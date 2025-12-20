@@ -6,7 +6,10 @@ import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.request.product.CreateProductVariationRequestDto;
 import com.example.haus.domain.dto.request.product.UpdateProductVariationRequestDto;
+import com.example.haus.domain.dto.response.category.CategoryResponseDto;
+import com.example.haus.domain.dto.response.product.ProductResponseDto;
 import com.example.haus.domain.dto.response.product.ProductVariationResponseDto;
+import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.service.ProductVariationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,7 +43,7 @@ public class ProductVariationController {
                 description = "Lấy tất cả các biến thể của một sản phẩm cụ thể",
                 security = @SecurityRequirement(name = "Bearer Token")
         )
-        public ResponseEntity<?> getProductVariationsByProductId(
+        public ResponseEntity<ResponseData<List<ProductVariationResponseDto>>> getProductVariationsByProductId(
                         @Parameter(description = "ID sản phẩm", example = "1") @PathVariable Long productId) {
 
                 List<ProductVariationResponseDto> variations = productVariationService
@@ -57,7 +60,7 @@ public class ProductVariationController {
                 description = "Lấy thông tin chi tiết của một biến thể sản phẩm theo ID",
                 security = @SecurityRequirement(name = "Bearer Token")
         )
-        public ResponseEntity<?> getProductVariationById(
+        public ResponseEntity<ResponseData<ProductVariationResponseDto>> getProductVariationById(
                         @Parameter(description = "ID biến thể sản phẩm", example = "1") @PathVariable Long variationId) {
 
                 ProductVariationResponseDto variation = productVariationService.getProductVariationById(variationId);
@@ -73,7 +76,7 @@ public class ProductVariationController {
                 description = "Tạo một biến thể mới cho sản phẩm đã có",
                 security = @SecurityRequirement(name = "Bearer Token")
         )
-        public ResponseEntity<?> createProductVariation(
+        public ResponseEntity<ResponseData<ProductVariationResponseDto>> createProductVariation(
                 @Valid @RequestPart("request") CreateProductVariationRequestDto request,
                 @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
                 ProductVariationResponseDto createdVariation = productVariationService.createProductVariation(request, imageFile);
@@ -90,7 +93,7 @@ public class ProductVariationController {
                 description = "Cập nhật thông tin của một biến thể sản phẩm đã có",
                 security = @SecurityRequirement(name = "Bearer Token")
         )
-        public ResponseEntity<?> updateProductVariation(
+        public ResponseEntity<ResponseData<ProductVariationResponseDto>> updateProductVariation(
                         Long productVariantId,
                         @Valid @RequestPart("request") UpdateProductVariationRequestDto request,
                         @RequestPart(value = "imageFile", required = false) MultipartFile file) {
@@ -109,7 +112,7 @@ public class ProductVariationController {
                 security = @SecurityRequirement(name = "Bearer Token")
         )
         @ApiResponse(responseCode = "200", description = "Xóa biến thể sản phẩm thành công")
-        public ResponseEntity<?> deleteProductVariation(
+        public ResponseEntity<ResponseData<Void>> deleteProductVariation(
                         @Parameter(description = "ID biến thể sản phẩm", example = "1") @PathVariable Long variationId) {
 
                 productVariationService.deleteProductVariation(variationId);

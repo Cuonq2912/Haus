@@ -5,7 +5,12 @@ import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
+import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.product.AddFavoriteRequestDto;
+import com.example.haus.domain.dto.response.category.CategoryResponseDto;
+import com.example.haus.domain.dto.response.product.CheckFavoriteResponseDto;
+import com.example.haus.domain.dto.response.product.FavoriteResponseDto;
+import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.security.CustomUserDetails;
 import com.example.haus.service.FavoriteService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,7 +44,7 @@ public class FavoriteController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PostMapping(UrlConstant.Product.ADD_FAVORITE)
-    public ResponseEntity<?> addFavorite(
+    public ResponseEntity<ResponseData<FavoriteResponseDto>> addFavorite(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody AddFavoriteRequestDto request) {
         
@@ -60,7 +65,7 @@ public class FavoriteController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @DeleteMapping(UrlConstant.Product.REMOVE_FAVORITE)
-    public ResponseEntity<?> removeFavorite(
+    public ResponseEntity<ResponseData<Void>> removeFavorite(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable @Parameter(description = "ID của sản phẩm cần xóa", example = "123") 
             Long productId) {
@@ -81,7 +86,7 @@ public class FavoriteController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping(UrlConstant.Product.GET_FAVORITES)
-    public ResponseEntity<?> getFavorites(
+    public ResponseEntity<ResponseData<PaginationResponseDto<FavoriteResponseDto>>> getFavorites(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(defaultValue = "1") 
             @Parameter(description = "Số trang (1..N)", example = "1")
@@ -106,7 +111,7 @@ public class FavoriteController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping(UrlConstant.Product.CHECK_FAVORITE)
-    public ResponseEntity<?> checkFavorite(
+    public ResponseEntity<ResponseData<CheckFavoriteResponseDto>> checkFavorite(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable @Parameter(description = "ID của sản phẩm", example = "123")
             Long productId) {

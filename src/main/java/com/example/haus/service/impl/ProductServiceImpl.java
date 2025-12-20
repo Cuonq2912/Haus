@@ -44,6 +44,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.web.multipart.MultipartFile;
 
+import static com.example.haus.constant.CommonConstant.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -76,7 +78,7 @@ public class ProductServiceImpl implements ProductService {
         if(product == null)
             throw new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED);
 
-        if (product.getIsDeleted() == CommonConstant.TRUE)
+        if (product.getIsDeleted().equals(CommonConstant.TRUE))
             throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_ALREADY_DELETED);
 
         return productMapper.productToProductResponse(product);
@@ -113,7 +115,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public ProductResponseDto createProduct(ProductRequestDto request, MultipartFile[] images) {
 
-        if (productRepository.existsByProductNameAndIsDeletedFalse(request.getProductName())) {
+        if (Boolean.TRUE.equals(productRepository.existsByProductNameAndIsDeletedFalse(request.getProductName()))) {
             throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_NAME_EXISTED);
         }
 
@@ -122,7 +124,7 @@ public class ProductServiceImpl implements ProductService {
         String productCode;
         do {
             productCode = ProductCodeUtil.generateProductCode();
-        } while (productRepository.existsByProductCode(productCode));
+        } while (Boolean.TRUE.equals(productRepository.existsByProductCode(productCode)));
 
         product.setProductCode(productCode);
 
@@ -172,78 +174,114 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponseDto updateProduct(Long productId, UpdateProductRequestDto request, MultipartFile[] images) {
-        if (productId == null || productId <= 0) {
-            throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
-        }
+        validateProductId(productId);
 
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED));
+        Product product = getActiveProductOrThrow(productId);
 
-        if (product.getIsDeleted() == CommonConstant.TRUE) {
-            throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_ALREADY_DELETED);
-        }
-
-        if (request.getProductName() != null &&
-                !product.getProductName().equals(request.getProductName()) &&
-                productRepository.existsByProductNameAndIsDeletedFalse(request.getProductName())) {
-            throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_NAME_EXISTED);
-        }
+        validateUniqueProductName(product, request);
 
         productMapper.updateProductFromUpdateDto(request, product);
 
-        if (request.getCategories() != null && !request.getCategories().isEmpty()) {
-            product.getCategories().clear();
-            for (String categoryName : request.getCategories()) {
-                Category category = categoryRepository.findByCategoryNameIgnoreCase(categoryName)
-                        .orElseThrow(() -> new InvalidDataException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
+        updateCategoriesIfPresent(product, request);
 
-                product.addCategory(category);
-            }
-        }
+        deleteImagesIfRequested(product, productId, request);
 
-        if (request.getImageIdsToDelete() != null && !request.getImageIdsToDelete().isEmpty()) {
-            List<Media> mediasToDelete = mediaRepository.findByIdsAndProductId(
-                    request.getImageIdsToDelete(), productId);
+        addNewImagesIfPresent(product, images);
 
-            for (Media mediaToDelete : mediasToDelete) {
-                try {
-                    uploadFileUtil.destroyFileWithUrl(mediaToDelete.getUrl());
-                    product.getMedias().remove(mediaToDelete);
-                    mediaRepository.delete(mediaToDelete);
-                } catch (Exception e) {
-                    log.warn("Failed to delete media with ID {} from cloud storage: {}",
-                            mediaToDelete.getId(), e.getMessage(), e);
-                }
-            }
-        }
-
-        if (images != null && images.length > 0) {
-            List<MultipartFile> imageList = List.of(images);
-            List<String> newImageUrls = uploadFileUtil.uploadMultipleFiles(imageList);
-            Date now = new Date();
-
-            for (String imageUrl : newImageUrls) {
-                Media media = Media.builder()
-                        .url(imageUrl)
-                        .type(MediaType.Image)
-                        .product(product)
-                        .build();
-                media.setCreatedAt(now);
-                media.setUpdatedAt(now);
-
-                if (product.getMedias() == null) {
-                    product.setMedias(new HashSet<>());
-                }
-                product.getMedias().add(media);
-            }
-        }
-
-        product.setUpdatedAt(new Date());
+        touchUpdatedAt(product);
 
         Product updatedProduct = productRepository.save(product);
-
         return productMapper.productToProductResponse(updatedProduct);
     }
+
+    private void validateProductId(Long productId) {
+        if (productId == null || productId <= 0) {
+            throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
+        }
+    }
+
+    private Product getActiveProductOrThrow(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED));
+
+        if (CommonConstant.TRUE.equals(product.getIsDeleted())) {
+            throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_ALREADY_DELETED);
+        }
+        return product;
+    }
+
+    private void validateUniqueProductName(Product product, UpdateProductRequestDto request) {
+        String newName = request.getProductName();
+        if (newName == null) return;
+
+        boolean isChanged = !product.getProductName().equals(newName);
+        boolean exists = productRepository.existsByProductNameAndIsDeletedFalse(newName);
+
+        if (isChanged && exists) {
+            throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_NAME_EXISTED);
+        }
+    }
+
+    private void updateCategoriesIfPresent(Product product, UpdateProductRequestDto request) {
+        if (request.getCategories() == null || request.getCategories().isEmpty()) return;
+
+        product.getCategories().clear();
+        for (String categoryName : request.getCategories()) {
+            Category category = categoryRepository.findByCategoryNameIgnoreCase(categoryName)
+                    .orElseThrow(() -> new InvalidDataException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
+            product.addCategory(category);
+        }
+    }
+
+    private void deleteImagesIfRequested(Product product, Long productId, UpdateProductRequestDto request) {
+        if (request.getImageIdsToDelete() == null || request.getImageIdsToDelete().isEmpty()) return;
+
+        List<Media> mediasToDelete = mediaRepository.findByIdsAndProductId(
+                request.getImageIdsToDelete(), productId);
+
+        for (Media mediaToDelete : mediasToDelete) {
+            deleteMediaSafely(product, mediaToDelete);
+        }
+    }
+
+    private void deleteMediaSafely(Product product, Media mediaToDelete) {
+        try {
+            uploadFileUtil.destroyFileWithUrl(mediaToDelete.getUrl());
+            product.getMedias().remove(mediaToDelete);
+            mediaRepository.delete(mediaToDelete);
+        } catch (Exception e) {
+            log.warn("Failed to delete media with ID {} from cloud storage: {}",
+                    mediaToDelete.getId(), e.getMessage(), e);
+        }
+    }
+
+    private void addNewImagesIfPresent(Product product, MultipartFile[] images) {
+        if (images == null || images.length == 0) return;
+
+        List<String> newImageUrls = uploadFileUtil.uploadMultipleFiles(List.of(images));
+        Date now = new Date();
+
+        if (product.getMedias() == null) {
+            product.setMedias(new HashSet<>());
+        }
+
+        for (String imageUrl : newImageUrls) {
+            Media media = Media.builder()
+                    .url(imageUrl)
+                    .type(MediaType.Image)
+                    .product(product)
+                    .build();
+            media.setCreatedAt(now);
+            media.setUpdatedAt(now);
+
+            product.getMedias().add(media);
+        }
+    }
+
+    private void touchUpdatedAt(Product product) {
+        product.setUpdatedAt(new Date());
+    }
+
 
     @Override
     public void deleteProduct(Long productId) {
@@ -281,13 +319,10 @@ public class ProductServiceImpl implements ProductService {
                                                                     String search) {
         log.info("Sorting by: {}; Search query: {}", sortBy, search);
 
-        Page<Product> productsPage = getProductsPageByFilter(null, paginationRequest, sortBy, search);
+        PageImpl<Product> productsPage = getProductsPageByFilter(null, paginationRequest, sortBy, search);
 
         List<ProductResponseDto> productResponseDtoList = productsPage.getContent().stream()
-                .map(product -> {
-                    return productMapper.productToProductResponse(product);
-
-                })
+                .map(productMapper::productToProductResponse)
                 .toList();
 
         PaginationCustom paginationCustom = createPagination(paginationRequest, sortBy, productsPage);
@@ -299,12 +334,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-    private Page<Product> getProductsPageByFilter(Long categoryId, // Tham số categoryId
+    private PageImpl<Product> getProductsPageByFilter(Long categoryId, // Tham số categoryId
                                                   PaginationRequestDto paginationRequest,
                                                   String sortBy,
                                                   String search) {
         List<SearchCriteria> searchCriteriaList = new ArrayList<>();
-        if (search != null && search.length() > 0) {
+        if (search != null && !search.isEmpty()) {
             String[] newSearch = StringUtils.split(search, "&");
             Pattern pattern = Pattern.compile(AppConstants.SEARCH_OPERATOR);
             for (String s : newSearch) {
@@ -326,7 +361,7 @@ public class ProductServiceImpl implements ProductService {
 
     private PaginationCustom createPagination(PaginationRequestDto paginationRequest,
                                               String sortBy,
-                                              Page pages) {
+                                              PageImpl<?> pages) {
         return PaginationCustom.builder()
                 .pageNum(paginationRequest.getPageNum() + 1)
                 .pageSize(pages.getSize())
@@ -343,44 +378,44 @@ public class ProductServiceImpl implements ProductService {
         Root<Product> root = query.from(Product.class);
 
         Predicate predicate = cb.conjunction();
-        SearchQueryCriteriaConsumer<Product> consumer = new SearchQueryCriteriaConsumer(predicate, cb, root);
+        SearchQueryCriteriaConsumer<Product> consumer = new SearchQueryCriteriaConsumer<>(predicate, cb, root);
 
         searchCriteriaList.forEach(consumer);
         predicate = consumer.getPredicate();
 
         if (categoryId != null) {
-            Join<Product, Category> categoryJoin = root.join("categories", JoinType.INNER);
-            Predicate categoryPredicate = cb.equal(categoryJoin.get("id"), categoryId);
+            Join<Product, Category> categoryJoin = root.join(CATEGORIES, JoinType.INNER);
+            Predicate categoryPredicate = cb.equal(categoryJoin.get(ID), categoryId);
             predicate = cb.and(predicate, categoryPredicate);
         }
 
-        Predicate deletedPredicate = cb.equal(root.get("isDeleted"), false);
+        Predicate deletedPredicate = cb.equal(root.get(IS_DELETED), false);
         predicate = cb.and(predicate, deletedPredicate);
 
         query.where(predicate);
 
         if (sortBy != null) {
-            if ("asc".equalsIgnoreCase(sortBy)) {
-                query.orderBy(cb.asc(root.get("price")));
-            } else if ("desc".equalsIgnoreCase(sortBy)) {
-                query.orderBy(cb.desc(root.get("price")));
-            } else if ("sold_quantity_asc".equalsIgnoreCase(sortBy)) {
-                query.orderBy(cb.asc(root.get("soldQuantity")));
-            } else if ("sold_quantity_desc".equalsIgnoreCase(sortBy)) {
-                query.orderBy(cb.desc(root.get("soldQuantity")));
-            } else if ("created_at_asc".equalsIgnoreCase(sortBy)) {
-                query.orderBy(cb.asc(root.get("createdAt")));
-            } else if ("created_at_desc".equalsIgnoreCase(sortBy)) {
-                query.orderBy(cb.desc(root.get("createdAt")));
+            if (ASC.equalsIgnoreCase(sortBy)) {
+                query.orderBy(cb.asc(root.get(PRICE)));
+            } else if (DESC.equalsIgnoreCase(sortBy)) {
+                query.orderBy(cb.desc(root.get(PRICE)));
+            } else if (SOLD_QUANTITY_ASC.equalsIgnoreCase(sortBy)) {
+                query.orderBy(cb.asc(root.get(SOLD_QUANTITY)));
+            } else if (SOLD_QUANTITY_DESC.equalsIgnoreCase(sortBy)) {
+                query.orderBy(cb.desc(root.get(SOLD_QUANTITY)));
+            } else if (CREATED_AT_ASC.equalsIgnoreCase(sortBy)) {
+                query.orderBy(cb.asc(root.get(CREATED_AT)));
+            } else if (CREATED_AT_DESC.equalsIgnoreCase(sortBy)) {
+                query.orderBy(cb.desc(root.get(CREATED_AT)));
             }
-            else if ("discount_asc".equalsIgnoreCase(sortBy) || "discount_desc".equalsIgnoreCase(sortBy)) {
-                Join<Product, Category> categoryJoin = root.join("categories", JoinType.LEFT);
-                Join<Category, Promotion> promotionJoin = categoryJoin.join("promotion", JoinType.LEFT);
+            else if (DISCOUNT_ASC.equalsIgnoreCase(sortBy) || DISCOUNT_ASC.equalsIgnoreCase(sortBy)) {
+                Join<Product, Category> categoryJoin = root.join(CATEGORIES, JoinType.LEFT);
+                Join<Category, Promotion> promotionJoin = categoryJoin.join(PROMOTION, JoinType.LEFT);
 
-                if ("discount_asc".equalsIgnoreCase(sortBy)) {
-                    query.orderBy(cb.asc(promotionJoin.get("discountPercent")));
+                if (DISCOUNT_ASC.equalsIgnoreCase(sortBy)) {
+                    query.orderBy(cb.asc(promotionJoin.get(DISCOUNT_PERCENT)));
                 } else {
-                    query.orderBy(cb.desc(promotionJoin.get("discountPercent")));
+                    query.orderBy(cb.desc(promotionJoin.get(DISCOUNT_PERCENT)));
                 }
             }
         }
@@ -397,29 +432,29 @@ public class ProductServiceImpl implements ProductService {
         CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
         Root<Product> root = countQuery.from(Product.class);
 
-        Join<Product, ProductVariation> variantsJoin = root.join("productVariations", JoinType.LEFT);
+        Join<Product, ProductVariation> variantsJoin = root.join(PRODUCT_VARIATIONS, JoinType.LEFT);
 
         Predicate predicate = cb.conjunction();
-        SearchQueryCriteriaConsumer<Product> consumer = new SearchQueryCriteriaConsumer(predicate, cb, root);
+        SearchQueryCriteriaConsumer<Product> consumer = new SearchQueryCriteriaConsumer<>(predicate, cb, root);
         searchCriteriaList.forEach(consumer);
         predicate = consumer.getPredicate();
 
         if (categoryId != null) {
-            Join<Product, Category> categoryJoin = root.join("categories", JoinType.INNER);
-            Predicate categoryPredicate = cb.equal(categoryJoin.get("id"), categoryId);
+            Join<Product, Category> categoryJoin = root.join(CATEGORIES, JoinType.INNER);
+            Predicate categoryPredicate = cb.equal(categoryJoin.get(ID), categoryId);
             predicate = cb.and(predicate, categoryPredicate);
         }
 
-        Predicate deletedPredicate = cb.equal(root.get("isDeleted"), false);
+        Predicate deletedPredicate = cb.equal(root.get(IS_DELETED), false);
         predicate = cb.and(predicate, deletedPredicate);
 
         if (searchCriteriaList.stream().anyMatch(c -> c.getKey().equalsIgnoreCase("color"))) {
             List<String> colorValues = searchCriteriaList.stream()
-                    .filter(c -> c.getKey().equalsIgnoreCase("color"))
+                    .filter(c -> c.getKey().equalsIgnoreCase(COLOR))
                     .map(SearchCriteria::getValue)
                     .map(Object::toString)
                     .toList();
-            predicate = cb.and(predicate, variantsJoin.get("color").in(colorValues));
+            predicate = cb.and(predicate, variantsJoin.get(COLOR).in(colorValues));
         }
 
         countQuery.select(cb.countDistinct(root));
@@ -431,15 +466,15 @@ public class ProductServiceImpl implements ProductService {
     private String determineSortByField(String sortBy) {
         if (sortBy == null) {
             return null;
-        } else if ("asc".equalsIgnoreCase(sortBy) || "desc".equalsIgnoreCase(sortBy)) {
-            return "price";
-        } else if ("discount_asc".equalsIgnoreCase(sortBy) || "discount_desc".equalsIgnoreCase(sortBy)) {
-            return "discountPercent";
-        } else if ("sold_quantity_asc".equalsIgnoreCase(sortBy) || "sold_quantity_desc".equalsIgnoreCase(sortBy)) {
-            return "sold_quantity";
+        } else if (ASC.equalsIgnoreCase(sortBy) || DESC.equalsIgnoreCase(sortBy)) {
+            return PRICE;
+        } else if (DISCOUNT_ASC.equalsIgnoreCase(sortBy) || DISCOUNT_DESC.equalsIgnoreCase(sortBy)) {
+            return DISCOUNT_PERCENT;
+        } else if (SOLD_QUANTITY_ASC.equalsIgnoreCase(sortBy) || SOLD_QUANTITY_DESC.equalsIgnoreCase(sortBy)) {
+            return SOLD_QUANTITY;
         }
-        else if ("created_at_asc".equalsIgnoreCase(sortBy) || "created_at_desc".equalsIgnoreCase(sortBy)) {
-            return "created_at";
+        else if (CREATED_AT_ASC.equalsIgnoreCase(sortBy) || CREATED_AT_DESC.equalsIgnoreCase(sortBy)) {
+            return CREATED_AT;
         }
         return null;
     }

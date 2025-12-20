@@ -6,6 +6,7 @@ import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.request.product.momo.MomoIpnRequestDto;
+import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.service.MomoService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,11 +39,10 @@ public class MomoController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PostMapping(UrlConstant.Payment.MOMO_CREATE_ORDER)
-    public ResponseEntity<?> createMomoOrder(@RequestParam Long orderId) throws JsonProcessingException {
+    public ResponseEntity<ResponseData<Object>> createMomoOrder(@RequestParam Long orderId) throws JsonProcessingException {
 
         Map<String, String> result = momoService.createPaymentOrder(orderId);
         String resultCode = result.get("resultCode");
-        System.out.println(resultCode);
         boolean success = "0".equals(resultCode);
 
         return success
@@ -50,9 +50,10 @@ public class MomoController {
                 HttpStatus.OK,
                 SuccessMessage.Payment.CREATE_MOMO_ORDER_SUCCESS,
                 result)
-                : ResponseUtil.error(
+                : ResponseUtil.success(
                 HttpStatus.BAD_REQUEST,
-                ErrorMessage.Payment.CREATE_MOMO_ORDER_FAIL + ": " + result.get("message"));
+                ErrorMessage.Payment.CREATE_MOMO_ORDER_FAIL + ": " + result.get("message"),
+                null);
     }
 
     @Operation(
@@ -60,7 +61,7 @@ public class MomoController {
             description = "API này nhận thông báo thanh toán trực tiếp từ MoMo server (Server-to-Server)"
     )
     @PostMapping(UrlConstant.Payment.MOMO_IPN)
-    public ResponseEntity<?> momoIPN(@RequestBody MomoIpnRequestDto request) {
+    public ResponseEntity<ResponseData<Void>> momoIPN(@RequestBody MomoIpnRequestDto request) {
 
         boolean success = momoService.handleIpnCallback(request);
 
@@ -68,9 +69,10 @@ public class MomoController {
                 ? ResponseUtil.success(
                 HttpStatus.OK,
                 SuccessMessage.Payment.MOMO_IPN_SUCCESS)
-                :ResponseUtil.error(
+                :ResponseUtil.success(
                 HttpStatus.BAD_REQUEST,
-                ErrorMessage.Payment.MOMO_IPN_VERIFY_FAIL);
+                ErrorMessage.Payment.MOMO_IPN_VERIFY_FAIL,
+                null);
     }
 
 
@@ -79,7 +81,7 @@ public class MomoController {
             description = "MoMo gọi về khi thanh toán xong (Redirect URL từ Browser)"
     )
     @GetMapping(UrlConstant.Payment.MOMO_CALLBACK)
-    public ResponseEntity<?> momoReturn(@RequestParam Map<String, String> allParams) {
+    public ResponseEntity<ResponseData<Object>> momoReturn(@RequestParam Map<String, String> allParams) {
         
         Map<String, String> result = momoService.handleRedirectCallback(allParams);
         boolean success = "success".equals(result.get("status"));
@@ -89,9 +91,10 @@ public class MomoController {
                 HttpStatus.OK,
                 SuccessMessage.Payment.MOMO_CALLBACK_SUCCESS,
                 result)
-                : ResponseUtil.error(
+                : ResponseUtil.success(
                 HttpStatus.BAD_REQUEST,
-                ErrorMessage.Payment.MOMO_CALLBACK_FAIL);
+                ErrorMessage.Payment.MOMO_CALLBACK_FAIL,
+                null);
 
     }
 

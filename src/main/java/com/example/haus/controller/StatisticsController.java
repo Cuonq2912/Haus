@@ -4,10 +4,13 @@ import com.example.haus.base.ResponseUtil;
 import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
+import com.example.haus.domain.dto.pagination.PaginationResponseDto;
+import com.example.haus.domain.dto.response.product.ProductStatisticResponseDto;
+import com.example.haus.domain.dto.response.statistic.RecentOrderResponseDto;
+import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.service.StatisticsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -15,12 +18,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Map;
 
 @RestApiV1
 @RequiredArgsConstructor
@@ -35,7 +36,7 @@ public class StatisticsController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping("/statistics/order-by-month")
-    public ResponseEntity<?> getOrderByMonth() {
+    public ResponseEntity<ResponseData<Map<String, Object>>> getOrderByMonth() {
         return ResponseUtil.success(
                 SuccessMessage.Statistic.GET_STATISTIC_SUCCESS,
                 statisticsService.getOrderByMonth()
@@ -48,7 +49,7 @@ public class StatisticsController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping("/statistics/get-recent-order")
-    public ResponseEntity<?> getRecentOrders(
+    public ResponseEntity<ResponseData<PaginationResponseDto<RecentOrderResponseDto>>> getRecentOrders(
             @RequestParam(defaultValue = "1") Integer pageNum,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(required = false, defaultValue = "2024-01-01")
@@ -75,7 +76,7 @@ public class StatisticsController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping("/statistics/get-order-by-four-criteria")
-    public ResponseEntity<?> getStatisticalOrderByFourCriteria(
+    public ResponseEntity<ResponseData<Map<String, Object>>> getStatisticalOrderByFourCriteria(
             @RequestParam(required = false, defaultValue = "2024-01-01")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate startDate,
@@ -99,7 +100,7 @@ public class StatisticsController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping("/statistics/get-best-seller")
-    public ResponseEntity<?> getBestSellers(
+    public ResponseEntity<ResponseData<PaginationResponseDto<ProductStatisticResponseDto>>> getBestSellers(
             @RequestParam(defaultValue = "1") Integer pageNum,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(required = false, defaultValue = "2024-01-01")
@@ -126,7 +127,7 @@ public class StatisticsController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping("/statistics/get-sale-by-parent-category")
-    public ResponseEntity<?> getSaleByParentCategory() {
+    public ResponseEntity<ResponseData<Map<String, Double>>> getSaleByParentCategory() {
         return ResponseUtil.success(
                 SuccessMessage.Statistic.GET_STATISTIC_SUCCESS,
                 statisticsService.getSaleByCategories()

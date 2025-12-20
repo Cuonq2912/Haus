@@ -6,6 +6,7 @@ import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
+import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.service.VNPayService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -20,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
@@ -40,15 +40,15 @@ public class VNPayController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping(UrlConstant.Payment.GET_PAYMENT_URL)
-    public ResponseEntity<?> getVNPayUrl(
+    public ResponseEntity<ResponseData<String>> getVNPayUrl(
             @RequestParam(value = "orderId") Long orderId,
             HttpServletRequest request
     ) {
-            String VNPayUrl = vnPayService.createVNPayUrl(orderId, request);
+            String vnPayUrl = vnPayService.createVNPayUrl(orderId, request);
             return ResponseUtil.success(
                             HttpStatus.OK,
                             SuccessMessage.Payment.GET_VNPAYURL_SUCCESS,
-                            VNPayUrl);
+                    vnPayUrl);
 
     }
 
@@ -57,7 +57,7 @@ public class VNPayController {
         description = "API này nhận thông báo thanh toán trực tiếp từ VNPay server (Trước vnpay return api) (Server-to-Server)"
     )
     @GetMapping(UrlConstant.Payment.VNPAY_IPN)
-    public ResponseEntity<?> vnPayIPN(@RequestParam Map<String, String> allParams) {
+    public ResponseEntity<ResponseData<Map<String, String>>> vnPayIPN(@RequestParam Map<String, String> allParams) {
 
         Map<String, String> response = vnPayService.processVNPayIPN(allParams);
         return ResponseUtil.success(
@@ -72,13 +72,13 @@ public class VNPayController {
             description = "VNPay gọi về khi thanh toán xong (Callback URL)"
     )
     @GetMapping(UrlConstant.Payment.VNPAY_RETURN)
-    public ResponseEntity<?> vnPayReturn(@RequestParam Map<String, String> allParams) {
+    public ResponseEntity<ResponseData<Object>> vnPayReturn(@RequestParam Map<String, String> allParams) {
         Map<String, Object> result = vnPayService.handleVNPayReturn(allParams);
         log.info("success = {}", result.get("success"));
         boolean success = (boolean) result.get("success");
         return success
                 ? ResponseUtil.success(HttpStatus.OK, SuccessMessage.Payment.CALLBACK_VNPAY_SUCCESS, result)
-                : ResponseUtil.error(HttpStatus.BAD_REQUEST, ErrorMessage.Payment.CALLBACK_VNPAY_FAIL);
+                : ResponseUtil.success(HttpStatus.BAD_REQUEST, ErrorMessage.Payment.CALLBACK_VNPAY_FAIL, null);
     }
 
     

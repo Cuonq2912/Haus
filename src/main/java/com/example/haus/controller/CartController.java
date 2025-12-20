@@ -7,6 +7,8 @@ import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.request.auth.LoginRequestDto;
 import com.example.haus.domain.dto.request.cart.CartRequest;
 import com.example.haus.domain.dto.request.cart.UpdateCartRequest;
+import com.example.haus.domain.dto.response.cart.CartResponseDto;
+import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.service.CartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -37,7 +39,7 @@ public class CartController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PostMapping(UrlConstant.Cart.ADD_CART)
-    public ResponseEntity<?> addItemToCart(@Valid @RequestBody CartRequest cartRequest, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<ResponseData<CartResponseDto>> addItemToCart(@Valid @RequestBody CartRequest cartRequest, @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseUtil.success(
                 SuccessMessage.Cart.ADD_CART_SUCCESS,
                 cartService.addToCart(userDetails.getUsername(), cartRequest)
@@ -50,7 +52,7 @@ public class CartController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping(UrlConstant.Cart.GET_CART_BY_USER_ID)
-    public ResponseEntity<?> getCart(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<ResponseData<CartResponseDto>> getCart(@AuthenticationPrincipal UserDetails userDetails) {
         return ResponseUtil.success(
                 SuccessMessage.Cart.GET_CART_SUCCESS,
                 cartService.getCart(userDetails.getUsername())
@@ -63,7 +65,7 @@ public class CartController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @DeleteMapping(UrlConstant.Cart.REMOVE_CART_ITEM_FROM_CART)
-    public ResponseEntity<?> removeCartItemFromCart(@PathVariable(name = "variantId") Long variantId, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<ResponseData<CartResponseDto>> removeCartItemFromCart(@PathVariable(name = "variantId") Long variantId, @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseUtil.success(
                 SuccessMessage.Cart.DELETE_CART_ITEM_FROM_CART,
                 cartService.removeItem(userDetails.getUsername(), variantId)
@@ -76,7 +78,7 @@ public class CartController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PatchMapping(UrlConstant.Cart.UPDATE_CART)
-    public ResponseEntity<?> updateCart(@RequestBody @Valid UpdateCartRequest updateCartRequest, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<ResponseData<CartResponseDto>> updateCart(@RequestBody @Valid UpdateCartRequest updateCartRequest, @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseUtil.success(
                 SuccessMessage.Cart.UPDATE_CART_SUCCESS,
                 cartService.updateCart(userDetails.getUsername(), updateCartRequest)
@@ -89,7 +91,7 @@ public class CartController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @DeleteMapping(UrlConstant.Cart.DELETE_CART)
-    public ResponseEntity<?> clearCart(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<ResponseData<Void>> clearCart(@AuthenticationPrincipal UserDetails userDetails) {
         cartService.clearCart(userDetails.getUsername());
         return ResponseUtil.success(
                 HttpStatus.NO_CONTENT,

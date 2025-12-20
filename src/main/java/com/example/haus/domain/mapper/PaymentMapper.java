@@ -13,9 +13,8 @@ public interface PaymentMapper {
 
     PaymentResponseDto paymentToPaymentResponseDto(Payment payment);
 
-    @Mappings({
-            @Mapping(target = "gateway", source = "paymentGateway"),
-            @Mapping(target = "type", source = "paymentType")
-    })
+
+    @Mapping(target = "gateway", source = "paymentGateway")
+    @Mapping(target = "type", source = "paymentType")
     Payment paymentRequestDtoToPayment(PaymentRequestDto paymentRequestDto);
 }

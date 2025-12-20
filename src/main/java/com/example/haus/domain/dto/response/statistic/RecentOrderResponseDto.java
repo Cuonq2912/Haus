@@ -1,13 +1,11 @@
 package com.example.haus.domain.dto.response.statistic;
 
 import com.example.haus.constant.OrderStatus;
-import com.example.haus.domain.dto.response.product.OrderResponseDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Getter
 @Setter

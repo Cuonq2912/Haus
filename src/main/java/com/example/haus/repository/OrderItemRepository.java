@@ -1,14 +1,10 @@
 package com.example.haus.repository;
 
 import com.example.haus.constant.OrderStatus;
-import com.example.haus.domain.dto.response.product.ProductStatisticResponseDto;
 import com.example.haus.domain.dto.response.statistic.BestSellerRow;
 import com.example.haus.domain.entity.product.OrderItem;
-import com.example.haus.domain.entity.product.Product;
-import com.example.haus.domain.entity.product.ProductVariation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

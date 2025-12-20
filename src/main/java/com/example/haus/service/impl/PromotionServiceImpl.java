@@ -60,7 +60,7 @@ public class PromotionServiceImpl implements PromotionService {
     @Override
     public PromotionResponseDto addPromotion(PromotionRequestDto requestDto) {
         // Kiểm tra code đã tồn tại chưa
-        if (promotionRepository.existsByPromotionCodeAndIsDeletedFalse(requestDto.getPromotionCode())) {
+        if (Boolean.TRUE.equals(promotionRepository.existsByPromotionCodeAndIsDeletedFalse(requestDto.getPromotionCode()))) {
             throw new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_EXISTED);
         }
 
@@ -82,7 +82,7 @@ public class PromotionServiceImpl implements PromotionService {
     @Override
     public PromotionResponseDto updatePromotion(Long id, PromotionRequestDto requestDto) {
 
-        if (promotionRepository.existsByPromotionCodeAndIsDeletedTrue(requestDto.getPromotionCode())) {
+        if (Boolean.TRUE.equals(promotionRepository.existsByPromotionCodeAndIsDeletedTrue(requestDto.getPromotionCode()))) {
             throw new InvalidDataException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED);
         }
 
@@ -168,9 +168,9 @@ public class PromotionServiceImpl implements PromotionService {
                 .build();
 
         List<PromotionResponseDto> promotionResponseDtoList = pages.getContent().stream()
-                .map(promotion -> {
-                    return promotionMapper.promotionToPromotionResponseDto(promotion);
-                })
+                .map(promotion ->
+                     promotionMapper.promotionToPromotionResponseDto(promotion)
+                )
                 .toList();
 
         return PaginationResponseDto.<PromotionResponseDto>builder()

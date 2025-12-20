@@ -5,7 +5,6 @@ import com.example.haus.domain.dto.request.cart.CartRequest;
 import com.example.haus.domain.dto.request.cart.UpdateCartRequest;
 import com.example.haus.domain.dto.response.cart.CartItemResponseDto;
 import com.example.haus.domain.dto.response.cart.CartResponseDto;
-import com.example.haus.domain.dto.response.cart.ProductInCartResponseDto;
 import com.example.haus.domain.dto.response.cart.ProductVariationInCartResponseDto;
 import com.example.haus.domain.entity.product.Cart;
 import com.example.haus.domain.entity.product.CartItem;
@@ -14,7 +13,6 @@ import com.example.haus.domain.entity.product.ProductVariation;
 import com.example.haus.domain.entity.user.User;
 import com.example.haus.domain.mapper.CartItemMapper;
 import com.example.haus.domain.mapper.CartMapper;
-import com.example.haus.domain.mapper.ProductMapper;
 import com.example.haus.domain.mapper.ProductVariationMapper;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
@@ -176,6 +174,7 @@ public class CartServiceImpl implements CartService {
             throw new InvalidDataException(ErrorMessage.Cart.ERR_CART_QUANTITY_INVALID);
         }
 
+        assert existingItem != null;
         existingItem.setProductVariation(productVariation);
         existingItem.setQuantity(updateCartRequest.quantity());
 

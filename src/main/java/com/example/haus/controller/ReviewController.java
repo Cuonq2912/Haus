@@ -5,7 +5,13 @@ import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
+import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.product.ReviewRequestDto;
+import com.example.haus.domain.dto.response.dashboard.TopReviewDto;
+import com.example.haus.domain.dto.response.product.RatingStatisticsDto;
+import com.example.haus.domain.dto.response.product.ReviewResponseDto;
+import com.example.haus.domain.dto.response.promotion.PromotionResponseDto;
+import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.security.CustomUserDetails;
 import com.example.haus.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,7 +45,7 @@ public class ReviewController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PostMapping(UrlConstant.Review.CREATE_REVIEW)
-    public ResponseEntity<?> createReview(
+    public ResponseEntity<ResponseData<ReviewResponseDto>> createReview(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable @Parameter(description = "ID của sản phẩm cần đánh giá", example = "1") Long productId,
             @Valid @RequestBody ReviewRequestDto request) {
@@ -58,7 +64,7 @@ public class ReviewController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PutMapping(UrlConstant.Review.UPDATE_REVIEW)
-    public ResponseEntity<?> updateReview(
+    public ResponseEntity<ResponseData<ReviewResponseDto>> updateReview(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable @Parameter(description = "ID của đánh giá cần cập nhật", example = "1") Long reviewId,
             @Valid @RequestBody ReviewRequestDto request) {
@@ -76,7 +82,7 @@ public class ReviewController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @DeleteMapping(UrlConstant.Review.DELETE_REVIEW)
-    public ResponseEntity<?> deleteReview(
+    public ResponseEntity<ResponseData<Void>> deleteReview(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable @Parameter(description = "ID của đánh giá cần xóa", example = "1") Long reviewId) {
         
@@ -93,7 +99,7 @@ public class ReviewController {
             description = "Lấy thông tin chi tiết của một đánh giá"
     )
     @GetMapping(UrlConstant.Review.GET_REVIEW_BY_ID)
-    public ResponseEntity<?> getReviewById(
+    public ResponseEntity<ResponseData<ReviewResponseDto>> getReviewById(
             @PathVariable @Parameter(description = "ID của đánh giá", example = "1") Long reviewId) {
         
         return ResponseUtil.success(
@@ -108,7 +114,7 @@ public class ReviewController {
             description = "Lấy tất cả đánh giá của một sản phẩm với phân trang"
     )
     @GetMapping(UrlConstant.Review.GET_PRODUCT_REVIEWS)
-    public ResponseEntity<?> getProductReviews(
+    public ResponseEntity<ResponseData<PaginationResponseDto<ReviewResponseDto>>> getProductReviews(
             @PathVariable @Parameter(description = "ID của sản phẩm", example = "1") Long productId,
             @RequestParam(defaultValue = "1") @Parameter(description = "Số trang", example = "1") Integer pageNum,
             @RequestParam(defaultValue = "10") @Parameter(description = "Số items trên mỗi trang", example = "10") Integer pageSize) {
@@ -126,7 +132,7 @@ public class ReviewController {
             description = "Lọc đánh giá của sản phẩm theo số sao (1-5)"
     )
     @GetMapping(UrlConstant.Review.GET_PRODUCT_REVIEWS_BY_RATING)
-    public ResponseEntity<?> getProductReviewsByRating(
+    public ResponseEntity<ResponseData<PaginationResponseDto<ReviewResponseDto>>> getProductReviewsByRating(
             @PathVariable @Parameter(description = "ID của sản phẩm", example = "1") Long productId,
             @PathVariable @Parameter(description = "Số sao (1-5)", example = "5") Integer rating,
             @RequestParam(defaultValue = "1") @Parameter(description = "Số trang", example = "1") Integer pageNum,
@@ -145,7 +151,7 @@ public class ReviewController {
             description = "Lấy thống kê số lượng và phần trăm đánh giá theo từng mức sao"
     )
     @GetMapping(UrlConstant.Review.GET_PRODUCT_RATING_STATISTICS)
-    public ResponseEntity<?> getProductRatingStatistics(
+    public ResponseEntity<ResponseData<RatingStatisticsDto>> getProductRatingStatistics(
             @PathVariable @Parameter(description = "ID của sản phẩm", example = "1") Long productId) {
         
         return ResponseUtil.success(
@@ -160,7 +166,7 @@ public class ReviewController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping(UrlConstant.Review.GET_MY_REVIEWS)
-    public ResponseEntity<?> getMyReviews(
+    public ResponseEntity<ResponseData<PaginationResponseDto<ReviewResponseDto>>> getMyReviews(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(defaultValue = "1") @Parameter(description = "Số trang", example = "1") Integer pageNum,
             @RequestParam(defaultValue = "10") @Parameter(description = "Số items trên mỗi trang", example = "10") Integer pageSize) {
@@ -178,7 +184,7 @@ public class ReviewController {
             description = "Lấy danh sách đánh giá được sắp xếp theo số sao giảm dần. Không phân biệt sản phẩm."
     )
     @GetMapping(UrlConstant.Review.GET_TOP_REVIEWS)
-    public ResponseEntity<?> getTopReviewsByRating(
+    public ResponseEntity<ResponseData<PaginationResponseDto<TopReviewDto>>> getTopReviewsByRating(
             @RequestParam(defaultValue = "0") @Parameter(description = "Số trang", example = "1") Integer pageNum,
             @RequestParam(defaultValue = "15") @Parameter(description = "Số items trên mỗi trang", example = "15") Integer pageSize
     ) {

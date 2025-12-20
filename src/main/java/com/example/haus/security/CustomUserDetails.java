@@ -16,7 +16,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CustomUserDetails implements UserDetails {
 
-    User user;
+    transient User user;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

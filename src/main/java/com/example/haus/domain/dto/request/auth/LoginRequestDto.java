@@ -1,7 +1,6 @@
 package com.example.haus.domain.dto.request.auth;
 
 import com.example.haus.constant.ErrorMessage;
-import com.example.haus.domain.validator.Email;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;

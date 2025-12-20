@@ -1,36 +1,25 @@
 package com.example.haus.service.impl;
 
-import com.example.haus.constant.ErrorMessage;
-import com.example.haus.constant.OrderStatus;
 import com.example.haus.constant.promotion.PromotionStatus;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
-import com.example.haus.domain.dto.response.invoice.InvoiceItemDto;
-import com.example.haus.domain.dto.response.invoice.InvoiceResponseDto;
-import com.example.haus.domain.dto.response.product.OrderResponseDto;
 import com.example.haus.domain.dto.response.product.ProductStatisticResponseDto;
 import com.example.haus.domain.dto.response.statistic.BestSellerRow;
 import com.example.haus.domain.dto.response.statistic.RecentOrderResponseDto;
 import com.example.haus.domain.dto.response.statistic.RevenueDetailResponseDto;
-import com.example.haus.domain.dto.response.statistic.StatisticResponseDto;
 import com.example.haus.domain.entity.product.*;
-import com.example.haus.domain.entity.product.payment.Payment;
-import com.example.haus.domain.entity.user.User;
 import com.example.haus.domain.mapper.*;
 import com.example.haus.exception.InvalidDataException;
-import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.CategoryRepository;
 import com.example.haus.repository.OrderItemRepository;
 import com.example.haus.repository.OrderRepository;
 import com.example.haus.repository.ProductRepository;
 import com.example.haus.service.StatisticsService;
 import com.example.haus.util.PaginationUtil;
-import com.google.api.client.util.DateTime;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.query.sqm.TemporalUnit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,9 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.*;
-import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
 @Service
@@ -105,11 +93,13 @@ public class StatisticsServiceImpl implements StatisticsService {
         final double[] totalCompleted = {0.0, 0.0};
         final double[] totalReturned = {0.0, 0.0};
 
-        Function<double[], Double> calcPercent = arr -> {
+        ToDoubleFunction<double[]> calcPercent = arr -> {
             double prev = arr[0];
             double curr = arr[1];
 
-            if (prev == 0.0) return curr;
+            if (prev == 0.0) {
+                return curr;
+            }
             return Math.ceil((curr - prev) / prev * 100);
         };
 
@@ -118,6 +108,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                 case PENDING -> totalPending[1] += order.getTotalAmount();
                 case COMPLETED -> totalCompleted[1] += order.getTotalAmount();
                 case RETURNED -> totalReturned[1] += order.getTotalAmount();
+                default -> throw new IllegalStateException("Unexpected value: " + order.getStatus());
             }
             total[1] += order.getTotalAmount();
         });
@@ -127,6 +118,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                 case PENDING -> totalPending[0] += order.getTotalAmount();
                 case COMPLETED -> totalCompleted[0] += order.getTotalAmount();
                 case RETURNED -> totalReturned[0] += order.getTotalAmount();
+                default -> throw new IllegalStateException("Unexpected value: " + order.getStatus());
             }
             log.info("DEv = {}", order.getTotalAmount());
             total[0] += order.getTotalAmount();
@@ -134,22 +126,22 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         map.put("totalOrders", RevenueDetailResponseDto.builder()
                 .totalOrder(total[1])
-                .percentIncrease(calcPercent.apply(total))
+                .percentIncrease(calcPercent.applyAsDouble(total))
                 .build());
 
         map.put("pendingOrders", RevenueDetailResponseDto.builder()
                 .totalOrder(totalPending[1])
-                .percentIncrease(calcPercent.apply(totalPending))
+                .percentIncrease(calcPercent.applyAsDouble(totalPending))
                 .build());
 
         map.put("completedOrders", RevenueDetailResponseDto.builder()
                 .totalOrder(totalCompleted[1])
-                .percentIncrease(calcPercent.apply(totalCompleted))
+                .percentIncrease(calcPercent.applyAsDouble(totalCompleted))
                 .build());
 
         map.put("returnOrders", RevenueDetailResponseDto.builder()
                 .totalOrder(totalReturned[1])
-                .percentIncrease(calcPercent.apply(totalReturned))
+                .percentIncrease(calcPercent.applyAsDouble(totalReturned))
                 .build());
 
         return map;

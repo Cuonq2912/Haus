@@ -5,7 +5,11 @@ import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
+import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.promotion.PromotionRequestDto;
+import com.example.haus.domain.dto.response.category.CategoryResponseDto;
+import com.example.haus.domain.dto.response.promotion.PromotionResponseDto;
+import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.service.PromotionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -37,7 +41,7 @@ public class PromotionController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PostMapping(UrlConstant.Promotion.ADD_PROMOTION)
-    public ResponseEntity<?> addPromotion (@Valid @RequestBody PromotionRequestDto promotionRequestDto){
+    public ResponseEntity<ResponseData<PromotionResponseDto>> addPromotion (@Valid @RequestBody PromotionRequestDto promotionRequestDto){
         return ResponseUtil.success(
                 SuccessMessage.Promotion.ADD_PROMOTION_SUCCESS,
                 promotionService.addPromotion(promotionRequestDto)
@@ -50,7 +54,7 @@ public class PromotionController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping(UrlConstant.Promotion.GET_PROMOTION_BY_ID)
-    public ResponseEntity<?> getPromotionById(@PathVariable Long promotionId){
+    public ResponseEntity<ResponseData<PromotionResponseDto>> getPromotionById(@PathVariable Long promotionId){
         return ResponseUtil.success(
                 SuccessMessage.Promotion.GET_PROMOTION_SUCCESS,
                 promotionService.getPromotionById(promotionId)
@@ -63,7 +67,7 @@ public class PromotionController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PutMapping(UrlConstant.Promotion.UPDATE_PROMOTION)
-    public ResponseEntity<?> updatePromotion(@PathVariable("promotionId") Long promotionId, @Valid @RequestBody PromotionRequestDto promotionRequestDto){
+    public ResponseEntity<ResponseData<PromotionResponseDto>> updatePromotion(@PathVariable("promotionId") Long promotionId, @Valid @RequestBody PromotionRequestDto promotionRequestDto){
         return ResponseUtil.success(
                 SuccessMessage.Promotion.UPDATE_PROMOTION_SUCCESS,
                 promotionService.updatePromotion(promotionId, promotionRequestDto)
@@ -76,7 +80,7 @@ public class PromotionController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @DeleteMapping(UrlConstant.Promotion.DELETE_PROMOTION)
-    public ResponseEntity<?> deletePromotion(@PathVariable Long promotionId){
+    public ResponseEntity<ResponseData<Void>> deletePromotion(@PathVariable Long promotionId){
         promotionService.deletePromotion(promotionId);
         return ResponseUtil.success(
                 HttpStatus.NO_CONTENT,
@@ -90,7 +94,7 @@ public class PromotionController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping(UrlConstant.Promotion.GET_PROMOTION_BY_CODE)
-    public ResponseEntity<?> getPromotionByPromotionCode(@PathVariable String promotionCode){
+    public ResponseEntity<ResponseData<PromotionResponseDto>> getPromotionByPromotionCode(@PathVariable String promotionCode){
         return ResponseUtil.success(
                 SuccessMessage.Promotion.GET_PROMOTION_SUCCESS,
                 promotionService.getPromotionByPromotionCode(promotionCode)
@@ -102,7 +106,7 @@ public class PromotionController {
             description = "Lọc khuyến mãi theo kiểu, ngày bđ, ngày kt, sort by percent với phân trang"
     )
     @GetMapping(UrlConstant.Promotion.FILTER_PROMOTION)
-    public ResponseEntity<?> filterProducts(
+    public ResponseEntity<ResponseData<PaginationResponseDto<PromotionResponseDto>>> filterProducts(
             @RequestParam(defaultValue = "1", required = false) Integer pageNum,
             @RequestParam(defaultValue = "10", required = false) Integer pageSize,
             @RequestParam(required = false) @Schema(example = "asc") String sortByPrice,

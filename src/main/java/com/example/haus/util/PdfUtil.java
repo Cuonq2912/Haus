@@ -20,6 +20,8 @@ import java.io.InputStream;
 @Slf4j(topic = "PDF-UTIL")
 public class PdfUtil {
 
+    private PdfUtil () {}
+
     //1. Mảng đơn vị
     private static final String[] units = {
             "không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"
@@ -62,7 +64,7 @@ public class PdfUtil {
                 }
 
                 // Nối vào chuỗi kết quả (nhóm lớn hơn đứng trước)
-                words = chunkWords + " " + words;
+                words = new StringBuilder().append(chunkWords).append(" ").append(words).toString();
             }
 
             number /= 1000;
@@ -71,7 +73,7 @@ public class PdfUtil {
 
         // Loại bỏ khoảng trắng thừa và viết hoa chữ cái đầu tiên
         words = words.trim();
-        if (words.length() > 0) {
+        if (!words.isEmpty()) {
             words = words.substring(0, 1).toUpperCase() + words.substring(1).toLowerCase();
         }
 
@@ -130,7 +132,7 @@ public class PdfUtil {
     }
 
     // Hàm tiện ích để tạo nhanh một PdfPCell từ một Element (Paragraph hoặc Table)
-    public static PdfPCell createCell(Element element, int border, int colspan) throws DocumentException {
+    public static PdfPCell createCell(Element element, int border, int colspan) {
         PdfPCell cell = new PdfPCell();
         cell.addElement(element);
         cell.setBorder(border);
@@ -142,7 +144,7 @@ public class PdfUtil {
     }
 
     // Overload để chỉ truyền Element và Border
-    public static PdfPCell createCell(Element element, int border) throws DocumentException {
+    public static PdfPCell createCell(Element element, int border) {
         return createCell(element, border, 0);
     }
 
@@ -192,7 +194,7 @@ public class PdfUtil {
         }
     }
 
-    public static Image generateQrCodeImage(String content, int width, int height) throws WriterException, IOException, BadElementException, com.google.zxing.WriterException {
+    public static Image generateQrCodeImage(String content, int width, int height) throws IOException, BadElementException, com.google.zxing.WriterException {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         // Cố gắng sử dụng nội dung (content) để tạo BitMatrix
         BitMatrix bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, width, height);
@@ -253,10 +255,8 @@ public class PdfUtil {
             // Thêm dòng báo lỗi hoặc bỏ qua
             Paragraph errorNote = new Paragraph("Lỗi tạo mã QR (QR Code generation failed)", font);
             mainTable.addCell(PdfUtil.createCell(errorNote, Rectangle.NO_BORDER, Element.ALIGN_LEFT));
-        } catch (com.itextpdf.text.pdf.qrcode.WriterException e) {
-            throw new RuntimeException(e);
-        } catch (DocumentException e) {
-            throw new RuntimeException(e);
+        } catch (Exception ex) {
+            throw new DocumentException("Failed to generate QR Code for invoice " + invoiceId, ex);
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.example.haus.domain.dto.response.product;
 
 import com.example.haus.constant.MediaType;
-import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

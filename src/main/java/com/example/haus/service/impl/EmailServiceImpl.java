@@ -68,7 +68,6 @@ public class EmailServiceImpl implements EmailService {
         Personalization personalization = new Personalization();
         personalization.addTo(toEmail);
 
-        //Add dynamic Template data;
         dynamicTemplateData.forEach(personalization::addDynamicTemplateData);
         mail.addPersonalization(personalization);
         mail.setTemplateId(templateRegistrationId);
@@ -114,7 +113,6 @@ public class EmailServiceImpl implements EmailService {
         Personalization personalization = new Personalization();
         personalization.addTo(toEmail);
 
-        //Add dynamic Template data;
         dynamicTemplateData.forEach(personalization::addDynamicTemplateData);
         mail.addPersonalization(personalization);
         mail.setTemplateId(templateForgotId);

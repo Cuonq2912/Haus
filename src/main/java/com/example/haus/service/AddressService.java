@@ -1,6 +1,5 @@
 package com.example.haus.service;
 
-import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.address.AddressRequestDto;
 import com.example.haus.domain.dto.response.address.AddressResponseDto;
 

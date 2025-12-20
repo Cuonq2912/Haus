@@ -109,7 +109,7 @@ public class AppDataSeeder implements ApplicationRunner {
 
     private Product convertToProduct(ProductJsonDto dto) {
         try {
-            Product product = Product.builder()
+            return Product.builder()
                     .productCode(dto.productCode)
                     .productName(dto.productName)
                     .price(dto.price)
@@ -120,9 +120,6 @@ public class AppDataSeeder implements ApplicationRunner {
                     .soldQuantity(dto.soldQuantity)
                     .isDeleted(false)
                     .build();
-
-            return product;
-
         } catch (Exception e) {
             log.warn("Failed to convert ProductJsonDto to Product for productCode: " + dto.productCode);
             return null;

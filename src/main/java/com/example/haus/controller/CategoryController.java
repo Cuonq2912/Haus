@@ -5,7 +5,10 @@ import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
+import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.category.CategoryRequestDto;
+import com.example.haus.domain.dto.response.category.CategoryResponseDto;
+import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -18,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestApiV1
 @Validated
@@ -34,7 +39,7 @@ public class CategoryController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PostMapping(UrlConstant.Category.ADD_CATEGORY)
-    public ResponseEntity<?> addCategory (@Valid @RequestBody CategoryRequestDto categoryRequest){
+    public ResponseEntity<ResponseData<CategoryResponseDto>> addCategory (@Valid @RequestBody CategoryRequestDto categoryRequest){
         return ResponseUtil.success(
                 SuccessMessage.Category.ADD_CATEGORY_SUCCESS,
                 categoryService.addCategory(categoryRequest)
@@ -47,7 +52,7 @@ public class CategoryController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping(UrlConstant.Category.GET_CATEGORY_BY_ID)
-    public ResponseEntity<?> getCategoryById(@PathVariable Long categoryId){
+    public ResponseEntity<ResponseData<CategoryResponseDto>> getCategoryById(@PathVariable Long categoryId){
         return ResponseUtil.success(
                 SuccessMessage.Category.GET_CATEGORY_SUCCESS,
                 categoryService.getCategoryById(categoryId)
@@ -59,7 +64,7 @@ public class CategoryController {
             description = "Dùng để front end lấy ra tất cả danh mục render ra UI"
     )
     @GetMapping(UrlConstant.Category.GET_ALL_SUB_CATEGORY)
-    public ResponseEntity<?> getAllSubCategories(){
+    public ResponseEntity<ResponseData<List<CategoryResponseDto>>> getAllSubCategories(){
         return ResponseUtil.success(
                 SuccessMessage.Category.GET_ALL_CATEGORY_SUCCESS,
                 categoryService.getAllSubCategories()
@@ -72,7 +77,7 @@ public class CategoryController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PutMapping(UrlConstant.Category.UPDATE_CATEGORY)
-    public ResponseEntity<?> updateCategory(@PathVariable("categoryId") Long categoryId, @Valid @RequestBody CategoryRequestDto categoryRequest){
+    public ResponseEntity<ResponseData<CategoryResponseDto>> updateCategory(@PathVariable("categoryId") Long categoryId, @Valid @RequestBody CategoryRequestDto categoryRequest){
         return ResponseUtil.success(
                 SuccessMessage.Category.UPDATE_CATEGORY_SUCCESS,
                 categoryService.updateCategory(categoryId, categoryRequest)
@@ -85,7 +90,7 @@ public class CategoryController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @DeleteMapping(UrlConstant.Category.DELETE_CATEGORY)
-    public ResponseEntity<?> deleteCategory(@PathVariable Long categoryId){
+    public ResponseEntity<ResponseData<Void>> deleteCategory(@PathVariable Long categoryId){
         categoryService.deleteCategory(categoryId);
         return ResponseUtil.success(
                 HttpStatus.NO_CONTENT,
@@ -98,7 +103,7 @@ public class CategoryController {
             description = "Tùy chọn search theo keyword and sort theo name"
     )
     @GetMapping(UrlConstant.Category.SEARCH_CATEGORY_BY_NAME_AND_SORT_BY_KEYWORD)
-    public ResponseEntity<?> searchCategoryByKeyword(
+    public ResponseEntity<ResponseData<PaginationResponseDto<CategoryResponseDto>>> searchCategoryByKeyword(
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "1") Integer pageNum,
             @RequestParam(defaultValue = "10") Integer pageSize) {

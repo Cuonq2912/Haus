@@ -1,8 +1,6 @@
 package com.example.haus.config;
 
 import com.example.haus.security.CustomUserDetailsService;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,7 +13,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class UserDetailsJwtConverter implements Converter<Jwt, AbstractAuthenticationToken> {
 
@@ -67,8 +64,8 @@ public class UserDetailsJwtConverter implements Converter<Jwt, AbstractAuthentic
         if (roles instanceof List<?> stringRoles){
             return ((List<String>) stringRoles)
                     .stream()
-                    .map(s ->  new SimpleGrantedAuthority(s)) // Map Role string sang GrantedAuthority
-                    .collect(Collectors.toList());
+                    .map(SimpleGrantedAuthority::new) // Map Role string sang GrantedAuthority
+                    .toList();
         }
 
         return Collections.emptyList();

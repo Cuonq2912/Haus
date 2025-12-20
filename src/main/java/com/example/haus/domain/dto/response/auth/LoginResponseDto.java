@@ -20,11 +20,4 @@ public class LoginResponseDto {
     String accessToken;
 
     String refreshToken;
-
-//    Boolean isDeleted;
-//
-//    Boolean canRecovery;
-//
-//    long dayRecoveryRemaining;
-
 }

@@ -2,7 +2,6 @@ package com.example.haus.domain.mapper;
 
 import com.example.haus.domain.dto.response.cart.CartItemResponseDto;
 import com.example.haus.domain.dto.response.cart.CartResponseDto;
-import com.example.haus.domain.entity.product.Cart;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;

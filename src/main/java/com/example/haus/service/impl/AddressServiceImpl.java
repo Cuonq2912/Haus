@@ -6,7 +6,6 @@ import com.example.haus.domain.dto.response.address.AddressResponseDto;
 import com.example.haus.domain.entity.address.Address;
 import com.example.haus.domain.entity.user.User;
 import com.example.haus.domain.mapper.AddressMapper;
-import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.AddressRepository;
 import com.example.haus.repository.UserRepository;

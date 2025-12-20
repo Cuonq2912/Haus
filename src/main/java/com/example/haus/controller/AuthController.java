@@ -6,7 +6,12 @@ import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.request.auth.*;
 import com.example.haus.domain.dto.request.auth.otp.VerifyOtpRequestDto;
+import com.example.haus.domain.dto.response.auth.LoginResponseDto;
+import com.example.haus.domain.dto.response.auth.RefreshTokenResponseDto;
+import com.example.haus.domain.dto.response.user.UserResponseDto;
+import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.service.AuthenticationService;
+import com.sendgrid.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -34,7 +39,7 @@ public class AuthController {
             description = "Dùng để đăng nhập tài khoản"
     )
     @PostMapping(UrlConstant.Auth.LOGIN)
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto loginRequestDto) {
+    public ResponseEntity<ResponseData<LoginResponseDto>> login(@Valid @RequestBody LoginRequestDto loginRequestDto) {
 
         SecurityContextHolder.getContext().getAuthentication();
 
@@ -49,9 +54,9 @@ public class AuthController {
             description = "Dùng để đăng xuất tài khoản"
     )
     @PostMapping(UrlConstant.Auth.LOGOUT)
-    public ResponseEntity<?> logout(@Valid @RequestBody LogoutRequestDto logoutRequestDto) {
+    public ResponseEntity<ResponseData<Void>> logout(@Valid @RequestBody LogoutRequestDto logoutRequestDto) {
         authenticationService.logout(logoutRequestDto);
-        return ResponseUtil.success(HttpStatus.NO_CONTENT, SuccessMessage.Auth.LOGOUT_SUCCESS, null);
+        return ResponseUtil.success(HttpStatus.NO_CONTENT, SuccessMessage.Auth.LOGOUT_SUCCESS);
     }
 
     @Operation(
@@ -59,7 +64,7 @@ public class AuthController {
             description = "Dùng để cấp lại token"
     )
     @PostMapping(UrlConstant.Auth.REFRESH_TOKEN)
-    public ResponseEntity<?> refresh(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
+    public ResponseEntity<ResponseData<RefreshTokenResponseDto>> refresh(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
         return ResponseUtil.success(
                 SuccessMessage.Auth.REFRESH_TOKEN_SUCCESS,
                 authenticationService.refresh(refreshTokenRequestDto)
@@ -71,9 +76,9 @@ public class AuthController {
             description = "Dùng để đăng kí tài khoản"
     )
     @PostMapping(UrlConstant.Auth.REGISTER)
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequestDto registerRequestDto) {
+    public ResponseEntity<ResponseData<Void>> register(@Valid @RequestBody RegisterRequestDto registerRequestDto) {
         authenticationService.register(registerRequestDto);
-        return ResponseUtil.success(HttpStatus.CREATED, SuccessMessage.Auth.REGISTER_SEND_OTP_SUCCESS, null);
+        return ResponseUtil.success(HttpStatus.CREATED, SuccessMessage.Auth.REGISTER_SEND_OTP_SUCCESS);
     }
 
     @Operation(
@@ -81,7 +86,7 @@ public class AuthController {
             description = "Dùng để xác thực OTP sau khi yêu cầu đăng kí tài khoản"
     )
     @PostMapping(UrlConstant.Auth.VERIFY_OTP)
-    public ResponseEntity<?> verify(@Valid @RequestBody VerifyOtpRequestDto verifyOtpRequestDto) {
+    public ResponseEntity<ResponseData<UserResponseDto>> verify(@Valid @RequestBody VerifyOtpRequestDto verifyOtpRequestDto) {
         return ResponseUtil.success(
                 HttpStatus.CREATED,
                 SuccessMessage.Auth.VERIFY_OTP_REGISTER_SUCCESS,
@@ -94,9 +99,9 @@ public class AuthController {
             description = "Dùng để lấy lại mật khẩu"
     )
     @PostMapping(UrlConstant.Auth.FORGOT_PASSWORD)
-    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequestDto forgotPasswordRequestDto) {
+    public ResponseEntity<ResponseData<Void>> forgotPassword(@Valid @RequestBody ForgotPasswordRequestDto forgotPasswordRequestDto) {
         authenticationService.forgotPassword(forgotPasswordRequestDto);
-        return ResponseUtil.success(HttpStatus.ACCEPTED, SuccessMessage.Auth.FORGOT_PASSWORD_SUCCESS, null);
+        return ResponseUtil.success(HttpStatus.ACCEPTED, SuccessMessage.Auth.FORGOT_PASSWORD_SUCCESS);
     }
 
     @Operation(
@@ -104,8 +109,8 @@ public class AuthController {
             description = "Dùng để xác thực OTP sau khi yêu cầu lấy lại mật khẩu"
     )
     @PostMapping(UrlConstant.Auth.VERIFY_OTP_TO_RESET_PASSWORD)
-    public ResponseEntity<?> verifyToResetPassword(@Valid @RequestBody VerifyOtpRequestDto request) {
-        boolean isVerified = authenticationService.verifyOtpToResetPassword(request);
+    public ResponseEntity<ResponseData<Void>> verifyToResetPassword(@Valid @RequestBody VerifyOtpRequestDto request) {
+        authenticationService.verifyOtpToResetPassword(request);
         return ResponseUtil.success(
                 HttpStatus.OK,
                 SuccessMessage.Auth.VERIFY_OTP_TO_RESET_PASSWORD_SUCCESS);
@@ -116,7 +121,7 @@ public class AuthController {
             description = "Dùng để đặt lại mật khẩu sau khi đã nhập được OTP"
     )
     @PostMapping(UrlConstant.Auth.RESET_PASSWORD)
-    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequestDto request) {
+    public ResponseEntity<ResponseData<UserResponseDto>> resetPassword(@Valid @RequestBody ResetPasswordRequestDto request) {
         return ResponseUtil.success(
                 SuccessMessage.Auth.RESET_PASSWORD_SUCCESS,
                 authenticationService.resetPassword(request)

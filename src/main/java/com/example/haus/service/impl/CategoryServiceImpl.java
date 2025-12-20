@@ -186,7 +186,6 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         // 5. Build pagination
-        Pageable pageable = PageRequest.of(page, size);
         int totalPages = (int) Math.ceil((double) totalElements / size);
 
         log.info("page = {}; size = {}", page, size);

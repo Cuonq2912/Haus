@@ -6,6 +6,11 @@ import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.order.OrderAllRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
+import com.example.haus.domain.dto.pagination.PaginationResponseDto;
+import com.example.haus.domain.dto.response.invoice.InvoiceResponseDto;
+import com.example.haus.domain.dto.response.product.CreateOrderResponseDto;
+import com.example.haus.domain.dto.response.product.OrderResponseDto;
+import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.service.OrderService;
 import com.itextpdf.text.DocumentException;
@@ -31,6 +36,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -54,7 +60,7 @@ public class OrderController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PostMapping("/orders")
-    public ResponseEntity<?> createOrder(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody OrderAllRequestDto orderAllRequestDto) {
+    public ResponseEntity<ResponseData<CreateOrderResponseDto>> createOrder(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody OrderAllRequestDto orderAllRequestDto) {
         String username = userDetails.getUsername();
         log.info("Username = {}", username);
         return ResponseUtil.success(
@@ -75,7 +81,7 @@ public class OrderController {
             }, security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping(UrlConstant.Order.GET_ALL_ORDERS)
-    public ResponseEntity<?> getAllOrders(
+    public ResponseEntity<ResponseData<PaginationResponseDto<OrderResponseDto>>> getAllOrders(
                     @RequestParam(defaultValue = "1") Integer pageNum,
                     @RequestParam(defaultValue = "10") Integer pageSize,
                     @RequestParam(required = false) String status) {
@@ -93,7 +99,7 @@ public class OrderController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping("/orders/{orderId}/invoice")
-    public ResponseEntity<?> getInvoiceDetails(
+    public ResponseEntity<ResponseData<InvoiceResponseDto>> getInvoiceDetails(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long orderId) {
         String username = userDetails.getUsername();
@@ -110,15 +116,13 @@ public class OrderController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping("/orders/cancel/{orderId}")
-    public ResponseEntity<?> cancelOrder(
+    public ResponseEntity<ResponseData<Void>> cancelOrder(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long orderId) {
         String username = userDetails.getUsername();
         orderService.cancelOrder(username, orderId);
-        return ResponseUtil.success(
-                HttpStatus.OK,
-                SuccessMessage.Order.CANCEL_ORDER_SUCCESS
-        );
+
+        return ResponseUtil.success(HttpStatus.OK, SuccessMessage.Order.CANCEL_ORDER_SUCCESS);
     }
 
     @Operation(
@@ -127,7 +131,7 @@ public class OrderController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping("/orders/{orderId}/invoice/pdf")
-    public ResponseEntity<?> exportPdf(
+    public ResponseEntity<byte[]> exportPdf(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long orderId) {
         try {
@@ -141,7 +145,7 @@ public class OrderController {
 
             // --- Bổ sung xử lý mã hóa UTF-8 cho tên file ---
             // Mã hóa tên tệp cho phần filename* (cho các ký tự non-ASCII)
-            String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
+            String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8.toString()).replace("\\+", "%20");
 
             // Thiết lập tiêu đề Content-Disposition: attachment
             headers.add(
@@ -156,13 +160,9 @@ public class OrderController {
             return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
 
         }
-        catch (ResourceNotFoundException e) {
+        catch (Exception e) {
             // Xử lý lỗi không tìm thấy đơn hàng
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (DocumentException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -172,7 +172,7 @@ public class OrderController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping(UrlConstant.Order.GET_ORDER_BY_ID)
-    public ResponseEntity<?> getOrderById(
+    public ResponseEntity<ResponseData<OrderResponseDto>> getOrderById(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long id) {
         String username = userDetails.getUsername();
@@ -193,7 +193,7 @@ public class OrderController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PatchMapping(UrlConstant.Order.UPDATE_STATUS_ORDER_BY_ID)
-    public ResponseEntity<?> updateStatusOrderById(
+    public ResponseEntity<ResponseData<OrderResponseDto>> updateStatusOrderById(
             @PathVariable Long id,
             @RequestParam String status) {
         return ResponseUtil.success(
@@ -207,7 +207,7 @@ public class OrderController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping(UrlConstant.Order.GET_ORDER_BY_ORDER_NUMBER)
-    public ResponseEntity<?> getOrderByOrderNumber(
+    public ResponseEntity<ResponseData<OrderResponseDto>> getOrderByOrderNumber(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable("orderNumber") String orderNumber) {
         String username = userDetails.getUsername();

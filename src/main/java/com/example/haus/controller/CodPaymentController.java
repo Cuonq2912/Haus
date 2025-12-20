@@ -5,7 +5,9 @@ import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.request.product.CodPaymentRequestDto;
+import com.example.haus.domain.dto.response.category.CategoryResponseDto;
 import com.example.haus.domain.dto.response.product.CodPaymentResponseDto;
+import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.service.CodPaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -37,7 +39,7 @@ public class CodPaymentController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PostMapping(UrlConstant.Payment.COD_PAYMENT)
-    public ResponseEntity<?> processCodPayment(@Valid @RequestBody CodPaymentRequestDto request) {
+    public ResponseEntity<ResponseData<CodPaymentResponseDto>> processCodPayment(@Valid @RequestBody CodPaymentRequestDto request) {
 
         CodPaymentResponseDto response = codPaymentService.processCodPayment(request);
 

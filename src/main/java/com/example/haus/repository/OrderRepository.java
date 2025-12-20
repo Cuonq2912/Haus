@@ -2,7 +2,6 @@ package com.example.haus.repository;
 
 import com.example.haus.constant.OrderStatus;
 import com.example.haus.domain.entity.product.Order;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,10 +10,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {

@@ -59,6 +59,7 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.example.haus.constant.CommonConstant.*;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -100,16 +101,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("grant_type", "password");
-        params.add("client_id", keycloakProperties.clientId());
-        params.add("client_secret", keycloakProperties.clientSecret());
+        params.add("grant_type", PASSWORD);
+        params.add(CLIENT_ID, keycloakProperties.clientId());
+        params.add(CLIENT_SECRET, keycloakProperties.clientSecret());
         params.add("scope", "openid");
         params.add("username", request.getUsername());
-        params.add("password", request.getPassword());
+        params.add(PASSWORD, request.getPassword());
 
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(params, headers);
         try {
-            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
+            var response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
 
             if (response.getStatusCode().is2xxSuccessful()) {
                 Map<String, Object> body = response.getBody();
@@ -127,7 +128,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         .userId(keycloakUtil.getUserId(request.getUsername()))
                         .role(realmRoles.toString().contains("ADMIN") ? "ADMIN" : "USER")
                         .accessToken(accessToken)
-                        .refreshToken((String) body.get("refresh_token"))
+                        .refreshToken((String) body.get(REFRESH_TOKEN))
                         .build();
             }
             else {
@@ -149,9 +150,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("client_id", keycloakProperties.clientId());
-        body.add("client_secret", keycloakProperties.clientSecret());
-        body.add("refresh_token", request.getRefreshToken());
+        body.add(CLIENT_ID, keycloakProperties.clientId());
+        body.add(CLIENT_SECRET, keycloakProperties.clientSecret());
+        body.add(REFRESH_TOKEN, request.getRefreshToken());
 
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
 
@@ -179,25 +180,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("client_id", keycloakProperties.clientId());
-        params.add("client_secret", keycloakProperties.clientSecret());
-        params.add("grant_type", "refresh_token");
-        params.add("refresh_token", request.getRefreshToken());
+        params.add(CLIENT_ID, keycloakProperties.clientId());
+        params.add(CLIENT_SECRET, keycloakProperties.clientSecret());
+        params.add("grant_type", REFRESH_TOKEN);
+        params.add(REFRESH_TOKEN, request.getRefreshToken());
 
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(params, headers);
 
         try {
-            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
+            var response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
 
             if (response.getStatusCode().is2xxSuccessful()) {
-                Map<String, Object> body = response.getBody();
+                Map<Object, Object> body = response.getBody();
                 String accessToken = (String) body.get("access_token");
-
-                DecodedJWT decodedJWT = JWT.decode(accessToken);
-                Map<String, Claim> claims = decodedJWT.getClaims();
-
-                List<String> realmRoles = (List<String>) claims.get("realm_access")
-                        .asMap().get("roles");
 
                 return RefreshTokenResponseDto.builder()
                         .tokenType(CommonConstant.BEARER_TOKEN)
@@ -304,7 +299,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setCart(cart);
 
         userRepository.save(user);
-        cart = cartRepository.save(cart);
+        cartRepository.save(cart);
 
         pendingRegisterMap.remove(request.getEmail());
 

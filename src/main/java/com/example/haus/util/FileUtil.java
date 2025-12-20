@@ -9,6 +9,8 @@ import java.nio.file.Paths;
 
 public class FileUtil {
 
+    private FileUtil() {}
+
     private static final Path CURRENT_FOLDER = Paths.get(System.getProperty("user.dir"));
 
     private static final Path RESOURCES_PATH = CURRENT_FOLDER.resolve(Paths.get("src/main/resources"));

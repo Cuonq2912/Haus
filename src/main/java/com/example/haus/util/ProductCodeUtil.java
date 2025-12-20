@@ -1,8 +1,6 @@
 package com.example.haus.util;
 
 import java.security.SecureRandom;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class ProductCodeUtil {
 
@@ -19,9 +17,4 @@ public class ProductCodeUtil {
         return PREFIX + digits.toString();
     }
 
-//    public static String generateUniqueProductCode() {
-//        LocalDateTime now = LocalDateTime.now();
-//        String timestamp = now.format(DateTimeFormatter.ofPattern("yyMMddHHmm"));
-//        return PREFIX + timestamp;
-//    }
 }

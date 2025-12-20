@@ -49,28 +49,25 @@ public interface ProductVariationMapper {
                         @MappingTarget ProductVariation productVariation,
                         UpdateProductVariationRequestDto request);
 
-        @Mappings({
-                @Mapping(target = "id", source = "productVariation.id"),
-                @Mapping(target = "color", source = "productVariation.color"),
-                @Mapping(target = "size", source = "productVariation.size"),
-                @Mapping(target = "price", source = "productVariation.price"),
-                @Mapping(target = "inventoryQuantity", source = "productVariation.inventoryQuantity"),
-                @Mapping(target = "soldQuantity", source = "productVariation.soldQuantity"),
-                @Mapping(target = "media", source = "productVariation.media"),
-                @Mapping(target = "discountPercent",
-                        expression = "java(cartItem.getProductVariation().getProduct()" +
-                                "     .getCategories().stream()" +
-                                "    .map(com.example.haus.domain.entity.product.Category::getPromotion)" +
-                                "    .filter(java.util.Objects::nonNull)" +
-                                "    .filter(p -> com.example.haus.constant.promotion.PromotionStatus.ACTIVE.equals(p.getStatus()))" +
-                                "    .map(com.example.haus.domain.entity.product.Promotion::getDiscountPercent)" +
-                                "    .filter(java.util.Objects::nonNull)" +
-                                "    .max(java.util.Comparator.naturalOrder())" +
-                                "    .orElse(null))"),
-                @Mapping(target = "isSelected", expression = "java(true)"),
-                @Mapping(target = "cartQuantity", source = "quantity")
-        })
-                // CartItem = Variant trong product
+        @Mapping(target = "id", source = "productVariation.id")
+        @Mapping(target = "color", source = "productVariation.color")
+        @Mapping(target = "size", source = "productVariation.size")
+        @Mapping(target = "price", source = "productVariation.price")
+        @Mapping(target = "inventoryQuantity", source = "productVariation.inventoryQuantity")
+        @Mapping(target = "soldQuantity", source = "productVariation.soldQuantity")
+        @Mapping(target = "media", source = "productVariation.media")
+        @Mapping(target = "discountPercent",
+                expression = "java(cartItem.getProductVariation().getProduct()" +
+                        "     .getCategories().stream()" +
+                        "    .map(com.example.haus.domain.entity.product.Category::getPromotion)" +
+                        "    .filter(java.util.Objects::nonNull)" +
+                        "    .filter(p -> com.example.haus.constant.promotion.PromotionStatus.ACTIVE.equals(p.getStatus()))" +
+                        "    .map(com.example.haus.domain.entity.product.Promotion::getDiscountPercent)" +
+                        "    .filter(java.util.Objects::nonNull)" +
+                        "    .max(java.util.Comparator.naturalOrder())" +
+                        "    .orElse(null))")
+        @Mapping(target = "isSelected", expression = "java(true)")
+        @Mapping(target = "cartQuantity", source = "quantity")
         ProductVariationInCartResponseDto cartItemToProductVariationInCartDto(CartItem cartItem);
 
         List<ProductVariationInCartResponseDto> cartItemListToProductVariationInCartDtoList(List<CartItem> cartItems);

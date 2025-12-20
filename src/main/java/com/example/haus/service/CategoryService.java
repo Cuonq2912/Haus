@@ -4,7 +4,6 @@ import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.category.CategoryRequestDto;
 import com.example.haus.domain.dto.response.category.CategoryResponseDto;
-import com.example.haus.domain.dto.response.product.ProductResponseDto;
 
 import java.util.List;
 

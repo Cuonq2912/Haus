@@ -16,9 +16,5 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 public interface UserMapper {
     UserResponseDto userToUserResponseDto(User user);
 
-    User createUserRequestDtoToUser(CreateUserRequestDto request);
-
-    void updateUserFromDto(UpdateUserRequestDto request, @MappingTarget User user);
-
     void updateUserFromPersonalInformationDto(UpdateUserRequestDto request, @MappingTarget User user);
 }

@@ -5,8 +5,12 @@ import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
+import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.product.ProductRequestDto;
 import com.example.haus.domain.dto.request.product.UpdateProductRequestDto;
+import com.example.haus.domain.dto.response.category.CategoryResponseDto;
+import com.example.haus.domain.dto.response.product.ProductResponseDto;
+import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -37,7 +41,7 @@ public class ProductController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping(UrlConstant.Product.GET_PRODUCT_BY_ID)
-    public ResponseEntity<?> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ResponseData<ProductResponseDto>> getProductById(@PathVariable Long id) {
         return ResponseUtil.success(
                 SuccessMessage.Product.GET_PRODUCT_SUCCESS,
                 productService.getProductById(id));
@@ -50,7 +54,7 @@ public class ProductController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PostMapping(value = UrlConstant.Product.CREATE_PRODUCT, consumes = "multipart/form-data")
-    public ResponseEntity<?> createProduct(
+    public ResponseEntity<ResponseData<ProductResponseDto>> createProduct(
 
             @Valid @RequestPart("request") ProductRequestDto request,
             @RequestPart(value = "images", required = false) MultipartFile[] images
@@ -62,24 +66,6 @@ public class ProductController {
         );
     }
 
-//    @Tag(name = "admin-product-controller", description = "Admin Product Management APIs")
-//    @Operation(
-//            summary = "Cập nhật sản phẩm",
-//            description = "Dùng để cập nhật thông tin sản phẩm theo id",
-//            security = @SecurityRequirement(name = "Bearer Token")
-//    )
-//    @PutMapping(value = UrlConstant.Product.UPDATE_PRODUCT, consumes = "multipart/form-data")
-//    public ResponseEntity<?> updateProduct(
-//            @PathVariable Long id,
-//            @Valid @RequestPart("request") ProductRequestDto request,
-//            @RequestPart(value = "images", required = false) MultipartFile[] images
-//    ) {
-//        return ResponseUtil.success(
-//                SuccessMessage.Product.UPDATE_PRODUCT_SUCCESS,
-//                productService.updateProduct(id, request, images)
-//        );
-//    }
-
     @Tag(name = "admin-product-controller", description = "Admin Product Management APIs")
     @Operation(
             summary = "Cập nhật sản phẩm",
@@ -87,7 +73,7 @@ public class ProductController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PutMapping(value = UrlConstant.Product.UPDATE_PRODUCT, consumes = "multipart/form-data")
-    public ResponseEntity<?> updateProduct(
+    public ResponseEntity<ResponseData<ProductResponseDto>> updateProduct(
             @PathVariable Long id,
             @Valid @RequestPart("request") UpdateProductRequestDto request,
             @RequestPart(value = "images", required = false) MultipartFile[] images
@@ -105,7 +91,7 @@ public class ProductController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @DeleteMapping(UrlConstant.Product.DELETE_PRODUCT)
-    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<ResponseData<Void>> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseUtil.success(
                 HttpStatus.OK,
@@ -120,7 +106,7 @@ public class ProductController {
             description = "Dùng để lấy danh sách sản phẩm thuộc category có phân trang"
     )
     @GetMapping(UrlConstant.Product.GET_PRODUCTS_BY_CATEGORY_ID)
-    public ResponseEntity<?> getProductsByCategoryId(
+    public ResponseEntity<ResponseData<PaginationResponseDto<ProductResponseDto>>> getProductsByCategoryId(
                     @PathVariable Long categoryId,
                     @RequestParam(defaultValue = "1") Integer pageNum,
                     @RequestParam(defaultValue = "10") Integer pageSize,
@@ -139,7 +125,7 @@ public class ProductController {
             description = "Lọc sản phẩm theo khoảng giá, màu sắc, chất liệu với phân trang"
     )
     @GetMapping(UrlConstant.Product.FILTER_PRODUCTS)
-    public ResponseEntity<?> filterProducts(
+    public ResponseEntity<ResponseData<PaginationResponseDto<ProductResponseDto>>> filterProducts(
             @RequestParam(defaultValue = "1", required = false) Integer pageNum,
             @RequestParam(defaultValue = "10", required = false) Integer pageSize,
             @RequestParam(required = false) @Schema(example = "asc or discount_asc or sold_quantity_asc or created_at_asc") String sortBy,
@@ -156,7 +142,7 @@ public class ProductController {
             description = "Lấy danh sách tất cả sản phẩm với phân trang và các tùy chọn sắp xếp productName, createdAt, price"
     )
     @GetMapping(UrlConstant.Product.GET_ALL_PRODUCTS)
-    public ResponseEntity<?> getAllProducts(
+    public ResponseEntity<ResponseData<PaginationResponseDto<ProductResponseDto>>> getAllProducts(
                     @RequestParam(defaultValue = "1") Integer pageNum,
                     @RequestParam(defaultValue = "10") Integer pageSize,
                     @RequestParam(defaultValue = "productName") String sortBy,

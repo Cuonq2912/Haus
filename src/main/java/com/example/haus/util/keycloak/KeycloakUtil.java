@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.haus.constant.CommonConstant.ADMIN_REALM;
+import static com.example.haus.constant.CommonConstant.USER_END_POINT;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -32,8 +34,8 @@ public class KeycloakUtil {
 
     public void sendResetPasswordEmail(String userId) {
         final String url = keycloakProperties.serverUrl()
-                + "admin/realms/" + keycloakProperties.realm()
-                + "/users/" + userId + "/execute-actions-email";
+                + ADMIN_REALM + keycloakProperties.realm()
+                + USER_END_POINT + userId + "/execute-actions-email";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, CommonConstant.BEARER_TOKEN + " " + getAdminToken());
@@ -56,7 +58,7 @@ public class KeycloakUtil {
 
     public boolean verifyEmail(String userId, boolean status) {
         final String url = keycloakProperties.serverUrl()
-                + "admin/realms/" + keycloakProperties.realm() + "/users/" + userId;
+                + ADMIN_REALM + keycloakProperties.realm() + USER_END_POINT + userId;
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, CommonConstant.BEARER_TOKEN + " " + getAdminToken());
@@ -213,14 +215,18 @@ public class KeycloakUtil {
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
         // Dùng Map để Spring tự parse JSON trả về
-        ResponseEntity<Map> response =
+        var response =
                 restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
 
         if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
             throw new KeycloakException("Failed to get role from Keycloak");
         }
 
-        Map role = response.getBody();
+        var role = response.getBody();
+
+        if (role == null) {
+            return null;
+        }
 
         return (String) role.get("id");
     }

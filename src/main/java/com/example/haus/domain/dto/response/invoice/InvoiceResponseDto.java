@@ -1,18 +1,11 @@
 package com.example.haus.domain.dto.response.invoice;
 
-// InvoiceResponseDto.java
-
-import com.example.haus.constant.promotion.PromotionType;
 import com.example.haus.domain.dto.response.payment.PaymentResponseDto;
 import com.example.haus.domain.dto.response.product.OrderResponseDto;
 import com.example.haus.domain.dto.response.promotion.PromotionResponseDto;
 import com.example.haus.domain.dto.response.user.UserResponseDto;
-import com.example.haus.domain.entity.user.Gender;
 import lombok.Builder;
 import lombok.Data;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 @Data

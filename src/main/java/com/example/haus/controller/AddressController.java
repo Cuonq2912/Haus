@@ -7,7 +7,10 @@ import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.request.address.AddressRequestDto;
 import com.example.haus.domain.dto.request.category.CategoryRequestDto;
+import com.example.haus.domain.dto.response.address.AddressResponseDto;
+import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.service.AddressService;
+import com.sendgrid.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -21,6 +24,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestApiV1
 @Validated
@@ -37,7 +42,7 @@ public class AddressController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PostMapping(UrlConstant.Address.ADD_ADDRESS)
-    public ResponseEntity<?> addAddress (@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody AddressRequestDto addressRequestDto){
+    public ResponseEntity<ResponseData<AddressResponseDto>> addAddress (@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody AddressRequestDto addressRequestDto){
         return ResponseUtil.success(
                 SuccessMessage.Address.ADD_ADDRESS_SUCCESS,
                 addressService.addAddress(userDetails.getUsername(), addressRequestDto)
@@ -50,7 +55,7 @@ public class AddressController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping(UrlConstant.Address.GET_ADDRESS)
-    public ResponseEntity<?> getAddressById(@PathVariable Long id){
+    public ResponseEntity<ResponseData<AddressResponseDto>> getAddressById(@PathVariable Long id){
         return ResponseUtil.success(
                 SuccessMessage.Address.GET_ADDRESS_SUCCESS,
                 addressService.getAddressById(id)
@@ -63,7 +68,7 @@ public class AddressController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping(UrlConstant.Address.GET_ADDRESSES_BY_USER_ID)
-    public ResponseEntity<?> getAddressesByUserId(@AuthenticationPrincipal UserDetails userDetails){
+    public ResponseEntity<ResponseData<List<AddressResponseDto>>> getAddressesByUserId(@AuthenticationPrincipal UserDetails userDetails){
         return ResponseUtil.success(
                 SuccessMessage.Address.GET_ADDRESS_SUCCESS,
                 addressService.getAddressesByUserId(userDetails.getUsername())
@@ -76,7 +81,7 @@ public class AddressController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PutMapping(UrlConstant.Address.UPDATE_ADDRESS)
-    public ResponseEntity<?> updateCategory(@AuthenticationPrincipal UserDetails userDetails, @PathVariable("id") Long id, @Valid @RequestBody AddressRequestDto addressRequestDto){
+    public ResponseEntity<ResponseData<AddressResponseDto>> updateCategory(@AuthenticationPrincipal UserDetails userDetails, @PathVariable("id") Long id, @Valid @RequestBody AddressRequestDto addressRequestDto){
         return ResponseUtil.success(
                 SuccessMessage.Address.UPDATE_ADDRESS_SUCCESS,
                 addressService.updateAddress(userDetails.getUsername(), id, addressRequestDto)
@@ -89,7 +94,7 @@ public class AddressController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @DeleteMapping(UrlConstant.Address.DELETE_ADDRESS)
-    public ResponseEntity<?> deleteCategory(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long id){
+    public ResponseEntity<ResponseData<Void>> deleteCategory(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long id){
         addressService.deleteAddress(userDetails.getUsername(), id);
         return ResponseUtil.success(
                 HttpStatus.NO_CONTENT,

@@ -43,7 +43,6 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String generateAccessToken(String userId, String username, Collection<? extends GrantedAuthority> authorities) {
-//        log.info("Generate access token for user{} with authorities{}", username, authorities);
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("role", authorities);
@@ -53,7 +52,6 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String generateRefreshToken(String userId, String username, Collection<? extends GrantedAuthority> authorities) {
-//        log.info("Generate refresh token for user{} with authorities{}", username, authorities);
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("role", authorities);
@@ -82,7 +80,6 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private String generateAccessToken(Map<String, Object> claims, String username) {
-//        log.info("------------- [ generateAccessToken]------------------");
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
@@ -94,7 +91,6 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private String generateRefreshToken(Map<String, Object> claims, String username) {
-//        log.info("------------- [ generateRefreshToken]------------------");
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
@@ -106,7 +102,6 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private Key getKey(TokenType type) {
-//        log.info("------------ [ getKey ] -------------------------");
         switch (type) {
             case ACCESS_TOKEN -> {
                 return Keys.hmacShaKeyFor(Decoders.BASE64.decode(accessKey));
@@ -119,13 +114,11 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private <T> T extractClaim(String token, TokenType type, Function<Claims, T> claimsTFunction) {
-//        log.info("------------- [ extractClaim ] ---------------");
         final Claims claims = extractAllClaims(token, type);
         return claimsTFunction.apply(claims);
     }
 
     private Claims extractAllClaims(String token, TokenType type) {
-//        log.info("------------- [ extraAllClaims ] --------------------");
         try {
             return Jwts.parserBuilder().setSigningKey(getKey(type)).build().parseClaimsJws(token).getBody();
         } catch (Exception e) {

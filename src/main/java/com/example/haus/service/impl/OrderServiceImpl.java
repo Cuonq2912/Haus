@@ -1,7 +1,9 @@
 package com.example.haus.service.impl;
 
+import com.example.haus.constant.AppConstants;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.OrderStatus;
+import com.example.haus.constant.RoleConstant;
 import com.example.haus.domain.dto.order.OrderAllRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
@@ -34,6 +36,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -80,7 +83,8 @@ public class OrderServiceImpl implements OrderService {
 
     AddressMapper addressMapper;
 
-    private static double totalPrice = 0;
+    @NonFinal
+    double totalPrice = 0;
 
 
     @Override
@@ -125,7 +129,7 @@ public class OrderServiceImpl implements OrderService {
         User currentUser = userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
-        if (!"ADMIN".equals(currentUser.getRole().name()) &&
+        if (!RoleConstant.ADMIN.equals(currentUser.getRole().name()) &&
             !order.getUser().getId().equals(currentUser.getId())) {
             throw new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED);
         }
@@ -164,9 +168,9 @@ public class OrderServiceImpl implements OrderService {
                 case COMPLETED, RETURNED -> payment.setStatus(PaymentStatus.COMPLETED);
                 case CANCELLED -> payment.setStatus(PaymentStatus.CANCELLED);
                 case REFUNDED -> payment.setStatus(PaymentStatus.REFUNDED);
-                default -> {
+                default ->
                     throw new InvalidDataException(ErrorMessage.Payment.STATUS_IS_NOT_SUPPORT);
-                }
+
             }
         }
 
@@ -366,11 +370,11 @@ public class OrderServiceImpl implements OrderService {
                 throw new IOException("Font file not found.");
             }
             byte[] fontData = is.readAllBytes();
-            String FONT_NAME_FOR_ITEXT = "font-UTF-8.ttf";
+            String fontNameForItext = "font-UTF-8.ttf";
 
             // Tải BaseFont từ byte array
             BaseFont baseFont = BaseFont.createFont(
-                    FONT_NAME_FOR_ITEXT,
+                    fontNameForItext,
                     BaseFont.IDENTITY_H,
                     BaseFont.EMBEDDED,
                     true,
@@ -378,7 +382,6 @@ public class OrderServiceImpl implements OrderService {
                     null);
 
             Font titleFont = new Font(baseFont, 20, Font.BOLD, BaseColor.BLUE);
-            Font subTitleFont = new Font(baseFont, 14, Font.BOLD, BaseColor.BLACK);
             Font normalFont = new Font(baseFont, 14, Font.NORMAL, BaseColor.BLACK);
             Font boldFont = new Font(baseFont, 14, Font.BOLD, BaseColor.BLACK);
             Font smallNormalFont = new Font(baseFont, 12, Font.NORMAL, BaseColor.BLACK);
@@ -388,15 +391,14 @@ public class OrderServiceImpl implements OrderService {
             // Sử dụng một PdfPTable chính để kiểm soát toàn bộ bố cục
             PdfPTable mainTable = new PdfPTable(1);
             mainTable.setWidthPercentage(100);
-//        mainTable.getDefaultCell().setBorderWidth(10f);
             mainTable.getDefaultCell().setBorder(Rectangle.BOX); // Thêm viền ngoài cho toàn bộ hóa đơn
             mainTable.getDefaultCell().setPadding(0);
 
             // Thêm các phần tử vào mainTable
             mainTable.addCell(createHeaderCell(invoiceData, titleFont, normalFont, baseFont));
-            mainTable.addCell(createSellerBuyerInfoCell(invoiceData, boldFont, normalFont, smallNormalFont));
+            mainTable.addCell(createSellerBuyerInfoCell(invoiceData, boldFont, smallNormalFont));
             mainTable.addCell(createItemsTable(invoiceData, smallBoldFont, smallNormalFont, smallBoldFont));
-            mainTable.addCell(createTotalAndSignatureCell(invoiceData, boldFont, normalFont, smallNormalFont));
+            mainTable.addCell(createTotalAndSignatureCell(boldFont, normalFont, smallNormalFont));
 
             document.add(mainTable);
             document.close();
@@ -434,7 +436,7 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
     }
 
-    private PdfPCell createHeaderCell(InvoiceResponseDto data, Font titleFont, Font normalFont, BaseFont baseFont) throws DocumentException, IOException {
+    private PdfPCell createHeaderCell(InvoiceResponseDto data, Font titleFont, Font normalFont, BaseFont baseFont) throws DocumentException {
         // 3 cột: Logo, Tiêu đề, Số Serial
         PdfPTable headerTable = new PdfPTable(3);
         headerTable.setWidthPercentage(100);
@@ -498,7 +500,7 @@ public class OrderServiceImpl implements OrderService {
         return mainCell;
     }
 
-    private PdfPCell createSellerBuyerInfoCell(InvoiceResponseDto data, Font boldFont, Font normalFont, Font smallNormalFont) throws DocumentException {
+    private PdfPCell createSellerBuyerInfoCell(InvoiceResponseDto data, Font boldFont, Font smallNormalFont) {
         PdfPTable infoTable = new PdfPTable(1);
         infoTable.setWidthPercentage(100);
 
@@ -510,8 +512,8 @@ public class OrderServiceImpl implements OrderService {
                 cell.setPaddingRight(1);
                 cell.setPaddingBottom(1);
                 table.addCell(cell);
-            } catch (DocumentException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                log.error(e.getMessage());
             }
         };
 
@@ -604,10 +606,10 @@ public class OrderServiceImpl implements OrderService {
             PdfUtil.addCellWithBorder(itemsTable, String.valueOf(item.getInventoryQuantity()), normalFont, Rectangle.BOX, Element.ALIGN_CENTER, 0, 0);
 
             // Cột 5 (Đơn giá)
-            PdfUtil.addCellWithBorder(itemsTable, String.format("%,.0f", item.getPrice()), normalFont, Rectangle.BOX, Element.ALIGN_RIGHT, 0, 0);
+            PdfUtil.addCellWithBorder(itemsTable, String.format(AppConstants.FORMAT_DIGIT_PDF, item.getPrice()), normalFont, Rectangle.BOX, Element.ALIGN_RIGHT, 0, 0);
 
             // Cột 6 (Thành tiền)
-            PdfUtil.addCellWithBorder(itemsTable, String.format("%,.0f", item.getTotal()), normalFont, Rectangle.BOX, Element.ALIGN_RIGHT, 0, 0);
+            PdfUtil.addCellWithBorder(itemsTable, String.format(AppConstants.FORMAT_DIGIT_PDF, item.getTotal()), normalFont, Rectangle.BOX, Element.ALIGN_RIGHT, 0, 0);
         }
 
         // --- Empty Rows (Giống mẫu) ---
@@ -619,7 +621,9 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // --- Tổng cộng (Total Row) ---
-        totalPrice = (subTotal - (data.getPromotion() != null ? data.getPromotion().getDiscountPercent() : 0L) + data.getResponseDto().getShippingFee());
+        float promotionDiscount = data.getPromotion() != null ? data.getPromotion().getDiscountPercent() : 0L;
+        Double shippingFee = data.getResponseDto().getShippingFee();
+        totalPrice = subTotal - promotionDiscount + shippingFee;
 
         // Total price
         PdfPCell totalLabelCell = new PdfPCell(new Phrase("Tổng cộng: (Total price):", boldFont));
@@ -629,7 +633,7 @@ public class OrderServiceImpl implements OrderService {
         totalLabelCell.setPadding(7);
         itemsTable.addCell(totalLabelCell);
 
-        PdfPCell totalValueCell = new PdfPCell(new Phrase(String.format("%,.0f", subTotal), normalFont));
+        PdfPCell totalValueCell = new PdfPCell(new Phrase(String.format(AppConstants.FORMAT_DIGIT_PDF, subTotal), normalFont));
         totalValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         totalValueCell.setBorder(Rectangle.BOX);
         totalValueCell.setPadding(7);
@@ -645,7 +649,7 @@ public class OrderServiceImpl implements OrderService {
             itemsTable.addCell(discountCell);
 
             double discountValue = data.getPromotion().getDiscountPercent() * subTotal;
-            PdfPCell discountValueCell = new PdfPCell(new Phrase("-" + String.format("%,.0f", discountValue), normalFont));
+            PdfPCell discountValueCell = new PdfPCell(new Phrase("-" + String.format(AppConstants.FORMAT_DIGIT_PDF, discountValue), normalFont));
             discountValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
             discountValueCell.setBorder(Rectangle.BOX);
             discountValueCell.setPadding(7);
@@ -660,7 +664,7 @@ public class OrderServiceImpl implements OrderService {
         shippingFeeCell.setPadding(7);
         itemsTable.addCell(shippingFeeCell);
 
-        PdfPCell shippingFeeValueCell = new PdfPCell(new Phrase(String.format("%,.0f", data.getResponseDto().getShippingFee()), normalFont));
+        PdfPCell shippingFeeValueCell = new PdfPCell(new Phrase(String.format(AppConstants.FORMAT_DIGIT_PDF, data.getResponseDto().getShippingFee()), normalFont));
         shippingFeeValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         shippingFeeValueCell.setBorder(Rectangle.BOX);
         shippingFeeValueCell.setPadding(7);
@@ -674,7 +678,7 @@ public class OrderServiceImpl implements OrderService {
         totalFinalLabelCell.setPadding(7);
         itemsTable.addCell(totalFinalLabelCell);
 
-        PdfPCell totalValueFinalLabelCell = new PdfPCell(new Phrase(String.format("%,.0f", totalPrice), normalFont));
+        PdfPCell totalValueFinalLabelCell = new PdfPCell(new Phrase(String.format(AppConstants.FORMAT_DIGIT_PDF, totalPrice), normalFont));
         totalValueFinalLabelCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         totalValueFinalLabelCell.setBorder(Rectangle.BOX);
         totalValueFinalLabelCell.setPadding(7);
@@ -701,7 +705,7 @@ public class OrderServiceImpl implements OrderService {
         return mainCell;
     }
 
-    private PdfPCell createTotalAndSignatureCell(InvoiceResponseDto data, Font boldFont, Font normalFont, Font smallNormalFont) throws DocumentException {
+    private PdfPCell createTotalAndSignatureCell(Font boldFont, Font normalFont, Font smallNormalFont) throws DocumentException {
         PdfPTable footerTable = new PdfPTable(2);
         footerTable.setWidthPercentage(100);
         footerTable.setWidths(new float[]{5f, 5f});

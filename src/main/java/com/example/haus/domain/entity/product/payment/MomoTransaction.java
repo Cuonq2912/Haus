@@ -4,7 +4,6 @@ import com.example.haus.domain.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "momo_transactions")
@@ -17,7 +16,6 @@ import org.hibernate.annotations.GenericGenerator;
 public class MomoTransaction extends BaseEntity {
     @Id
     @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id", insertable = false, updatable = false, nullable = false, columnDefinition = "CHAR(36)")
     String id;
 

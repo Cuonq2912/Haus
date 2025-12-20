@@ -13,7 +13,7 @@ public class ResponseData<T> implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private  String message;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private T data;
+    private transient T data;
 
     public ResponseData(T data) {
         this.data = data;

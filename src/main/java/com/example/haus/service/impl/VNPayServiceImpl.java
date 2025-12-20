@@ -1,6 +1,7 @@
 package com.example.haus.service.impl;
 
 import com.example.haus.config.VNPayConfig;
+import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.OrderStatus;
 import com.example.haus.domain.dto.request.auth.otp.PendingResetPasswordRequestDto;
@@ -24,7 +25,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +36,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+
+import static com.example.haus.constant.CommonConstant.*;
 
 @Service
 @Slf4j(topic = "VNPAY-SERVICE")
@@ -56,9 +61,9 @@ public class VNPayServiceImpl implements VNPayService {
     int maxPaymentTime;
 
     @Value("${spring.config.activate.on-profile}")
-    static String activeProfile;
+    String activeProfile;
 
-    private final String SUCCESS_CODE = "00";
+    private static final String SUCCESS_CODE = "00";
 
     @Override
     @Transactional
@@ -84,7 +89,7 @@ public class VNPayServiceImpl implements VNPayService {
 
         // Tạo mã giao dịch
         String ref = order.getId() + "-" + System.currentTimeMillis();
-        params.put("vnp_TxnRef", ref);
+        params.put(VNP_TXN_REF, ref);
         params.put("vnp_OrderInfo", "Payment for order " + order.getId());
 
         // Lấy IP
@@ -93,9 +98,9 @@ public class VNPayServiceImpl implements VNPayService {
 
         // Tạo hashData
         String hashData = PaymentUtil.createPaymentUrl(params);
-        String vnpSecureHash = PaymentUtil.hmacSHA512(vnPayConfig.getVnp_HashSecret(), hashData);
+        String vnpSecureHash = PaymentUtil.hmacSHA512(vnPayConfig.getVnPayHashSecret(), hashData);
 
-        return vnPayConfig.getVnp_PayUrl() + "?" + hashData + "&vnp_SecureHash=" + vnpSecureHash;
+        return vnPayConfig.getVnPayUrl() + "?" + hashData + "&vnp_SecureHash=" + vnpSecureHash;
     }
 
     @NotNull
@@ -112,7 +117,7 @@ public class VNPayServiceImpl implements VNPayService {
         }
 
         if (payment.getExpireAt() == null) {
-            Calendar newExpireTime = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+            Calendar newExpireTime = Calendar.getInstance(TimeZone.getTimeZone(ETC_GMT7));
             newExpireTime.add(Calendar.SECOND, maxPaymentTime);
             payment.setExpireAt(newExpireTime.getTime());
         }
@@ -125,7 +130,7 @@ public class VNPayServiceImpl implements VNPayService {
 
         // Payment EXPIRED hoặc CANCELLED
         if (payment.getStatus() == PaymentStatus.EXPIRED || payment.getStatus() == PaymentStatus.CANCELLED) {
-            Calendar newExpireTime = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+            Calendar newExpireTime = Calendar.getInstance(TimeZone.getTimeZone(ETC_GMT7));
             newExpireTime.add(Calendar.SECOND, maxPaymentTime);
             
             payment.setStatus(PaymentStatus.PENDING);
@@ -136,7 +141,7 @@ public class VNPayServiceImpl implements VNPayService {
         // Payment PENDING nhưng đã quá hạn
         Date currentTime = new Date();
         if (payment.getStatus() == PaymentStatus.PENDING && currentTime.after(payment.getExpireAt())) {
-            Calendar newExpireTime = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+            Calendar newExpireTime = Calendar.getInstance(TimeZone.getTimeZone(ETC_GMT7));
             newExpireTime.add(Calendar.SECOND, maxPaymentTime);
             
             payment.setExpireAt(newExpireTime.getTime());
@@ -180,13 +185,13 @@ public class VNPayServiceImpl implements VNPayService {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
 
         // Ngày tạo giao dịch
-        String vnp_CreateDate = formatter.format(now.getTime());
-        params.put("vnp_CreateDate", vnp_CreateDate);
+        String vnpCreateDate = formatter.format(now.getTime());
+        params.put("vnp_CreateDate", vnpCreateDate);
 
         // Ngày hết hạn giao dịch (tính từ now + allowedTime)
         now.add(Calendar.SECOND, allowedTime);
-        String vnp_ExpireDate = formatter.format(now.getTime());
-        params.put("vnp_ExpireDate", vnp_ExpireDate);
+        String vnpExpireDate = formatter.format(now.getTime());
+        params.put("vnp_ExpireDate", vnpExpireDate);
     }
 
     @Override
@@ -198,14 +203,14 @@ public class VNPayServiceImpl implements VNPayService {
             
             if (!verifySignature(params)) {  // ✅ ĐÚNG: Nếu signature KHÔNG hợp lệ
                 log.error("IPN: Invalid signature!");
-                response.put("RspCode", "97");
-                response.put("Message", "Invalid signature");
+                response.put(RSP_CODE, "97");
+                response.put(MESSAGE, "Invalid signature");
                 return response;
             }
             
             log.info("IPN: Signature verified successfully");
 
-            String txnRef = params.get("vnp_TxnRef");
+            String txnRef = params.get(VNP_TXN_REF);
             String responseCode = params.get("vnp_ResponseCode");
             Long amount = Long.parseLong(params.get("vnp_Amount")) / 100;
 
@@ -221,16 +226,16 @@ public class VNPayServiceImpl implements VNPayService {
 
             if (payment.getStatus() == PaymentStatus.COMPLETED) {
                 log.warn("IPN: Order {} already processed as COMPLETED", orderId);
-                response.put("RspCode", "02");
-                response.put("Message", "Order already confirmed");
+                response.put(RSP_CODE, "02");
+                response.put(MESSAGE, "Order already confirmed");
                 return response;
             }
 
             long expectedAmount = Math.round(payment.getAmount());
             if (expectedAmount != amount) {
                 log.error("IPN: Amount mismatch! Expected: {}, Got: {}", expectedAmount, amount);
-                response.put("RspCode", "04");
-                response.put("Message", "Invalid amount");
+                response.put(RSP_CODE, "04");
+                response.put(MESSAGE, "Invalid amount");
                 return response;
             }
 
@@ -252,7 +257,7 @@ public class VNPayServiceImpl implements VNPayService {
 
             response.put("RspCode", "00");
             response.put("Message", "Confirm Success");
-            checkIpnList.put(params.get("vnp_TxnRef").split("-")[0], true);
+            checkIpnList.put(params.get(VNP_TXN_REF).split("-")[0], true);
 
         return response;
     }
@@ -289,7 +294,7 @@ public class VNPayServiceImpl implements VNPayService {
         fieldsToHash.remove("vnp_SecureHash");
         fieldsToHash.remove("vnp_SecureHashType");
 
-        String calculatedHash = PaymentUtil.hashAllFields(fieldsToHash, vnPayConfig.getVnp_HashSecret());
+        String calculatedHash = PaymentUtil.hashAllFields(fieldsToHash, vnPayConfig.getVnPayHashSecret());
 
         return calculatedHash.equalsIgnoreCase(receivedHash);  // ✅ ĐÚNG: TRUE = valid, FALSE = invalid
     }
@@ -299,8 +304,6 @@ public class VNPayServiceImpl implements VNPayService {
             log.warn("Attempted to update inventory for a null or empty order.");
             throw new InvalidDataException(ErrorMessage.Order.ERR_ORDER_ITEMS_EMPTY);
         }
-
-//        order.getOrderItems().size();
 
         Set<Long> productIdsToUpdate = new HashSet<>();
         Double totalAmountCheck = 0.0;

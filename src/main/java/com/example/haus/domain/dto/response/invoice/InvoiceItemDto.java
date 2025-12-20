@@ -2,7 +2,6 @@ package com.example.haus.domain.dto.response.invoice;
 
 import com.example.haus.domain.dto.response.product.MediaResponseDto;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
