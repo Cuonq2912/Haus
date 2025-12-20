@@ -1,15 +1,17 @@
 package com.example.haus.domain.mapper;
 
 import com.example.haus.domain.dto.order.OrderRequestDto;
+import com.example.haus.domain.dto.response.product.OrderItemResponseDto;
 import com.example.haus.domain.dto.response.product.OrderResponseDto;
 import com.example.haus.domain.dto.response.statistic.RecentOrderResponseDto;
 import com.example.haus.domain.entity.product.Order;
+import com.example.haus.domain.entity.product.OrderItem;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring",
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
-    uses = { AddressMapper.class, OrderItemMapper.class }
+    uses = { AddressMapper.class, OrderItemMapper.class, MediaMapper.class }
 )
 public interface OrderMapper {
     @Mapping(target = "recipientInfo", source = "shippingAddress")

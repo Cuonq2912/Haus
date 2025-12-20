@@ -24,4 +24,5 @@ public interface OrderService {
 
     byte[] generateInvoicePdf(Long orderId, String username) throws DocumentException, IOException;
 
+    void cancelOrder(String username, Long orderId);
 }

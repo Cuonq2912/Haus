@@ -19,6 +19,7 @@ import com.example.haus.domain.entity.user.User;
 import com.example.haus.domain.mapper.*;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
+import com.example.haus.repository.CategoryRepository;
 import com.example.haus.repository.OrderItemRepository;
 import com.example.haus.repository.OrderRepository;
 import com.example.haus.repository.ProductRepository;
@@ -46,15 +47,15 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j(topic = "PROMOTION-SERVICE")
+@Slf4j(topic = "STATISTIC-SERVICE")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class StatisticsServiceImpl implements StatisticsService {
 
     OrderRepository orderRepository;
-    private final OrderMapper orderMapper;
-    private final ProductMapper productMapper;
-    private final ProductRepository productRepository;
+    OrderMapper orderMapper;
+    ProductRepository productRepository;
     OrderItemRepository orderItemRepository;
+    CategoryRepository categoryRepository;
 
 
     @Override
@@ -223,5 +224,33 @@ public class StatisticsServiceImpl implements StatisticsService {
 
 
         return PaginationUtil.createPaginationResponse(page, paginationRequest, dtos);
+    }
+
+    @Override
+    public Map<String, Double> getSaleByCategories() {
+        List<Category> categories = categoryRepository.findAll();
+        Map<String, List<Product>> productsOfParentCategories =
+                categories.stream()
+                        .flatMap(category -> {
+                            Long key = category.getParentCategory() != null
+                                    ? category.getParentCategory().getId()
+                                    : category.getId();
+
+                            String finalKey = String.join(".", key.toString(), category.getCategoryName());
+
+                            return category.getProducts().stream()
+                                    .map(product -> Map.entry(finalKey, product));
+                        })
+                        .collect(Collectors.groupingBy(
+                                Map.Entry::getKey,
+                                Collectors.mapping(Map.Entry::getValue, Collectors.toList())
+                        ));
+
+        Map<String, Double> result = new HashMap<>();
+        for(Map.Entry<String, List<Product>> entry : productsOfParentCategories.entrySet()) {
+            result.put(entry.getKey(), entry.getValue().stream().mapToDouble(Product::getPrice).sum());
+        }
+
+        return result;
     }
 }

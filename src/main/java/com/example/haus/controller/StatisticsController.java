@@ -119,4 +119,17 @@ public class StatisticsController {
                 statisticsService.getBestSellers(paginationRequest, startDate, endDate)
         );
     }
+
+    @Operation(
+            summary = "Thống kê tổng tiền các sản phẩm bán được theo danh mục cha",
+            description = "Thống kê tổng tiền các sản phẩm bán được theo danh mục cha.",
+            security = @SecurityRequirement(name = "Bearer Token")
+    )
+    @GetMapping("/statistics/get-sale-by-parent-category")
+    public ResponseEntity<?> getSaleByParentCategory() {
+        return ResponseUtil.success(
+                SuccessMessage.Statistic.GET_STATISTIC_SUCCESS,
+                statisticsService.getSaleByCategories()
+        );
+    }
 }

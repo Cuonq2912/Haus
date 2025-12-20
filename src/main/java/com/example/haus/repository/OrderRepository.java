@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
@@ -68,4 +69,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Page<Order> findByDateTime(@Param("startDate") LocalDate startDate,
                                @Param("endDate") LocalDate endDate,
                                Pageable pageable);
+
+    Optional<Order> findByIdAndUserId(Long orderId, String userId);
 }

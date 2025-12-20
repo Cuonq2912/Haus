@@ -102,6 +102,25 @@ public class OrderController {
                 orderService.getInvoiceDetails(orderId, username)
         );
     }
+
+
+    @Operation(
+            summary = "Hủy đơn hàng",
+            description = "Hủy đơn hàng.",
+            security = @SecurityRequirement(name = "Bearer Token")
+    )
+    @GetMapping("/orders/cancel/{orderId}")
+    public ResponseEntity<?> cancelOrder(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long orderId) {
+        String username = userDetails.getUsername();
+        orderService.cancelOrder(username, orderId);
+        return ResponseUtil.success(
+                HttpStatus.OK,
+                SuccessMessage.Order.CANCEL_ORDER_SUCCESS
+        );
+    }
+
     @Operation(
             summary = "Xuất hóa đơn PDF",
             description = "Truy vấn toàn bộ dữ liệu đơn hàng, sản phẩm, và người dùng để xuất hóa đơn.",

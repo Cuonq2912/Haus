@@ -130,6 +130,7 @@ public class SuccessMessage {
         public static final String CHECKOUT_SUCCESS = "Checkout successfully";
         public static final String BUY_NOW_SUCCESS = "Buy now successfully";
         public static final String CREATE_ORDER_SUCCESS = "Create order successfully";
+        public static final String CANCEL_ORDER_SUCCESS = "Cancel order successfully";
 
     }
         public static final String CREATE_ORDER_SUCCESS = "Create order success";

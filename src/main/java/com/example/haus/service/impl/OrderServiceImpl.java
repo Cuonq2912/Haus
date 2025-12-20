@@ -408,6 +408,32 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
+    @Override
+    public void cancelOrder(String username, Long orderId) {
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
+                () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED)
+        );
+
+        Order order = orderRepository.findByIdAndUserId(orderId, user.getId()).orElseThrow(
+                ()  -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED)
+        );
+
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new InvalidDataException("Order cancelled");
+        }
+
+        if (order.getStatus() == OrderStatus.DELIVERED ||
+        order.getStatus() == OrderStatus.COMPLETED ||
+        order.getStatus() == OrderStatus.REFUNDED ||
+        order.getStatus() == OrderStatus.RETURNED) {
+            throw new InvalidDataException("Order can not cancel");
+        }
+
+        order.setStatus(OrderStatus.CANCELLED);
+
+        orderRepository.save(order);
+    }
+
     private PdfPCell createHeaderCell(InvoiceResponseDto data, Font titleFont, Font normalFont, BaseFont baseFont) throws DocumentException, IOException {
         // 3 cột: Logo, Tiêu đề, Số Serial
         PdfPTable headerTable = new PdfPTable(3);
