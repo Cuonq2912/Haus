@@ -17,6 +17,6 @@ public interface StatisticsService {
 
     PaginationResponseDto<ProductStatisticResponseDto> getBestSellers(PaginationRequestDto paginationRequest, LocalDate startDate, LocalDate endDate);
 
-    Map<String, Double> getSaleByCategories();
+    Map<String, Double> getSaleByCategories(LocalDate startDate, LocalDate endDate);
 
 }
