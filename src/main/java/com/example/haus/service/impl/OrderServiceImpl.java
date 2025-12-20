@@ -234,13 +234,16 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = orderMapper.orderRequestDtoToOrder(orderAllRequestDto.getOrder());
         order.setStatus(OrderStatus.PENDING);
-        order.setOrderDate(LocalDate.now());
         List<OrderItem> orderItems = orderAllRequestDto.getOrderItems().stream().map(orderItemRequestDto -> {
             ProductVariation productVariation = productVariationRepository.findByIdAndIsDeletedFalse(orderItemRequestDto.getProductVariationId())
                     .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
 
             OrderItem orderItem = orderItemMapper.orderItemRequestDtoToOrderItem(orderItemRequestDto);
             orderItem.setProductVariation(productVariation);
+
+            if (productVariation.getInventoryQuantity() < orderItemRequestDto.getQuantity()) {
+                throw new InvalidDataException(ErrorMessage.Cart.ERR_CART_QUANTITY_INVALID);
+            }
 
             orderItem.setOrder(order); // Gán Order cho OrderItem
 
