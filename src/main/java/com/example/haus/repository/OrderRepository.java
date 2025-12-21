@@ -68,4 +68,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                                Pageable pageable);
 
     Optional<Order> findByIdAndUserId(Long orderId, String userId);
-}
+
+    List<Order> findByOrderDateBetween(
+            LocalDate startDate,
+            LocalDate endDate
+    );}

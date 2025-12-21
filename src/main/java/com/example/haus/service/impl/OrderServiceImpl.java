@@ -242,6 +242,10 @@ public class OrderServiceImpl implements OrderService {
 
             var product = productVariation.getProduct();
 
+            if (productVariation.getInventoryQuantity() < orderItemRequestDto.getQuantity()) {
+                throw new InvalidDataException(ErrorMessage.Cart.ERR_CART_QUANTITY_INVALID);
+            }
+
             OrderItem orderItem = OrderItem.builder()
                     .quantity(orderItemRequestDto.getQuantity())
                     .priceAtSale(productVariation.getPrice())
@@ -336,7 +340,7 @@ public class OrderServiceImpl implements OrderService {
                             .color(item.getSnapshotColor())
                             .size(item.getSnapshotSize())
                             .price(item.getPriceAtSale())
-                            .media(item.getSnapshotImageUrl() != null ? 
+                            .media(item.getSnapshotImageUrl() != null ?
                                 MediaResponseDto.builder().url(item.getSnapshotImageUrl()).build() : null)
                             .build();
                 })

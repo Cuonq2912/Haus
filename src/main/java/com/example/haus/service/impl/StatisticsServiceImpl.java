@@ -108,7 +108,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                 case PENDING -> totalPending[1] += order.getTotalAmount();
                 case COMPLETED -> totalCompleted[1] += order.getTotalAmount();
                 case RETURNED -> totalReturned[1] += order.getTotalAmount();
-                default -> throw new IllegalStateException("Unexpected value: " + order.getStatus());
+                default -> log.error("Unexpected value: {}", order.getStatus());
             }
             total[1] += order.getTotalAmount();
         });
@@ -118,7 +118,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                 case PENDING -> totalPending[0] += order.getTotalAmount();
                 case COMPLETED -> totalCompleted[0] += order.getTotalAmount();
                 case RETURNED -> totalReturned[0] += order.getTotalAmount();
-                default -> throw new IllegalStateException("Unexpected value: " + order.getStatus());
+                default -> log.error("Unexpected value: {}", order.getStatus());
             }
             log.info("DEv = {}", order.getTotalAmount());
             total[0] += order.getTotalAmount();
@@ -219,27 +219,30 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public Map<String, Double> getSaleByCategories() {
-        List<Category> categories = categoryRepository.findAll();
-        Map<String, List<Product>> productsOfParentCategories =
-                categories.stream()
-                        .flatMap(category -> {
-                            Long key = category.getParentCategory() != null
-                                    ? category.getParentCategory().getId()
-                                    : category.getId();
+    public Map<String, Double> getSaleByCategories(LocalDate startDate, LocalDate endDate) {
+        List<Order> orders = orderRepository.findByOrderDateBetween(startDate, endDate);
 
-                            String finalKey = String.join(".", key.toString(), category.getCategoryName());
+        List<Product> products = orders.stream()
+                .flatMap(order -> order.getOrderItems().stream())
+                .map(OrderItem::getProductVariation)
+                .map(ProductVariation::getProduct)
+                .distinct()
+                .toList();
 
-                            return category.getProducts().stream()
-                                    .map(product -> Map.entry(finalKey, product));
-                        })
+        Map<String, List<Product>> productByCategoryName =
+                products.stream()
+                        .flatMap(product ->
+                                product.getCategories().stream()
+                                        .map(category -> Map.entry(new StringBuilder().append(category.getId()).append(".").append(category.getCategoryName()).toString(), product))
+                        )
                         .collect(Collectors.groupingBy(
                                 Map.Entry::getKey,
                                 Collectors.mapping(Map.Entry::getValue, Collectors.toList())
                         ));
 
+
         Map<String, Double> result = new HashMap<>();
-        for(Map.Entry<String, List<Product>> entry : productsOfParentCategories.entrySet()) {
+        for(Map.Entry<String, List<Product>> entry : productByCategoryName.entrySet()) {
             result.put(entry.getKey(), entry.getValue().stream().mapToDouble(Product::getPrice).sum());
         }
 

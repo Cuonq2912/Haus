@@ -127,10 +127,24 @@ public class StatisticsController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping("/statistics/get-sale-by-parent-category")
-    public ResponseEntity<ResponseData<Map<String, Double>>> getSaleByParentCategory() {
+    public ResponseEntity<ResponseData<Map<String, Double>>> getSaleByParentCategory(
+            @RequestParam(required = false, defaultValue = "2024-01-01")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate
+    ) {
+        if (startDate == null) {
+            startDate = LocalDate.of(2024, 1, 1);
+        }
+        if (endDate == null) {
+            endDate = LocalDate.now();
+        }
         return ResponseUtil.success(
                 SuccessMessage.Statistic.GET_STATISTIC_SUCCESS,
-                statisticsService.getSaleByCategories()
+                statisticsService.getSaleByCategories(startDate, endDate)
         );
     }
 }
