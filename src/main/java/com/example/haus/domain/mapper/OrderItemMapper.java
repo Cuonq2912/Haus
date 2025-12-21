@@ -16,13 +16,14 @@ public interface OrderItemMapper {
 
     OrderItem orderItemRequestDtoToOrderItem(OrderItemRequestDto orderItemRequestDto);
 
-    @Mapping(target = "productId", source = "productVariation.product.id")
-    @Mapping(target = "productCode", source = "productVariation.product.productCode")
-    @Mapping(target = "productName", source = "productVariation.product.productName")
-    @Mapping(target = "variationId", source = "productVariation.id")
-    @Mapping(target = "color", source = "productVariation.color")
-    @Mapping(target = "size", source = "productVariation.size")
-    @Mapping(target = "image", source = "productVariation.media")
+    @Mapping(target = "orderItemId", source = "id")
+    @Mapping(target = "productCode", source = "snapshotProductCode")
+    @Mapping(target = "productName", source = "snapshotProductName")
+    @Mapping(target = "color", source = "snapshotColor")
+    @Mapping(target = "size", source = "snapshotSize")
+    @Mapping(target = "material", source = "snapshotMaterial")
+    @Mapping(target = "imageUrl", source = "snapshotImageUrl")
+    @Mapping(target = "originalProductVariationId", source = "productVariation.id")
     @Mapping(target = "total", expression = "java(orderItem.getQuantity() * orderItem.getPriceAtSale())")
     OrderItemResponseDto orderItemToOrderItemResponseDto(OrderItem orderItem);
 }
