@@ -67,10 +67,6 @@ public class ReviewServiceImpl implements ReviewService {
             throw new InvalidDataException(ErrorMessage.Review.ERR_REVIEW_CAN_NOT_BEFORE_BUY);
         }
 
-        if (reviewRepository.existsByUserIdAndProductId(userId, productId)) {
-            throw new InvalidDataException(ErrorMessage.Review.ERR_REVIEW_YOU_REVIEWED_THIS_ORDER);
-        }
-
         com.example.haus.domain.entity.product.OrderItem orderItem = orderItems.get(0);
 
         if (orderItem == null || orderItem.getId() == null) {
