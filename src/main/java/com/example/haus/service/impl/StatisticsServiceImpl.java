@@ -1,5 +1,6 @@
 package com.example.haus.service.impl;
 
+import com.example.haus.constant.OrderStatus;
 import com.example.haus.constant.promotion.PromotionStatus;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
@@ -220,7 +221,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public Map<String, Double> getSaleByCategories(LocalDate startDate, LocalDate endDate) {
-        List<Order> orders = orderRepository.findByOrderDateBetween(startDate, endDate);
+        List<Order> orders = orderRepository.findByOrderDateBetween(startDate, endDate, OrderStatus.COMPLETED);
 
         List<Product> products = orders.stream()
                 .flatMap(order -> order.getOrderItems().stream())

@@ -16,7 +16,7 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-  Page<Order> findByStatus(OrderStatus status, Pageable pageable);
+    Page<Order> findByStatus(OrderStatus status, Pageable pageable);
 
     @Query("SELECT o FROM Order o " +
             "LEFT JOIN FETCH o.orderItems oi " +
@@ -58,7 +58,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query(
             """
-            SELECT p
+
+                    SELECT p
             FROM Order p
             WHERE (p.orderDate >= :startDate) AND (p.orderDate <= :endDate)
             """
@@ -69,7 +70,16 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Optional<Order> findByIdAndUserId(Long orderId, String userId);
 
+    @Query("""
+    SELECT o
+    FROM Order o
+    WHERE o.orderDate >= :startDate
+      AND o.orderDate <= :endDate
+      AND o.status = :status
+        """)
     List<Order> findByOrderDateBetween(
-            LocalDate startDate,
-            LocalDate endDate
-    );}
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("status") OrderStatus status
+    );
+}
