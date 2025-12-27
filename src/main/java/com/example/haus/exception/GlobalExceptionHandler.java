@@ -267,6 +267,32 @@ public class GlobalExceptionHandler {
         return errorResponse;
     }
 
+        @ExceptionHandler(RateLimitExceededException.class)
+        @ResponseStatus(TOO_MANY_REQUESTS)
+        @ApiResponses(value = {
+                @ApiResponse(responseCode = "429", description = "Too Many Requests", content = {
+                        @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(name = "429 Response", summary = "Handle exception when rate limit exceeded", value = """
+                                                        {
+                                                          "timestamp": "2023-10-19T06:07:35.321+00:00",
+                                                          "status": 429,
+                                                          "path": "/api/v1/auth/login",
+                                                          "error": "Too Many Requests",
+                                                          "message": "Rate limit exceeded. Please retry after 60 seconds.",
+                                                          "retry_after_seconds": 60
+                                                        }
+                                                        """)) })
+        })
+        public ErrorResponse handleRateLimitExceededException(RateLimitExceededException e, WebRequest webRequest) {
+                ErrorResponse errorResponse = new ErrorResponse();
+                errorResponse.setTimestamp(new Date());
+                errorResponse.setStatus(TOO_MANY_REQUESTS.value());
+                errorResponse.setPath(webRequest.getDescription(false).replace("uri=", ""));
+                errorResponse.setError(TOO_MANY_REQUESTS.getReasonPhrase());
+                errorResponse.setMessage(String.format("Rate limit exceeded. Please retry after %d seconds.",
+                        e.getRetryAfterSeconds()));
+                return errorResponse;
+        }
+
     /**
      * Handle exception when internal server error
      *
