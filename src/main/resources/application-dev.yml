@@ -102,3 +102,88 @@ keycloak:
   clientSecret: ${KEYCLOAK_CLIENTSECRET}
   adminUser: ${KEYCLOAK_ADMINUSER}
   adminPassword: ${KEYCLOAK_ADMINPASSWORD}
+
+#Rate Limiting
+rate-limit:
+  enabled: true
+  storage-type: memory
+  whitelist-ips:
+  - 127.0.0.1
+  - 0:0:0:0:0:0:0:1
+  default:
+    capacity: 1000
+    refill-tokens: 1000
+    refill-duration: PT1H
+  per-ip:
+    capacity: 200
+    refill-tokens: 200
+    refill-duration: PT10M
+  endpoints:
+    - path: /api/v1/auth/login
+      capacity: 5
+      refill-tokens: 5
+      refill-duration: PT1M
+      by-ip: true
+    - path: /api/v1/auth/register
+      capacity: 10
+      refill-tokens: 10
+      refill-duration: PT1H
+      by-ip: true
+    - path: /api/v1/auth/forgot-password
+      capacity: 3
+      refill-tokens: 3
+      refill-duration: PT1M
+      by-ip: true
+    - path: /api/v1/auth/verify-otp
+      capacity: 5
+      refill-tokens: 5
+      refill-duration: PT1M
+      by-ip: true
+    - path: /api/v1/auth/verify-otp-to-reset-password
+      capacity: 5
+      refill-tokens: 5
+      refill-duration: PT1M
+      by-ip: true
+    - path: /api/v1/auth/reset-password
+      capacity: 5
+      refill-tokens: 5
+      refill-duration: PT1M
+      by-ip: true
+    - path: /api/v1/auth/refresh
+      capacity: 30
+      refill-tokens: 30
+      refill-duration: PT1M
+      by-ip: false
+
+    - path: /api/v1/user/update-password
+      capacity: 5
+      refill-tokens: 5
+      refill-duration: PT5M
+      by-ip: false
+    - path: /api/v1/user/delete-my-account
+      capacity: 3
+      refill-tokens: 3
+      refill-duration: PT1H
+      by-ip: false
+
+    - path: /api/v1/payment/vnpay/payment_url
+      capacity: 10
+      refill-tokens: 10
+      refill-duration: PT1M
+      by-ip: false
+    - path: /api/v1/payment/momo/create
+      capacity: 10
+      refill-tokens: 10
+      refill-duration: PT1M
+      by-ip: false
+    - path: /api/v1/payment/cod
+      capacity: 10
+      refill-tokens: 10
+      refill-duration: PT1M
+      by-ip: false
+
+    - path: /api/v1/product/search
+      capacity: 100
+      refill-tokens: 100
+      refill-duration: PT1M
+      by-ip: true
