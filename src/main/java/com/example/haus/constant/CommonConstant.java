@@ -15,10 +15,10 @@ public class CommonConstant {
     public static final String PROMOTION = "promotion";
     public static final String SOLD_QUANTITY_ASC = "sold_quantity_asc";
     public static final String SOLD_QUANTITY_DESC = "sold_quantity_desc";
-    public static final String SOLD_QUANTITY = "sold_quantity";
+    public static final String SOLD_QUANTITY = "soldQuantity";
     public static final String CREATED_AT_ASC = "created_at_asc";
     public static final String CREATED_AT_DESC = "created_at_desc";
-    public static final String CREATED_AT = "created_at";
+    public static final String CREATED_AT = "createdAt";
     public static final String PRICE = "price";
     public static final String CATEGORIES = "categories";
     public static final String ID = "id";

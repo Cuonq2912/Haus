@@ -26,6 +26,28 @@ public class OrderItem extends BaseEntity {
     @Column(nullable = false)
     Double priceAtSale;
 
+    @Column(nullable = false)
+    String snapshotProductCode;
+
+    @Column(nullable = false)
+    String snapshotProductName;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    String snapshotDescription;
+
+    @Column(length = 100)
+    String snapshotMaterial;
+
+    @Column(nullable = false)
+    String snapshotColor;
+
+    @Column(nullable = false)
+    String snapshotSize;
+
+    @Column
+    String snapshotImageUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     Order order;

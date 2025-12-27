@@ -115,7 +115,7 @@ public class OrderController {
             description = "Hủy đơn hàng.",
             security = @SecurityRequirement(name = "Bearer Token")
     )
-    @GetMapping("/orders/cancel/{orderId}")
+    @PostMapping("/orders/cancel/{orderId}")
     public ResponseEntity<ResponseData<Void>> cancelOrder(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long orderId) {
