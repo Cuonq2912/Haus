@@ -16,7 +16,6 @@ services:
       - '3307:3306'
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
     networks:
       - backend
     healthcheck:
@@ -25,18 +24,18 @@ services:
       timeout: 5s
       retries: 5
 
-#  redis:
-#    image: redis:6.2-alpine
-#    container_name: redis
-#    hostname: redis
-#    ports:
-#      - '6379:6379'
-#    environment:
-#      - ALLOW_EMPTY_PASSWORD=yes
-#      - REDIS_DISABLE_COMMANDS=FLUSHDB;FLUSHALL
-#    networks:
-#      - backend
-#
+  redis:
+    image: redis:6.2-alpine
+    container_name: redis
+    hostname: redis
+    ports:
+      - '6379:6379'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB;FLUSHALL
+    networks:
+      - backend
+
 #  zookeeper:
 #    image: confluentinc/cp-zookeeper:latest
 #    container_name: zookeeper

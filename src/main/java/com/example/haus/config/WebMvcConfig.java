@@ -1,30 +1,31 @@
-//package com.example.haus.config;
-//
-//import org.springframework.beans.factory.annotation.Value;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.web.servlet.config.annotation.CorsRegistry;
-//import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-//
-//@Configuration
-//public class WebMvcConfig implements WebMvcConfigurer {
-//
-//    @Value("${cors.allowed-origins}")
-//    private String[] allowedOrigins;
-//
-//    @Override
-//    public void addCorsMappings(CorsRegistry registry) {
-//        registry.addMapping("/api/**")
-//                .allowedHeaders("*")
-//                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-//                .allowedOrigins(allowedOrigins)
-//                .allowCredentials(true)
-//                .maxAge(3600);
-//
-//        registry.addMapping("/auth/**")
-//                .allowedHeaders("*")
-//                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-//                .allowedOrigins(allowedOrigins)
-//                .allowCredentials(true)
-//                .maxAge(3600);
-//    }
-//}
+package com.example.haus.config;
+
+import com.example.haus.interceptor.RateLimitInterceptor;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class WebMvcConfig implements WebMvcConfigurer {
+
+  RateLimitInterceptor rateLimitInterceptor;
+
+  @Override
+  public void addInterceptors(InterceptorRegistry registry) {
+
+      registry.addInterceptor(rateLimitInterceptor)
+          .addPathPatterns("/api/**", "/auth/**")
+          .excludePathPatterns(
+              "/swagger-ui/**",
+              "/swagger-ui.html",
+              "/v3/api-docs/**",
+              "/swagger-resources/**",
+              "/webjars/**",
+              "/actuator/**");
+  }
+}
