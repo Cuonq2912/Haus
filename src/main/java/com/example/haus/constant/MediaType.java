@@ -7,7 +7,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public enum MediaType {
 
     @JsonProperty("image")
-    Image,
+    IMAGE,
+
     @JsonProperty("video")
-    Video
+    VIDEO,
+
+    @JsonProperty("document")
+    DOCUMENT
 }
