@@ -4,6 +4,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
+import com.example.haus.constant.MediaType;
 import com.example.haus.domain.entity.user.User;
 import com.example.haus.domain.mapper.UserMapper;
 import com.example.haus.domain.dto.request.user.profile.ConfirmPasswordUpdateUserRequestDto;
@@ -16,6 +17,7 @@ import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.exception.UploadFileException;
 import com.example.haus.helper.PersonalInformationHelper;
 import com.example.haus.repository.UserRepository;
+import com.example.haus.service.FileValidatorService;
 import com.example.haus.service.UserService;
 import com.example.haus.util.keycloak.KeycloakUtil;
 import lombok.AccessLevel;
@@ -32,26 +34,21 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 
-
 @Service
 @Slf4j(topic = "USER-SERVICE")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class    UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService {
 
     UserRepository userRepository;
-
     UserMapper userMapper;
-
     PersonalInformationHelper personalInformationHelper;
-
     Cloudinary cloudinary;
-
     KeycloakUtil keycloakUtil;
+    FileValidatorService fileValidatorService;
 
     @Override
     public void deleteAccount(Authentication authentication) {
-
         String username = authentication.getName();
 
         User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
@@ -85,12 +82,10 @@ public class    UserServiceImpl implements UserService {
                 () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         if (requestDto.getProfileData() != null) {
-
             UpdateUserRequestDto personalInfo = personalInformationHelper
                     .handleEmptyStrings(requestDto.getProfileData());
 
             userMapper.updateUserFromPersonalInformationDto(personalInfo, user);
-
         }
 
         User updatedUser = userRepository.save(user);
@@ -100,7 +95,6 @@ public class    UserServiceImpl implements UserService {
 
     @Override
     public void updatePassword(UpdatePasswordRequestDto request, Authentication authentication) {
-
         String username = authentication.getName();
 
         User user = userRepository.findByUsernameAndIsDeletedFalse(username)
@@ -129,9 +123,9 @@ public class    UserServiceImpl implements UserService {
         log.info("Password updated successfully for user {}", username);
     }
 
-
     @Override
     public UserResponseDto uploadAvatar(MultipartFile file, Authentication authentication) throws IOException {
+        fileValidatorService.validateFile(file, MediaType.IMAGE);
 
         User user = userRepository.findByUsernameAndIsDeletedFalse(authentication.getName()).orElseThrow(
                 () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
@@ -139,16 +133,18 @@ public class    UserServiceImpl implements UserService {
         if(user.getAvatarPublicId() != null){
             cloudinary.uploader().destroy(user.getAvatarPublicId(), ObjectUtils.emptyMap());
         }
+
         String imageUrl;
         String publicId;
         try{
+            String safeFilename = fileValidatorService.generateSafeFileName(file.getOriginalFilename());
+
             Map<String, Object> uploadParams = ObjectUtils.asMap(
                     "folder", "haus/avatars",
-                    "public_id", "avatar_" + user.getId() + "_" + System.currentTimeMillis(),
+                    "public_id", safeFilename,
                     "resource_type", "image",
                     "overwrite", true,
-                    "transformation", "w_400,h_400,c_fill,q_auto"
-            );
+                    "transformation", "w_400,h_400,c_fill,q_auto");
 
             Map<?, ?> result = cloudinary.uploader().upload(file.getBytes(), uploadParams);
             publicId = (String) result.get("public_id");
