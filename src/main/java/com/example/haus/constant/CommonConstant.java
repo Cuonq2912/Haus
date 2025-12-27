@@ -47,6 +47,7 @@ public class CommonConstant {
     public static final String PASSWORD = "password";
     public static final String CLIENT_SECRET = "client_secret";
     public static final String REFRESH_TOKEN = "refresh_token";
+    public static final String MEMORY = "memory";
 
     private CommonConstant() {
         //
