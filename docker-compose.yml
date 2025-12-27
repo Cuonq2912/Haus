@@ -3,7 +3,7 @@ services:
   # MySQL Database Service
   mysql:
     image: mysql:8.0
-    container_name: mysql
+    container_name: haus-mysql
     cap_add:
       - SYS_NICE
     restart: always
@@ -26,7 +26,7 @@ services:
 
   redis:
     image: redis:6.2-alpine
-    container_name: redis
+    container_name: haus-redis
     hostname: redis
     ports:
       - '6379:6379'
@@ -35,6 +35,13 @@ services:
       - REDIS_DISABLE_COMMANDS=FLUSHDB;FLUSHALL
     networks:
       - backend
+
+  clamav:
+    image: clamav/clamav:stable
+    container_name: haus-clamav
+    ports:
+      - "3310:3310"
+    restart: unless-stopped
 
 #  zookeeper:
 #    image: confluentinc/cp-zookeeper:latest
