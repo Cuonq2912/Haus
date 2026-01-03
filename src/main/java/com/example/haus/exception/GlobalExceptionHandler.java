@@ -267,11 +267,11 @@ public class GlobalExceptionHandler {
         return errorResponse;
     }
 
-        @ExceptionHandler(RateLimitExceededException.class)
-        @ResponseStatus(TOO_MANY_REQUESTS)
-        @ApiResponses(value = {
-                @ApiResponse(responseCode = "429", description = "Too Many Requests", content = {
-                        @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(name = "429 Response", summary = "Handle exception when rate limit exceeded", value = """
+    @ExceptionHandler(RateLimitExceededException.class)
+    @ResponseStatus(TOO_MANY_REQUESTS)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "429", description = "Too Many Requests", content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(name = "429 Response", summary = "Handle exception when rate limit exceeded", value = """
                                                         {
                                                           "timestamp": "2023-10-19T06:07:35.321+00:00",
                                                           "status": 429,
@@ -281,17 +281,45 @@ public class GlobalExceptionHandler {
                                                           "retry_after_seconds": 60
                                                         }
                                                         """)) })
-        })
-        public ErrorResponse handleRateLimitExceededException(RateLimitExceededException e, WebRequest webRequest) {
-                ErrorResponse errorResponse = new ErrorResponse();
-                errorResponse.setTimestamp(new Date());
-                errorResponse.setStatus(TOO_MANY_REQUESTS.value());
-                errorResponse.setPath(webRequest.getDescription(false).replace("uri=", ""));
-                errorResponse.setError(TOO_MANY_REQUESTS.getReasonPhrase());
-                errorResponse.setMessage(String.format("Rate limit exceeded. Please retry after %d seconds.",
+    })
+    public ErrorResponse handleRateLimitExceededException(RateLimitExceededException e, WebRequest webRequest) {
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.setTimestamp(new Date());
+            errorResponse.setStatus(TOO_MANY_REQUESTS.value());
+            errorResponse.setPath(webRequest.getDescription(false).replace("uri=", ""));
+            errorResponse.setError(TOO_MANY_REQUESTS.getReasonPhrase());
+            errorResponse.setMessage(String.format("Rate limit exceeded. Please retry after %d seconds.",
                         e.getRetryAfterSeconds()));
-                return errorResponse;
-        }
+            return errorResponse;
+    }
+
+    /**
+     * Handle file validation exceptions (MIME type, magic bytes, size, virus)
+     */
+    @ExceptionHandler(FileValidationException.class)
+    @ResponseStatus(BAD_REQUEST)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "File Validation Failed", content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(name = "400 Response", summary = "Handle file validation errors", value = """
+                                                        {
+                                                          "timestamp": "2024-12-27T06:07:35.321+00:00",
+                                                          "status": 400,
+                                                          "path": "/api/v1/user/upload-avatar",
+                                                          "error": "File Validation Failed",
+                                                          "message": "Loại file 'application/x-php' không được hỗ trợ"
+                                                        }
+                                                        """)) })
+    })
+    public ErrorResponse handleFileValidationException(FileValidationException e, WebRequest webRequest) {
+            log.warn("File validation failed: {} - {}", e.getErrorCode(), e.getMessage());
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.setTimestamp(new Date());
+            errorResponse.setStatus(BAD_REQUEST.value());
+            errorResponse.setPath(webRequest.getDescription(false).replace("uri=", ""));
+            errorResponse.setError("File Validation Failed");
+            errorResponse.setMessage(e.getMessage());
+            return errorResponse;
+    }
 
     /**
      * Handle exception when internal server error

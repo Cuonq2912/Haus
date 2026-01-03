@@ -105,7 +105,7 @@ public class ProductVariationServiceImpl implements ProductVariationService {
         if (StringUtils.isNotBlank(imageUrl)) {
             Media media = Media.builder()
                     .url(imageUrl)
-                    .type(MediaType.Image)
+                    .type(MediaType.IMAGE)
                     .productVariation(productVariation)
                     .build();
             productVariation.setMedia(media);
@@ -150,7 +150,7 @@ public class ProductVariationServiceImpl implements ProductVariationService {
             } else {
                 Media media = Media.builder()
                         .url(imageUrl)
-                        .type(MediaType.Image)
+                        .type(MediaType.IMAGE)
                         .productVariation(existingVariation)
                         .build();
                 existingVariation.setMedia(media);

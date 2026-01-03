@@ -190,11 +190,11 @@ public class ErrorMessage {
         public static final String COD_PAYMENT_ALREADY_COMPLETED = "exception.cod.payment.already.completed";
         public static final String STATUS_IS_NOT_SUPPORT = "exception.status.is.not.support";
 
-
     }
 
     public static class Cart {
-        private Cart() {}
+        private Cart() {
+        }
 
         public static final String ERR_CART_NOT_FOUND = "exception.cart.not.found";
         public static final String ERR_CART_QUANTITY_INVALID = "exception.cart.quantity.invalid";
@@ -204,7 +204,8 @@ public class ErrorMessage {
 
     public static class Address {
 
-        private Address() {}
+        private Address() {
+        }
 
         public static final String ERR_RECIPIENT_NAME_EMPTY = "exception.recipient.name.empty";
         public static final String ERR_PHONE_NUMBER_EMPTY = "exception.phone.number.empty";
@@ -230,6 +231,21 @@ public class ErrorMessage {
         public static final String ERR_REVIEW_UNAUTHORIZED_DELETE = "exception.review.unauthorized.delete";
         public static final String ERR_REVIEW_RATING_INVALID = "exception.review.rating.invalid";
         public static final String ERR_REVIEW_TAG_INVALID = "exception.review.tag.invalid";
+    }
+
+
+    public static class FileUpload {
+
+        private FileUpload() {
+        }
+
+        public static final String EMPTY_FILE = "File không được để trống";
+        public static final String FILE_TOO_LARGE = "Kích thước file vượt quá giới hạn cho phép";
+        public static final String INVALID_MIME_TYPE = "Loại file không được hỗ trợ";
+        public static final String INVALID_CONTENT = "Nội dung file không hợp lệ hoặc không khớp với loại file được khai báo";
+        public static final String VIRUS_DETECTED = "Phát hiện virus trong file";
+        public static final String SCAN_FAILED = "Không thể quét virus cho file";
+        public static final String UPLOAD_FAILED = "Upload file thất bại";
     }
 
 }

@@ -2,6 +2,7 @@ package com.example.haus;
 
 import com.example.haus.config.keycloak.KeycloakProperties;
 import com.example.haus.config.properties.AdminInfoProperties;
+import com.example.haus.config.properties.FileUploadProperties;
 import com.example.haus.domain.entity.product.Cart;
 import com.example.haus.domain.entity.user.Role;
 import com.example.haus.domain.entity.user.User;
@@ -22,7 +23,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @RequiredArgsConstructor
 @SpringBootApplication(scanBasePackages = "com.example.haus")
-@EnableConfigurationProperties({AdminInfoProperties.class, KeycloakProperties.class})
+@EnableConfigurationProperties({AdminInfoProperties.class, KeycloakProperties.class, FileUploadProperties.class })
 @EnableScheduling
 public class HausApplication {
 

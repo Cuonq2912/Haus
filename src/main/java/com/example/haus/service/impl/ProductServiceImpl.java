@@ -154,7 +154,7 @@ public class ProductServiceImpl implements ProductService {
             for (String imageUrl : imageUrls) {
                 Media media = Media.builder()
                         .url(imageUrl)
-                        .type(MediaType.Image)
+                        .type(MediaType.IMAGE)
                         .product(savedProduct)
                         .build();
                 media.setCreatedAt(now);
@@ -268,7 +268,7 @@ public class ProductServiceImpl implements ProductService {
         for (String imageUrl : newImageUrls) {
             Media media = Media.builder()
                     .url(imageUrl)
-                    .type(MediaType.Image)
+                    .type(MediaType.IMAGE)
                     .product(product)
                     .build();
             media.setCreatedAt(now);
@@ -472,8 +472,7 @@ public class ProductServiceImpl implements ProductService {
             return DISCOUNT_PERCENT;
         } else if (SOLD_QUANTITY_ASC.equalsIgnoreCase(sortBy) || SOLD_QUANTITY_DESC.equalsIgnoreCase(sortBy)) {
             return SOLD_QUANTITY;
-        }
-        else if (CREATED_AT_ASC.equalsIgnoreCase(sortBy) || CREATED_AT_DESC.equalsIgnoreCase(sortBy)) {
+        } else if (CREATED_AT_ASC.equalsIgnoreCase(sortBy) || CREATED_AT_DESC.equalsIgnoreCase(sortBy)) {
             return CREATED_AT;
         }
         return null;

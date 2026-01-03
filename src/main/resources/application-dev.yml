@@ -34,9 +34,13 @@ spring:
       use_sql_comments: true
   #  kafka:
   #    bootstrap   -servers: localhost:29092
-  #  redis:
-  #    host: ${REDIS_HOST:localhost}
-  #    port: ${REDIS_PORT:6379}
+
+  # Redis
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+
   sendGrid:
     apiKey: ${SENDGRID_API_KEY}
     fromEmail: quanducbui2023@gmail.com
@@ -93,6 +97,15 @@ payment:
     orderType: ${VNPAY_ORDER_TYPE:other}
     currCode: ${VNPAY_CURRCODE:VND}
     locale: ${VNPAY_LOCALE:vn}
+
+  momo:
+    partner-code: ${MOMO_PARTNER_CODE}
+    access-key: ${MOMO_ACCESS_KEY}
+    secret-key: ${MOMO_SECRET_KEY}
+    end-point: ${MOMO_ENDPOINT:https://test-payment.momo.vn/v2/gateway/api/create}
+    redirect-url: ${MOMO_REDIRECT_URL:http://localhost:8080/api/v1/payment/momo/callback}
+    ipn-url: ${MOMO_IPN_URL:http://localhost:8080/api/v1/payment/momo/ipn}
+    request-type: ${MOMO_REQUEST_TYPE:captureWallet}
 
 #KeyCloak
 keycloak:
@@ -187,3 +200,21 @@ rate-limit:
       refill-tokens: 100
       refill-duration: PT1M
       by-ip: true
+
+# File Upload Security
+file-upload:
+  enabled: true
+  max-file-size: 10485760      # 10MB
+  max-image-size: 5242880       # 5MB
+  allowed-image-types:
+    - image/jpeg
+    - image/png
+    - image/gif
+    - image/webp
+  allowed-document-types:
+    - application/pdf
+  virus-scan:
+    enabled: true
+    clamav-host: localhost
+    clamav-port: 3310
+    timeout: 30000
