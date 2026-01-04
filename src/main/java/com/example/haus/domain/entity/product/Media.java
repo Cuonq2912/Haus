@@ -20,7 +20,7 @@ public class Media extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     String url;
 
     @Enumerated(EnumType.STRING)
