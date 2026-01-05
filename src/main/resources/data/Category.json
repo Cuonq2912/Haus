@@ -1,0 +1,34 @@
+[
+  {
+    "categoryName": "Ngoài trời",
+    "description": "Bàn ghế và thiết bị dùng ngoài trời, sân vườn"
+  },
+  {
+    "categoryName": "Nhà bếp & Thiết bị",
+    "description": "Kệ bếp, tủ bếp và các thiết bị nhà bếp"
+  },
+  {
+    "categoryName": "Phòng ăn",
+    "description": "Bàn ăn, ghế ăn và đồ nội thất phòng ăn"
+  },
+  {
+    "categoryName": "Phòng khách",
+    "description": "Sofa, bàn trà, kệ tivi và đồ nội thất phòng khách"
+  },
+  {
+    "categoryName": "Phòng ngủ",
+    "description": "Giường ngủ, tủ quần áo, tủ đầu giường và nội thất phòng ngủ"
+  },
+  {
+    "categoryName": "Phòng tắm",
+    "description": "Tủ lavabo, kệ phòng tắm và thiết bị phòng tắm"
+  },
+  {
+    "categoryName": "Phòng trẻ em",
+    "description": "Giường cho bé, kệ sách, tủ quần áo cho trẻ em"
+  },
+  {
+    "categoryName": "Văn phòng tại nhà",
+    "description": "Bàn làm việc, ghế văn phòng và thiết bị văn phòng"
+  }
+]
