@@ -108,6 +108,12 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<CategoryResponseDto> getAllCategories() {
+        List<Category> categories = categoryRepository.findAll();
+        return categories.stream().map(category -> categoryMapper.categoryToCategoryResponseDto(category)).toList();
+    }
+
+    @Override
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
