@@ -70,7 +70,17 @@ public class CategoryController {
                 categoryService.getAllSubCategories()
         );
     }
-
+    @Operation(
+            summary = "Lấy tất cả danh mục",
+            description = "Lấy tất cả danh mục "
+    )
+    @GetMapping(UrlConstant.Category.GET_ALL_CATEGORIES_LIST)
+    public ResponseEntity<ResponseData<List<CategoryResponseDto>>> getAllCategories(){
+        return ResponseUtil.success(
+                SuccessMessage.Category.GET_ALL_CATEGORY_SUCCESS,
+                categoryService.getAllCategories()
+        );
+    }
     @Operation(
             summary = "Cập nhật danh mục",
             description = "Dùng để admin cập nhật danh mục theo ID và request form với role Admin",

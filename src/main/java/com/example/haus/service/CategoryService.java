@@ -17,6 +17,8 @@ public interface CategoryService {
 
     List<CategoryResponseDto> getAllSubCategories();
 
+    List<CategoryResponseDto> getAllCategories();
+
     void deleteCategory(Long id);
 
     PaginationResponseDto<CategoryResponseDto> searchCategoryByKeywordAndSortByKeyword(String keyword, PaginationRequestDto paginationRequest);
