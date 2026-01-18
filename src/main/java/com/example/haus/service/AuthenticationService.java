@@ -9,9 +9,9 @@ import com.example.haus.domain.dto.response.user.UserResponseDto;
 public interface AuthenticationService {
     LoginResponseDto authentication(LoginRequestDto request);
 
-    void logout(LogoutRequestDto request);
+    void logout(String refreshToken);
 
-    RefreshTokenResponseDto refresh(RefreshTokenRequestDto request);
+    RefreshTokenResponseDto refresh(String refreshToken);
 
     void register(RegisterRequestDto request);
 

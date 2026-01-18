@@ -8,6 +8,13 @@ spring:
     port: ${REDIS_PORT:6379}
     password: ${REDIS_PASSWORD:}
 
+security:
+  cookie:
+    name: refresh_token
+    max-age-seconds: 604800
+    secure: true
+    path: /api/v1/auth
+
 springdoc:
   api-docs:
     enabled: true

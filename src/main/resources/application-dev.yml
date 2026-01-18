@@ -69,6 +69,11 @@ security:
   user-endpoints: /api/v1/user/**
   admin-endpoints: /api/v1/admin/**, /api/v1/promotion/**, /api/v1/category/**, /api/v1/product/**
   swagger-endpoints: /swagger-ui/**, /v3/api-docs/**, /swagger-ui.html
+  cookie:
+    name: refresh_token
+    max-age-seconds: 604800
+    secure: false
+    path: /api/v1/auth
 
 #JWT
 jwt:
