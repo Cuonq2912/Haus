@@ -11,8 +11,10 @@ import com.example.haus.domain.dto.response.auth.RefreshTokenResponseDto;
 import com.example.haus.domain.dto.response.user.UserResponseDto;
 import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.service.AuthenticationService;
-import com.sendgrid.Response;
+import com.google.api.client.util.Value;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -29,23 +32,43 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Validated
 @RequiredArgsConstructor
 @Slf4j(topic = "AUTH-CONTROLLER")
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class AuthController {
 
-    AuthenticationService authenticationService;
+    final AuthenticationService authenticationService;
+
+    @Value("${security.cookie.name:refresh_token}")
+    String cookieName;
+
+    @Value("${security.cookie.max-age-seconds:604800}")
+    int cookieMaxAge;
+    
+    @Value("${security.cookie.secure:true}")
+    boolean cookieSecure;
+    
+    @Value("${security.cookie.path:/api/v1/auth}")
+    String cookiePath;
+
+
 
     @Operation(
             summary = "Đăng nhập tài khoản",
             description = "Dùng để đăng nhập tài khoản"
     )
     @PostMapping(UrlConstant.Auth.LOGIN)
-    public ResponseEntity<ResponseData<LoginResponseDto>> login(@Valid @RequestBody LoginRequestDto loginRequestDto) {
+    public ResponseEntity<ResponseData<LoginResponseDto>> login(@Valid @RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
 
         SecurityContextHolder.getContext().getAuthentication();
 
+        LoginResponseDto result = authenticationService.authentication(loginRequestDto);
+
+        setRefreshTokenCookie(response, result.getRefreshToken());
+
+        result.setRefreshToken(null);
+
         return ResponseUtil.success(
                 SuccessMessage.Auth.LOGIN_SUCCESS,
-                authenticationService.authentication(loginRequestDto)
+                result
         );
     }
 
@@ -54,8 +77,11 @@ public class AuthController {
             description = "Dùng để đăng xuất tài khoản"
     )
     @PostMapping(UrlConstant.Auth.LOGOUT)
-    public ResponseEntity<ResponseData<Void>> logout(@Valid @RequestBody LogoutRequestDto logoutRequestDto) {
-        authenticationService.logout(logoutRequestDto);
+    public ResponseEntity<ResponseData<Void>> logout(@CookieValue(name = "refresh_token", required = false) String refreshToken,
+                                                    HttpServletResponse response) {
+        authenticationService.logout(refreshToken);
+
+        deleteRefreshTokenCookie(response);
         return ResponseUtil.success(HttpStatus.NO_CONTENT, SuccessMessage.Auth.LOGOUT_SUCCESS);
     }
 
@@ -64,10 +90,18 @@ public class AuthController {
             description = "Dùng để cấp lại token"
     )
     @PostMapping(UrlConstant.Auth.REFRESH_TOKEN)
-    public ResponseEntity<ResponseData<RefreshTokenResponseDto>> refresh(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
+    public ResponseEntity<ResponseData<RefreshTokenResponseDto>> refresh(@CookieValue(name = "refresh_token") String refreshToken,
+                                                        HttpServletResponse response) {
+        
+        RefreshTokenResponseDto result = authenticationService.refresh(refreshToken);
+
+        setRefreshTokenCookie(response, result.getRefreshToken());
+
+        result.setRefreshToken(null);
+
         return ResponseUtil.success(
                 SuccessMessage.Auth.REFRESH_TOKEN_SUCCESS,
-                authenticationService.refresh(refreshTokenRequestDto)
+                result
         );
     }
 
@@ -127,4 +161,26 @@ public class AuthController {
                 authenticationService.resetPassword(request)
         );
     }
+
+
+    private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
+        Cookie cookie = new Cookie(cookieName, refreshToken);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(cookieSecure);
+        cookie.setPath(cookiePath);
+        cookie.setMaxAge(cookieMaxAge);
+        cookie.setAttribute("SameSite", "Strict");
+        response.addCookie(cookie);
+    }
+
+    private void deleteRefreshTokenCookie(HttpServletResponse response) {
+        Cookie cookie = new Cookie(cookieName, "");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(cookieSecure);
+        cookie.setPath(cookiePath);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+    }
+
+
 }

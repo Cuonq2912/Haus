@@ -6,8 +6,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.haus.config.keycloak.KeycloakProperties;
 import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
-import com.example.haus.constant.TokenType;
-import com.example.haus.domain.entity.InvalidatedToken;
 import com.example.haus.domain.entity.product.Cart;
 import com.example.haus.domain.entity.user.Role;
 import com.example.haus.domain.entity.user.User;
@@ -23,45 +21,30 @@ import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.KeycloakException;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.CartRepository;
-import com.example.haus.repository.InvalidatedTokenRepository;
 import com.example.haus.repository.UserRepository;
-import com.example.haus.security.CustomUserDetailsService;
 import com.example.haus.service.AuthenticationService;
 import com.example.haus.service.EmailService;
-import com.example.haus.service.JwtService;
-import com.example.haus.service.UserService;
 import com.example.haus.util.OtpUtil;
 import com.example.haus.util.keycloak.KeycloakUtil;
-import com.nimbusds.jwt.SignedJWT;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
-import org.springframework.security.authentication.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.client.RestTemplate;
 
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.example.haus.constant.CommonConstant.*;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -73,13 +56,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     KeycloakProperties keycloakProperties;
 
-    JwtService jwtService;
-
     AuthMapper authMapper;
 
     EmailService emailService;
-
-    InvalidatedTokenRepository invalidatedTokenRepository;
 
     UserRepository userRepository;
 
@@ -141,7 +120,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void logout(LogoutRequestDto request) {
+    public void logout(String refreshToken) {
         String url = keycloakProperties.serverUrl()
                 + "/realms/" + keycloakProperties.realm()
                 + "/protocol/openid-connect/logout";
@@ -152,7 +131,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add(CLIENT_ID, keycloakProperties.clientId());
         body.add(CLIENT_SECRET, keycloakProperties.clientSecret());
-        body.add(REFRESH_TOKEN, request.getRefreshToken());
+        body.add(REFRESH_TOKEN, refreshToken);
 
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
 
@@ -172,7 +151,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public RefreshTokenResponseDto refresh(RefreshTokenRequestDto request) {
+    public RefreshTokenResponseDto refresh(String refreshToken) {
 
         final String url = keycloakProperties.serverUrl() + "/realms/" + keycloakProperties.realm() + "/protocol/openid-connect/token";
 
@@ -183,7 +162,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         params.add(CLIENT_ID, keycloakProperties.clientId());
         params.add(CLIENT_SECRET, keycloakProperties.clientSecret());
         params.add("grant_type", REFRESH_TOKEN);
-        params.add(REFRESH_TOKEN, request.getRefreshToken());
+        params.add(REFRESH_TOKEN, refreshToken);
 
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(params, headers);
 
