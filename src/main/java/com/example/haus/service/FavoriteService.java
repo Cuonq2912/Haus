@@ -5,7 +5,7 @@ import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.product.AddFavoriteRequestDto;
 import com.example.haus.domain.dto.response.product.CheckFavoriteResponseDto;
 import com.example.haus.domain.dto.response.product.FavoriteResponseDto;
-
+import com.example.haus.domain.dto.response.product.ProductResponseDto;
 
 public interface FavoriteService {
 
@@ -13,10 +13,9 @@ public interface FavoriteService {
 
     void removeFavorite(String userId, Long productId);
 
-    PaginationResponseDto<FavoriteResponseDto> getFavorites(
-        String userId, 
-        PaginationRequestDto paginationRequest
-    );
+    PaginationResponseDto<ProductResponseDto> getFavorites(
+            String userId,
+            PaginationRequestDto paginationRequest);
 
     CheckFavoriteResponseDto checkFavorite(String userId, Long productId);
 
