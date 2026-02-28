@@ -29,6 +29,7 @@ import com.example.haus.repository.*;
 import com.example.haus.service.OrderService;
 import com.example.haus.util.PaginationUtil;
 import com.example.haus.util.PdfUtil;
+import com.example.haus.util.UpdateSoldQuantityUtil;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -83,6 +84,8 @@ public class OrderServiceImpl implements OrderService {
     MediaMapper mediaMapper;
 
     AddressMapper addressMapper;
+
+    UpdateSoldQuantityUtil updateSoldQuantityUtil;
 
     @NonFinal
     double totalPrice = 0;
@@ -146,8 +149,10 @@ public class OrderServiceImpl implements OrderService {
             throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
         }
 
-        Order order = orderRepository.findById(id)
+        Order order = orderRepository.findByIdWithOrderItems(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
+
+        OrderStatus previousStatus = order.getStatus();
 
         if (status == null || status.trim().isEmpty()) {
             throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
@@ -172,6 +177,35 @@ public class OrderServiceImpl implements OrderService {
                 default ->
                     throw new InvalidDataException(ErrorMessage.Payment.STATUS_IS_NOT_SUPPORT);
 
+            }
+        }
+
+        if (orderStatus == OrderStatus.COMPLETED && previousStatus != OrderStatus.COMPLETED) {
+            Set<Long> updatedProductIds = new HashSet<>();
+            for (OrderItem item : order.getOrderItems()) {
+                ProductVariation variation = item.getProductVariation();
+                variation.setSoldQuantity(variation.getSoldQuantity() + item.getQuantity());
+                variation.setInventoryQuantity(variation.getInventoryQuantity() - item.getQuantity());
+                productVariationRepository.save(variation);
+                updatedProductIds.add(variation.getProduct().getId());
+            }
+            for (Long productId : updatedProductIds) {
+                updateSoldQuantityUtil.updateProductTotalInventoryAndSoldQuantity(productId);
+            }
+        }
+
+        if ((orderStatus == OrderStatus.CANCELLED || orderStatus == OrderStatus.REFUNDED)
+                && previousStatus == OrderStatus.COMPLETED) {
+            Set<Long> updatedProductIds = new HashSet<>();
+            for (OrderItem item : order.getOrderItems()) {
+                ProductVariation variation = item.getProductVariation();
+                variation.setSoldQuantity(Math.max(0, variation.getSoldQuantity() - item.getQuantity()));
+                variation.setInventoryQuantity(variation.getInventoryQuantity() + item.getQuantity());
+                productVariationRepository.save(variation);
+                updatedProductIds.add(variation.getProduct().getId());
+            }
+            for (Long productId : updatedProductIds) {
+                updateSoldQuantityUtil.updateProductTotalInventoryAndSoldQuantity(productId);
             }
         }
 
@@ -228,6 +262,7 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
+    @Transactional
     public CreateOrderResponseDto createOrder(String username, OrderAllRequestDto orderAllRequestDto) {
         User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
                 () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED)
@@ -692,7 +727,8 @@ public class OrderServiceImpl implements OrderService {
         totalFinalLabelCell.setPadding(7);
         itemsTable.addCell(totalFinalLabelCell);
 
-        PdfPCell totalValueFinalLabelCell = new PdfPCell(new Phrase(String.format(AppConstants.FORMAT_DIGIT_PDF, totalPrice), normalFont));
+        PdfPCell totalValueFinalLabelCell = new PdfPCell(
+                new Phrase(String.format(AppConstants.FORMAT_DIGIT_PDF, totalPrice), normalFont));
         totalValueFinalLabelCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         totalValueFinalLabelCell.setBorder(Rectangle.BOX);
         totalValueFinalLabelCell.setPadding(7);
@@ -722,7 +758,7 @@ public class OrderServiceImpl implements OrderService {
     private PdfPCell createTotalAndSignatureCell(Font boldFont, Font normalFont, Font smallNormalFont) throws DocumentException {
         PdfPTable footerTable = new PdfPTable(2);
         footerTable.setWidthPercentage(100);
-        footerTable.setWidths(new float[]{5f, 5f});
+        footerTable.setWidths(new float[] { 5f, 5f });
 
         // --- Cột 1: Số tiền viết bằng chữ và Người mua ---
         PdfPTable leftTable = new PdfPTable(1);

@@ -7,10 +7,12 @@ import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.product.AddFavoriteRequestDto;
 import com.example.haus.domain.dto.response.product.CheckFavoriteResponseDto;
 import com.example.haus.domain.dto.response.product.FavoriteResponseDto;
+import com.example.haus.domain.dto.response.product.ProductResponseDto;
 import com.example.haus.domain.entity.product.Favorite;
 import com.example.haus.domain.entity.product.Media;
 import com.example.haus.domain.entity.product.Product;
 import com.example.haus.domain.entity.user.User;
+import com.example.haus.domain.mapper.ProductMapper;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.FavoriteRepository;
 import com.example.haus.repository.ProductRepository;
@@ -27,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -37,16 +40,18 @@ public class FavoriteServiceImpl implements FavoriteService {
     FavoriteRepository favoriteRepository;
     ProductRepository productRepository;
     UserRepository userRepository;
+    ProductMapper productMapper;
 
     @Override
     @Transactional
     public FavoriteResponseDto addFavorite(String userId, AddFavoriteRequestDto request) {
 
         Long productId = request.getProductId();
-        
+
         Product product = productRepository.findById(productId)
                 .filter(p -> !p.getIsDeleted())
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED + ": " + productId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED + ": " + productId));
 
         var existingFavorite = favoriteRepository.findByUserIdAndProductId(userId, productId);
         if (existingFavorite.isPresent()) {
@@ -60,9 +65,9 @@ public class FavoriteServiceImpl implements FavoriteService {
 
             Favorite favorite = Favorite.of(user, product);
             favorite = favoriteRepository.save(favorite);
-            
+
             return buildFavoriteResponse(favorite);
-            
+
         } catch (DataIntegrityViolationException e) {
             log.debug("Concurrent creation detected, fetching existing favorite");
             Favorite favorite = favoriteRepository.findByUserIdAndProductId(userId, productId)
@@ -71,13 +76,12 @@ public class FavoriteServiceImpl implements FavoriteService {
         }
     }
 
-
     @Override
     @Transactional
     public void removeFavorite(String userId, Long productId) {
 
         int deletedCount = favoriteRepository.deleteByUserIdAndProductId(userId, productId);
-        
+
         if (deletedCount > 0) {
             log.info("Successfully removed product {} from favorites for user {}", productId, userId);
         } else {
@@ -85,39 +89,40 @@ public class FavoriteServiceImpl implements FavoriteService {
         }
     }
 
-
     @Override
     @Transactional(readOnly = true)
-    public PaginationResponseDto<FavoriteResponseDto> getFavorites(
-            String userId, 
+    public PaginationResponseDto<ProductResponseDto> getFavorites(
+            String userId,
             PaginationRequestDto paginationRequest) {
 
-        
         int pageIndex = paginationRequest.getPageNum();
         int pageSize = paginationRequest.getPageSize();
-        
+
         Pageable pageable = PageRequest.of(pageIndex, pageSize);
-        
-        Page<FavoriteResponseDto> page = favoriteRepository
+
+        Page<Favorite> page = favoriteRepository
                 .findByUserIdWithProductDetails(userId, pageable);
-        
+
+        List<ProductResponseDto> productResponseList = page.getContent().stream()
+                .map(favorite -> productMapper.productToProductResponse(favorite.getProduct()))
+                .toList();
+
         PaginationCustom paginationCustom = PaginationCustom.builder()
                 .pageNum(paginationRequest.getDisplayPageNum())
                 .pageSize(paginationRequest.getPageSize())
                 .totalElement(page.getTotalElements())
                 .totalPages(page.getTotalPages())
                 .build();
-        
-        return new PaginationResponseDto<>(paginationCustom, page.getContent());
-    }
 
+        return new PaginationResponseDto<>(paginationCustom, productResponseList);
+    }
 
     @Override
     @Transactional(readOnly = true)
     public CheckFavoriteResponseDto checkFavorite(String userId, Long productId) {
 
         var favorite = favoriteRepository.findByUserIdAndProductId(userId, productId);
-        
+
         return CheckFavoriteResponseDto.builder()
                 .isFavorited(favorite.isPresent())
                 .favoriteId(favorite.map(Favorite::getId).orElse(null))
@@ -132,15 +137,14 @@ public class FavoriteServiceImpl implements FavoriteService {
         return count;
     }
 
-
     private FavoriteResponseDto buildFavoriteResponse(Favorite favorite) {
         Product product = favorite.getProduct();
-        
+
         String imageUrl = product.getMedias().stream()
                 .findFirst()
                 .map(Media::getUrl)
                 .orElse(null);
-        
+
         FavoriteResponseDto.ProductInfo productInfo = FavoriteResponseDto.ProductInfo.builder()
                 .id(product.getId())
                 .productCode(product.getProductCode())
@@ -148,7 +152,7 @@ public class FavoriteServiceImpl implements FavoriteService {
                 .price(product.getPrice())
                 .imageUrl(imageUrl)
                 .build();
-        
+
         return FavoriteResponseDto.builder()
                 .id(favorite.getId())
                 .product(productInfo)

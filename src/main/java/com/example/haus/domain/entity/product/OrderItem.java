@@ -45,7 +45,7 @@ public class OrderItem extends BaseEntity {
     @Column(nullable = false)
     String snapshotSize;
 
-    @Column
+    @Column(length = 2048)
     String snapshotImageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
