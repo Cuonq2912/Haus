@@ -5,7 +5,7 @@ COPY pom.xml ./
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-# Satge 2: Use OpenJDK for running
+# Stage 2: Use OpenJDK for running
 FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar

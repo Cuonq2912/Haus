@@ -33,3 +33,12 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Local
+docs/
+.m2/
+logs/
+*.log
+scripts/
+deploy/
+.docker-empty/
