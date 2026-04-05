@@ -8,7 +8,7 @@
 # Haus
 
 Backend REST API for an e-commerce platform selling furniture and home decor.  
-Live: https://haus.net.in/  (Disabled now. Contact Me if you need!)
+Live: https://haus.net.in/  (Disabled now. Please contact Me if you need!)  
 API Docs: https://haus.net.in/swagger-ui/index.html
 
 ---
