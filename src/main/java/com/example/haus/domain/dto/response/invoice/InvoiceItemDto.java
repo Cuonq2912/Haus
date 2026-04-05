@@ -5,12 +5,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 @Builder
 public class InvoiceItemDto {
-    //Product
+    // Product
     private Long productId;
     private String productCode;
     private String productName;

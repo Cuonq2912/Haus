@@ -14,12 +14,14 @@ import java.util.Locale;
 @Configuration
 public class LocalResolver extends AcceptHeaderLocaleResolver implements WebMvcConfigurer {
 
-    private List<Locale> locales = List.of(Locale.forLanguageTag("en"), Locale.forLanguageTag("fr"), Locale.forLanguageTag("vi"));
+    private List<Locale> locales = List.of(Locale.forLanguageTag("en"), Locale.forLanguageTag("fr"),
+            Locale.forLanguageTag("vi"));
 
     @Override
     public Locale resolveLocale(HttpServletRequest request) {
         String languageHeader = request.getHeader("Accept-Language");
-        return !StringUtils.hasLength(languageHeader) ? Locale.US : Locale.lookup(Locale.LanguageRange.parse(languageHeader), locales);
+        return !StringUtils.hasLength(languageHeader) ? Locale.US
+                : Locale.lookup(Locale.LanguageRange.parse(languageHeader), locales);
     }
 
     @Bean

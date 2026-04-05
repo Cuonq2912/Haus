@@ -9,10 +9,7 @@ import lombok.experimental.FieldDefaults;
 import java.util.List;
 
 @Entity
-@Table(
-        name = "carts",
-        uniqueConstraints = @UniqueConstraint(columnNames = "user_id")
-)
+@Table(name = "carts", uniqueConstraints = @UniqueConstraint(columnNames = "user_id"))
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

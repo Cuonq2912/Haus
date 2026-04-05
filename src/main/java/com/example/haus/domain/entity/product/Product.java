@@ -56,11 +56,7 @@ public class Product extends BaseEntity {
     Boolean isDeleted = CommonConstant.FALSE;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "product_categories",
-            joinColumns = @JoinColumn(name = "product_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
+    @JoinTable(name = "product_categories", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
     @Builder.Default
     Set<Category> categories = new HashSet<>();
 
@@ -74,7 +70,7 @@ public class Product extends BaseEntity {
     Set<Media> medias = new HashSet<>();
 
     // ---------------- Helper methods ----------------
-    //Category
+    // Category
     public void addCategory(Category category) {
         if (categories == null) {
             categories = new HashSet<>();
@@ -90,7 +86,7 @@ public class Product extends BaseEntity {
         }
     }
 
-    //Review
+    // Review
     public void addReview(Review review) {
         if (!reviews.contains(review)) {
             reviews.add(review);

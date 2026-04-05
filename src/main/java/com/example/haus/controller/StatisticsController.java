@@ -30,121 +30,72 @@ import java.util.Map;
 public class StatisticsController {
     StatisticsService statisticsService;
 
-    @Operation(
-            summary = "Xuất hóa đơn theo quý (theo status) và Xuất Sale graph",
-            description = "Xuất hóa đơn theo quý (theo status).",
-            security = @SecurityRequirement(name = "Bearer Token")
-    )
+    @Operation(summary = "Xuất hóa đơn theo quý (theo status) và Xuất Sale graph", description = "Xuất hóa đơn theo quý (theo status).", security = @SecurityRequirement(name = "Bearer Token"))
     @GetMapping("/statistics/order-by-month")
     public ResponseEntity<ResponseData<Map<String, Object>>> getOrderByMonth() {
-        return ResponseUtil.success(
-                SuccessMessage.Statistic.GET_STATISTIC_SUCCESS,
-                statisticsService.getOrderByMonth()
-        );
+        return ResponseUtil.success(SuccessMessage.Statistic.GET_STATISTIC_SUCCESS,
+                statisticsService.getOrderByMonth());
     }
 
-    @Operation(
-            summary = "Thống kê các đơn hàng gần đây",
-            description = "Thống kê các đơn hàng gần đây.",
-            security = @SecurityRequirement(name = "Bearer Token")
-    )
+    @Operation(summary = "Thống kê các đơn hàng gần đây", description = "Thống kê các đơn hàng gần đây.", security = @SecurityRequirement(name = "Bearer Token"))
     @GetMapping("/statistics/get-recent-order")
     public ResponseEntity<ResponseData<PaginationResponseDto<RecentOrderResponseDto>>> getRecentOrders(
-            @RequestParam(defaultValue = "1") Integer pageNum,
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(required = false, defaultValue = "2024-01-01")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate startDate,
+            @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(required = false, defaultValue = "2024-01-01") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
 
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate endDate
-            ) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
         if (endDate == null) {
             endDate = LocalDate.now();
         }
         PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize, "orderDate", "desc");
-        return ResponseUtil.success(
-                SuccessMessage.Order.GET_ORDER_SUCCESS,
+        return ResponseUtil.success(SuccessMessage.Order.GET_ORDER_SUCCESS,
                 statisticsService.getRecentOrders(paginationRequest, startDate, endDate));
     }
 
-    @Operation(
-            summary = "Thống kê tổng tiền đơn hàng theo 4 tiêu chí",
-            description = "Thống kê tổng tiền đơn hàng theo 4 tiêu chí.",
-            security = @SecurityRequirement(name = "Bearer Token")
-    )
+    @Operation(summary = "Thống kê tổng tiền đơn hàng theo 4 tiêu chí", description = "Thống kê tổng tiền đơn hàng theo 4 tiêu chí.", security = @SecurityRequirement(name = "Bearer Token"))
     @GetMapping("/statistics/get-order-by-four-criteria")
     public ResponseEntity<ResponseData<Map<String, Object>>> getStatisticalOrderByFourCriteria(
-            @RequestParam(required = false, defaultValue = "2024-01-01")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate startDate,
+            @RequestParam(required = false, defaultValue = "2024-01-01") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
 
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate endDate
-    ) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
         if (endDate == null) {
             endDate = LocalDate.now();
         }
-        return ResponseUtil.success(
-                SuccessMessage.Order.GET_ORDER_SUCCESS,
+        return ResponseUtil.success(SuccessMessage.Order.GET_ORDER_SUCCESS,
                 statisticsService.getSales(startDate, endDate));
     }
 
-    @Operation(
-            summary = "Thống kê các sản phẩm bán chạy gần đây",
-            description = "Thống kê các sản phẩm bán chạy gần đây.",
-            security = @SecurityRequirement(name = "Bearer Token")
-    )
+    @Operation(summary = "Thống kê các sản phẩm bán chạy gần đây", description = "Thống kê các sản phẩm bán chạy gần đây.", security = @SecurityRequirement(name = "Bearer Token"))
     @GetMapping("/statistics/get-best-seller")
     public ResponseEntity<ResponseData<PaginationResponseDto<ProductStatisticResponseDto>>> getBestSellers(
-            @RequestParam(defaultValue = "1") Integer pageNum,
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(required = false, defaultValue = "2024-01-01")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate startDate,
+            @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(required = false, defaultValue = "2024-01-01") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
 
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate endDate) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
         if (endDate == null) {
             endDate = LocalDate.now();
         }
         PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize, "orderDate", "desc");
-        return ResponseUtil.success(
-                SuccessMessage.Statistic.GET_STATISTIC_SUCCESS,
-                statisticsService.getBestSellers(paginationRequest, startDate, endDate)
-        );
+        return ResponseUtil.success(SuccessMessage.Statistic.GET_STATISTIC_SUCCESS,
+                statisticsService.getBestSellers(paginationRequest, startDate, endDate));
     }
 
-    @Operation(
-            summary = "Thống kê tổng tiền các sản phẩm bán được theo danh mục cha",
-            description = "Thống kê tổng tiền các sản phẩm bán được theo danh mục cha.",
-            security = @SecurityRequirement(name = "Bearer Token")
-    )
+    @Operation(summary = "Thống kê tổng tiền các sản phẩm bán được theo danh mục cha", description = "Thống kê tổng tiền các sản phẩm bán được theo danh mục cha.", security = @SecurityRequirement(name = "Bearer Token"))
     @GetMapping("/statistics/get-sale-by-parent-category")
     public ResponseEntity<ResponseData<Map<String, Double>>> getSaleByParentCategory(
-            @RequestParam(required = false, defaultValue = "2024-01-01")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate startDate,
+            @RequestParam(required = false, defaultValue = "2024-01-01") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
 
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate endDate
-    ) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         if (startDate == null) {
             startDate = LocalDate.of(2024, 1, 1);
         }
         if (endDate == null) {
             endDate = LocalDate.now();
         }
-        return ResponseUtil.success(
-                SuccessMessage.Statistic.GET_STATISTIC_SUCCESS,
-                statisticsService.getSaleByCategories(startDate, endDate)
-        );
+        return ResponseUtil.success(SuccessMessage.Statistic.GET_STATISTIC_SUCCESS,
+                statisticsService.getSaleByCategories(startDate, endDate));
     }
 }

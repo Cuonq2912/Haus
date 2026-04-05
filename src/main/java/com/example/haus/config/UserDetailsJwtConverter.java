@@ -38,11 +38,8 @@ public class UserDetailsJwtConverter implements Converter<Jwt, AbstractAuthentic
 
         Collection<? extends GrantedAuthority> authorities = extractAuthorities(jwt);
 
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                userDetails,
-                null,
-                authorities
-        );
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails,
+                null, authorities);
 
         authenticationToken.setDetails(jwt);
 
@@ -61,10 +58,9 @@ public class UserDetailsJwtConverter implements Converter<Jwt, AbstractAuthentic
 
         Object roles = realmAccessMap.get(ROLES);
 
-        if (roles instanceof List<?> stringRoles){
-            return ((List<String>) stringRoles)
-                    .stream()
-                    .map(SimpleGrantedAuthority::new) // Map Role string sang GrantedAuthority
+        if (roles instanceof List<?> stringRoles) {
+            return ((List<String>) stringRoles).stream().map(SimpleGrantedAuthority::new) // Map Role string sang
+                                                                                          // GrantedAuthority
                     .toList();
         }
 

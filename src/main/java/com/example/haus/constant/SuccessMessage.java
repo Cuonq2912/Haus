@@ -2,11 +2,13 @@ package com.example.haus.constant;
 
 public class SuccessMessage {
 
-    private SuccessMessage() {}
+    private SuccessMessage() {
+    }
 
     public static class Auth {
 
-        private Auth() {}
+        private Auth() {
+        }
 
         public static final String LOGIN_SUCCESS = "Login successful";
         public static final String LOGOUT_SUCCESS = "Logout successful";
@@ -21,7 +23,8 @@ public class SuccessMessage {
 
     public static class User {
 
-        private User() {}
+        private User() {
+        }
 
         public static final String GET_MY_PROFILE_SUCCESS = "Get my profile successful";
         public static final String UPDATE_PROFILE_SUCCESS = "Update profile successful";
@@ -32,7 +35,8 @@ public class SuccessMessage {
 
     public static class Address {
 
-        private Address() {}
+        private Address() {
+        }
 
         public static final String ADD_ADDRESS_SUCCESS = "Add address successful";
         public static final String UPDATE_ADDRESS_SUCCESS = "Update address successful";
@@ -43,7 +47,8 @@ public class SuccessMessage {
 
     public static class Category {
 
-        private Category() {}
+        private Category() {
+        }
 
         public static final String ADD_CATEGORY_SUCCESS = "Add category successful";
         public static final String UPDATE_CATEGORY_SUCCESS = "Update category successful";
@@ -54,7 +59,8 @@ public class SuccessMessage {
 
     public static class Cart {
 
-        private Cart() {}
+        private Cart() {
+        }
 
         public static final String ADD_CART_SUCCESS = "Add cart successful";
         public static final String UPDATE_CART_SUCCESS = "Update cart successful";
@@ -65,7 +71,8 @@ public class SuccessMessage {
 
     public static class Promotion {
 
-        private Promotion() {}
+        private Promotion() {
+        }
 
         public static final String ADD_PROMOTION_SUCCESS = "Add promotion successful";
         public static final String UPDATE_PROMOTION_SUCCESS = "Update promotion successful";
@@ -73,9 +80,11 @@ public class SuccessMessage {
         public static final String GET_ALL_PROMOTION_SUCCESS = "Get all promotion successful";
         public static final String DELETE_PROMOTION_SUCCESS = "Delete promotion successful";
     }
+
     public static class Product {
 
-        private Product() {}
+        private Product() {
+        }
 
         public static final String GET_PRODUCT_SUCCESS = "Get product successful";
         public static final String CREATE_PRODUCT_SUCCESS = "Create product successful";
@@ -100,7 +109,8 @@ public class SuccessMessage {
 
     public static class Payment {
 
-        private Payment() {}
+        private Payment() {
+        }
 
         public static final String GET_VNPAYURL_SUCCESS = "Get VNPay url request successful";
         public static final String IPN_RECEIVED_SUCCESS = "VNPay IPN received and processed successfully";
@@ -115,14 +125,16 @@ public class SuccessMessage {
     }
 
     public static class Statistic {
-        private Statistic() {}
+        private Statistic() {
+        }
 
         public static final String GET_STATISTIC_SUCCESS = "Get statistics successful";
     }
 
     public static class Order {
 
-        private Order() {}
+        private Order() {
+        }
 
         public static final String GET_ORDER_SUCCESS = "Get order successfully";
         public static final String UPDATE_STATUS_ORDER_SUCCESS = "Update status order successfully";
@@ -131,11 +143,13 @@ public class SuccessMessage {
         public static final String CANCEL_ORDER_SUCCESS = "Cancel order successfully";
 
     }
-        public static final String CREATE_ORDER_SUCCESS = "Create order success";
+
+    public static final String CREATE_ORDER_SUCCESS = "Create order success";
 
     public static class Review {
 
-        private Review() {}
+        private Review() {
+        }
 
         public static final String CREATE_REVIEW_SUCCESS = "Review created successfully";
         public static final String UPDATE_REVIEW_SUCCESS = "Review updated successfully";

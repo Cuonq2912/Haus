@@ -19,18 +19,14 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
                     FROM Favorite f
                     WHERE f.user.id = :userId AND f.product.id = :productId
             """)
-    boolean existsByUserIdAndProductId(
-            @Param("userId") String userId,
-            @Param("productId") Long productId);
+    boolean existsByUserIdAndProductId(@Param("userId") String userId, @Param("productId") Long productId);
 
     @Query("""
                     SELECT f
                     FROM Favorite f
                     WHERE f.user.id = :userId AND f.product.id = :productId
             """)
-    Optional<Favorite> findByUserIdAndProductId(
-            @Param("userId") String userId,
-            @Param("productId") Long productId);
+    Optional<Favorite> findByUserIdAndProductId(@Param("userId") String userId, @Param("productId") Long productId);
 
     @Query("""
                 SELECT f FROM Favorite f
@@ -39,9 +35,7 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
                 AND p.isDeleted = false
                 ORDER BY f.createdAt DESC
             """)
-    Page<Favorite> findByUserIdWithProductDetails(
-            @Param("userId") String userId,
-            Pageable pageable);
+    Page<Favorite> findByUserIdWithProductDetails(@Param("userId") String userId, Pageable pageable);
 
     @Query("""
                 SELECT COUNT(f)
@@ -56,7 +50,5 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
                 WHERE f.user.id = :userId
                   AND f.product.id = :productId
             """)
-    int deleteByUserIdAndProductId(
-            @Param("userId") String userId,
-            @Param("productId") Long productId);
+    int deleteByUserIdAndProductId(@Param("userId") String userId, @Param("productId") Long productId);
 }

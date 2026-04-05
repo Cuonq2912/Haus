@@ -25,15 +25,11 @@ public class UpdateSoldQuantityUtil {
     ProductRepository productRepository;
 
     public void updateProductTotalInventoryAndSoldQuantity(Long productId) {
-        List<ProductVariation> activeVariations = productVariationRepository
-                .findByProductId(productId);
+        List<ProductVariation> activeVariations = productVariationRepository.findByProductId(productId);
 
-        int totalQuantity = activeVariations.stream()
-                .mapToInt(ProductVariation::getInventoryQuantity)
-                .sum();
+        int totalQuantity = activeVariations.stream().mapToInt(ProductVariation::getInventoryQuantity).sum();
 
-        int soldQuantity = activeVariations.stream()
-                .collect(Collectors.summingInt(ProductVariation::getSoldQuantity));
+        int soldQuantity = activeVariations.stream().collect(Collectors.summingInt(ProductVariation::getSoldQuantity));
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED));

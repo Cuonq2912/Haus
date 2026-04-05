@@ -22,7 +22,7 @@ public interface PromotionRepository extends JpaRepository<Promotion, Long> {
 
     Optional<Promotion> findByIdAndIsDeletedFalse(Long id);
 
-    //Update scheduled
+    // Update scheduled
     @Modifying
     @Transactional
     @Query("UPDATE Promotion p SET p.status = 'EXPIRED' WHERE p.endDate < :currentTime AND p.status = 'ACTIVE'")

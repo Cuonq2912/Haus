@@ -8,14 +8,10 @@ import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring",
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS
-)
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE, nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface PaymentMapper {
 
     PaymentResponseDto paymentToPaymentResponseDto(Payment payment);
-
 
     @Mapping(target = "gateway", source = "paymentGateway")
     @Mapping(target = "type", source = "paymentType")

@@ -31,22 +31,22 @@ public class RateLimitServiceImpl implements RateLimitService {
 
     @Override
     public boolean allowRequest(HttpServletRequest request) {
-        if(!rateLimitProperties.isEnabled()) {
+        if (!rateLimitProperties.isEnabled()) {
             return true;
         }
 
         String clientIp = RateLimitUtil.getClientIp(request);
 
         // Kiểm tra IP có trong whitelist không
-        if(RateLimitUtil.isIpWhitelisted(clientIp, rateLimitProperties.getWhitelistIps())){
+        if (RateLimitUtil.isIpWhitelisted(clientIp, rateLimitProperties.getWhitelistIps())) {
             log.debug("IP {} is whitelisted, skipping rate limit", clientIp);
             return true;
         }
 
-        String endpoint =request.getRequestURI();
+        String endpoint = request.getRequestURI();
         Optional<EndpointConfig> endpointConfig = findEndpointConfig(endpoint);
 
-        if (endpointConfig.isPresent() && endpointConfig.get().isDisabled()){
+        if (endpointConfig.isPresent() && endpointConfig.get().isDisabled()) {
             log.debug("Rate limiting disabled for endpoint: {}", endpoint);
             return true;
         }
@@ -57,8 +57,8 @@ public class RateLimitServiceImpl implements RateLimitService {
         long capacity;
         long refillTokens;
         Duration refillDuration;
-        //Lấy cấu hình limit (từ endpoint config || default)
-        if(endpointConfig.isPresent()){
+        // Lấy cấu hình limit (từ endpoint config || default)
+        if (endpointConfig.isPresent()) {
             EndpointConfig config = endpointConfig.get();
             capacity = config.getCapacity();
             refillTokens = config.getRefillTokens();
@@ -74,30 +74,31 @@ public class RateLimitServiceImpl implements RateLimitService {
 
         ConsumptionProbe probe = bucket.tryConsumeAndReturnRemaining(1);
 
-        if(probe.isConsumed()){
+        if (probe.isConsumed()) {
             log.debug("Request allowed for key: {}, remaining tokens: {}", key, probe.getRemainingTokens());
             return true;
         } else {
             long waitForRefill = TimeUnit.NANOSECONDS.toSeconds(probe.getNanosToWaitForRefill());
-            log.warn("Rate limit exceeded for key: {}, endpoint: {}, retry after: {} seconds",
-                    key, endpoint, waitForRefill);
+            log.warn("Rate limit exceeded for key: {}, endpoint: {}, retry after: {} seconds", key, endpoint,
+                    waitForRefill);
             throw new RateLimitExceededException(waitForRefill, endpoint);
         }
 
     }
 
-    private Optional<EndpointConfig> findEndpointConfig(String endpoint){
-        return rateLimitProperties.getEndpoints().stream()
-                .filter(config -> matchesPath(endpoint, config.getPath()))
+    private Optional<EndpointConfig> findEndpointConfig(String endpoint) {
+        return rateLimitProperties.getEndpoints().stream().filter(config -> matchesPath(endpoint, config.getPath()))
                 .findFirst();
     }
 
-    private boolean matchesPath(String endpoint, String pattern){
-        if(pattern == null || endpoint == null) return false;
+    private boolean matchesPath(String endpoint, String pattern) {
+        if (pattern == null || endpoint == null)
+            return false;
 
-        if(endpoint.equals(pattern) || endpoint.startsWith(pattern)) return true;
+        if (endpoint.equals(pattern) || endpoint.startsWith(pattern))
+            return true;
 
-        if(pattern.endsWith("/**")){
+        if (pattern.endsWith("/**")) {
             String prefix = pattern.substring(0, pattern.length() - 3);
             return endpoint.startsWith(prefix);
         }
@@ -105,12 +106,13 @@ public class RateLimitServiceImpl implements RateLimitService {
     }
 
     private String resolveIdentifier(HttpServletRequest request, Optional<EndpointConfig> endpointConfig) {
-        if(endpointConfig.isPresent() && endpointConfig.get().isByIp()){
+        if (endpointConfig.isPresent() && endpointConfig.get().isByIp()) {
             return "ip:" + RateLimitUtil.getClientIp(request);
         }
 
         String userId = RateLimitUtil.getUserId();
-        if(userId != null) return "user:" + userId;
+        if (userId != null)
+            return "user:" + userId;
         return "ip:" + RateLimitUtil.getClientIp(request);
     }
 }

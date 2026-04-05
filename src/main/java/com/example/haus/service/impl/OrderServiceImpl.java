@@ -89,14 +89,12 @@ public class OrderServiceImpl implements OrderService {
     @NonFinal
     double totalPrice = 0;
 
-
     @Override
     @Transactional(readOnly = true)
-    public PaginationResponseDto<OrderResponseDto> getAllOrders(PaginationRequestDto paginationRequest, String status, String username) {
+    public PaginationResponseDto<OrderResponseDto> getAllOrders(PaginationRequestDto paginationRequest, String status,
+            String username) {
 
-        Pageable pageable = PageRequest.of(
-                paginationRequest.getPageNum(),
-                paginationRequest.getPageSize());
+        Pageable pageable = PageRequest.of(paginationRequest.getPageNum(), paginationRequest.getPageSize());
 
         User currentUser = userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
@@ -112,18 +110,15 @@ public class OrderServiceImpl implements OrderService {
                 throw new InvalidDataException(ErrorMessage.Order.ERR_INVALID_ORDER_STATUS);
             }
 
-            orderPage = isAdmin
-                    ? orderRepository.findByStatus(orderStatus, pageable)
+            orderPage = isAdmin ? orderRepository.findByStatus(orderStatus, pageable)
                     : orderRepository.findByUserIdAndStatusWithOrderItems(currentUser.getId(), orderStatus, pageable);
         } else {
-            orderPage = isAdmin
-                    ? orderRepository.findAllWithOrderItems(pageable)
+            orderPage = isAdmin ? orderRepository.findAllWithOrderItems(pageable)
                     : orderRepository.findByUserIdWithOrderItems(currentUser.getId(), pageable);
         }
 
         List<OrderResponseDto> orderResponseList = orderPage.getContent().stream()
-                .map(orderMapper::orderToOrderResponseDto)
-                .toList();
+                .map(orderMapper::orderToOrderResponseDto).toList();
 
         return PaginationUtil.createPaginationResponse(orderPage, paginationRequest, orderResponseList);
     }
@@ -141,8 +136,8 @@ public class OrderServiceImpl implements OrderService {
         User currentUser = userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
-        if (!RoleConstant.ADMIN.equals(currentUser.getRole().name()) &&
-            !order.getUser().getId().equals(currentUser.getId())) {
+        if (!RoleConstant.ADMIN.equals(currentUser.getRole().name())
+                && !order.getUser().getId().equals(currentUser.getId())) {
             throw new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED);
         }
 
@@ -178,12 +173,11 @@ public class OrderServiceImpl implements OrderService {
         Payment payment = order.getPayment();
         if (payment != null) {
             switch (orderStatus) {
-                case PENDING, PROCESSING, DELIVERED, CONFIRMED -> payment.setStatus(PaymentStatus.PENDING);
-                case COMPLETED, RETURNED -> payment.setStatus(PaymentStatus.COMPLETED);
-                case CANCELLED -> payment.setStatus(PaymentStatus.CANCELLED);
-                case REFUNDED -> payment.setStatus(PaymentStatus.REFUNDED);
-                default ->
-                    throw new InvalidDataException(ErrorMessage.Payment.STATUS_IS_NOT_SUPPORT);
+            case PENDING, PROCESSING, DELIVERED, CONFIRMED -> payment.setStatus(PaymentStatus.PENDING);
+            case COMPLETED, RETURNED -> payment.setStatus(PaymentStatus.COMPLETED);
+            case CANCELLED -> payment.setStatus(PaymentStatus.CANCELLED);
+            case REFUNDED -> payment.setStatus(PaymentStatus.REFUNDED);
+            default -> throw new InvalidDataException(ErrorMessage.Payment.STATUS_IS_NOT_SUPPORT);
 
             }
         }
@@ -223,21 +217,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private OrderResponseDto convertToOrderResponseDto(Order order) {
-        OrderResponseDto dto = OrderResponseDto.builder()
-                .id(order.getId())
-                .orderNumber(order.getOrderNumber())
-                .shippingFee(order.getShippingFee())
-                .totalAmount(order.getTotalAmount())
-                .status(order.getStatus())
-                .orderDate(order.getOrderDate())
-                .deliveryDate(order.getDeliveryDate())
-                .createdAt(order.getCreatedAt())
-                .updatedAt(order.getUpdatedAt())
-                .build();
+        OrderResponseDto dto = OrderResponseDto.builder().id(order.getId()).orderNumber(order.getOrderNumber())
+                .shippingFee(order.getShippingFee()).totalAmount(order.getTotalAmount()).status(order.getStatus())
+                .orderDate(order.getOrderDate()).deliveryDate(order.getDeliveryDate()).createdAt(order.getCreatedAt())
+                .updatedAt(order.getUpdatedAt()).build();
 
-        if(order.getShippingAddress() != null) {
-            dto.setRecipientInfo(addressMapper.addressToAddressResponseDto(order.getShippingAddress())
-            );
+        if (order.getShippingAddress() != null) {
+            dto.setRecipientInfo(addressMapper.addressToAddressResponseDto(order.getShippingAddress()));
         }
 
         if (order.getPromotion() != null) {
@@ -252,36 +238,31 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private OrderResponseDto.PromotionInfo convertToPromotionInfo(Promotion promotion) {
-        return OrderResponseDto.PromotionInfo.builder()
-                .code(promotion.getPromotionCode())
-                .discountPercent(promotion.getDiscountPercent() != null
-                        ? promotion.getDiscountPercent().intValue()
-                        : null)
+        return OrderResponseDto.PromotionInfo.builder().code(promotion.getPromotionCode())
+                .discountPercent(
+                        promotion.getDiscountPercent() != null ? promotion.getDiscountPercent().intValue() : null)
                 .build();
     }
 
     private OrderResponseDto.PaymentInfo convertToPaymentInfo(Payment payment) {
-        return OrderResponseDto.PaymentInfo.builder()
-                .amount(payment.getAmount())
-                .type(payment.getType())
-                .status(payment.getStatus())
-                .build();
+        return OrderResponseDto.PaymentInfo.builder().amount(payment.getAmount()).type(payment.getType())
+                .status(payment.getStatus()).build();
     }
-
 
     @Override
     @Transactional
     public CreateOrderResponseDto createOrder(String username, OrderAllRequestDto orderAllRequestDto) {
-        User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
-                () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED)
-        );
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         Order order = orderMapper.orderRequestDtoToOrder(orderAllRequestDto.getOrder());
         order.setStatus(OrderStatus.PENDING);
         order.setOrderDate(LocalDate.now());
         List<OrderItem> orderItems = orderAllRequestDto.getOrderItems().stream().map(orderItemRequestDto -> {
-            ProductVariation productVariation = productVariationRepository.findByIdAndIsDeletedFalse(orderItemRequestDto.getProductVariationId())
-                    .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
+            ProductVariation productVariation = productVariationRepository
+                    .findByIdAndIsDeletedFalse(orderItemRequestDto.getProductVariationId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
 
             var product = productVariation.getProduct();
 
@@ -289,23 +270,16 @@ public class OrderServiceImpl implements OrderService {
                 throw new InvalidDataException(ErrorMessage.Cart.ERR_CART_QUANTITY_INVALID);
             }
 
-            OrderItem orderItem = OrderItem.builder()
-                    .quantity(orderItemRequestDto.getQuantity())
-                    .priceAtSale(productVariation.getPrice())
-                    .snapshotProductCode(product.getProductCode())
-                    .snapshotProductName(product.getProductName())
-                    .snapshotDescription(product.getDescription())
-                    .snapshotMaterial(product.getMaterial())
-                    .snapshotColor(productVariation.getColor())
+            OrderItem orderItem = OrderItem.builder().quantity(orderItemRequestDto.getQuantity())
+                    .priceAtSale(productVariation.getPrice()).snapshotProductCode(product.getProductCode())
+                    .snapshotProductName(product.getProductName()).snapshotDescription(product.getDescription())
+                    .snapshotMaterial(product.getMaterial()).snapshotColor(productVariation.getColor())
                     .snapshotSize(productVariation.getSize())
                     .snapshotImageUrl(productVariation.getMedia() != null ? productVariation.getMedia().getUrl() : null)
-                    .productVariation(productVariation)
-                    .order(order)
-                    .build();
+                    .productVariation(productVariation).order(order).build();
 
             return orderItem;
         }).toList();
-
 
         Payment payment = paymentMapper.paymentRequestDtoToPayment(orderAllRequestDto.getPayment());
         payment.setStatus(PaymentStatus.PENDING);
@@ -314,8 +288,8 @@ public class OrderServiceImpl implements OrderService {
 
         payment.setOrder(order);
 
-
-        Optional<Promotion> promotion = promotionRepository.findByIdAndIsDeletedFalse(orderAllRequestDto.getOrder().getPromotionId());
+        Optional<Promotion> promotion = promotionRepository
+                .findByIdAndIsDeletedFalse(orderAllRequestDto.getOrder().getPromotionId());
 
         List<Address> addresses = orderAllRequestDto.getOrder().getAddresses().stream().map(addressRequestDto -> {
             Address address = addressRepository.findByIdAndIsDeletedFalse(addressRequestDto.getId())
@@ -325,10 +299,7 @@ public class OrderServiceImpl implements OrderService {
             return address;
         }).toList();
 
-        Address selectedAddress = addresses
-                .stream()
-                .filter(Address::getIsSelected)
-                .findFirst()
+        Address selectedAddress = addresses.stream().filter(Address::getIsSelected).findFirst()
                 .orElseThrow(() -> new InvalidDataException("No shipping address selected"));
         order.setShippingAddress(selectedAddress);
 
@@ -341,9 +312,7 @@ public class OrderServiceImpl implements OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        return CreateOrderResponseDto.builder()
-                .orderId(savedOrder.getId())
-                .build();
+        return CreateOrderResponseDto.builder().orderId(savedOrder.getId()).build();
     }
 
     @Override
@@ -356,8 +325,7 @@ public class OrderServiceImpl implements OrderService {
         User currentUser = userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
-        if (!"ADMIN".equals(currentUser.getRole().name()) &&
-            !order.getUser().getId().equals(currentUser.getId())) {
+        if (!"ADMIN".equals(currentUser.getRole().name()) && !order.getUser().getId().equals(currentUser.getId())) {
             throw new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED);
         }
 
@@ -368,26 +336,20 @@ public class OrderServiceImpl implements OrderService {
         User user = order.getUser();
         Payment payment = order.getPayment();
 
-        List<InvoiceItemDto> itemDtos = order.getOrderItems().stream()
-                .map(item -> {
-                    Double total = item.getQuantity() * item.getPriceAtSale();
+        List<InvoiceItemDto> itemDtos = order.getOrderItems().stream().map(item -> {
+            Double total = item.getQuantity() * item.getPriceAtSale();
 
-                    return InvoiceItemDto.builder()
-                            .productId(item.getProductVariation() != null ? item.getProductVariation().getProduct().getId() : null)
-                            .productCode(item.getSnapshotProductCode())
-                            .productName(item.getSnapshotProductName())
-                            .description(item.getSnapshotDescription())
-                            .productVariationId(item.getProductVariation() != null ? item.getProductVariation().getId() : null)
-                            .inventoryQuantity(item.getQuantity())
-                            .total(total)
-                            .color(item.getSnapshotColor())
-                            .size(item.getSnapshotSize())
-                            .price(item.getPriceAtSale())
-                            .media(item.getSnapshotImageUrl() != null ?
-                                MediaResponseDto.builder().url(item.getSnapshotImageUrl()).build() : null)
-                            .build();
-                })
-                .toList();
+            return InvoiceItemDto.builder()
+                    .productId(
+                            item.getProductVariation() != null ? item.getProductVariation().getProduct().getId() : null)
+                    .productCode(item.getSnapshotProductCode()).productName(item.getSnapshotProductName())
+                    .description(item.getSnapshotDescription())
+                    .productVariationId(item.getProductVariation() != null ? item.getProductVariation().getId() : null)
+                    .inventoryQuantity(item.getQuantity()).total(total).color(item.getSnapshotColor())
+                    .size(item.getSnapshotSize()).price(item.getPriceAtSale()).media(item.getSnapshotImageUrl() != null
+                            ? MediaResponseDto.builder().url(item.getSnapshotImageUrl()).build() : null)
+                    .build();
+        }).toList();
 
         InvoiceResponseDto.InvoiceResponseDtoBuilder builder = InvoiceResponseDto.builder();
 
@@ -404,7 +366,6 @@ public class OrderServiceImpl implements OrderService {
         return builder.build();
     }
 
-
     @Override
     @jakarta.transaction.Transactional
     public byte[] generateInvoicePdf(Long orderId, String username) throws DocumentException, IOException {
@@ -418,8 +379,8 @@ public class OrderServiceImpl implements OrderService {
         // --- 1. CHUẨN BỊ FONT ---
         // Trong generateInvoicePdf(Long orderId)
 
-// --- 1. CHUẨN BỊ FONT ---
-// ĐỔI sang tải từ Classpath
+        // --- 1. CHUẨN BỊ FONT ---
+        // ĐỔI sang tải từ Classpath
         try (InputStream is = getClass().getResourceAsStream("/fonts/font-UTF-8.ttf")) {
             if (is == null) {
                 // Log lỗi hoặc ném ngoại lệ nếu font không được tìm thấy
@@ -430,13 +391,8 @@ public class OrderServiceImpl implements OrderService {
             String fontNameForItext = "font-UTF-8.ttf";
 
             // Tải BaseFont từ byte array
-            BaseFont baseFont = BaseFont.createFont(
-                    fontNameForItext,
-                    BaseFont.IDENTITY_H,
-                    BaseFont.EMBEDDED,
-                    true,
-                    fontData,
-                    null);
+            BaseFont baseFont = BaseFont.createFont(fontNameForItext, BaseFont.IDENTITY_H, BaseFont.EMBEDDED, true,
+                    fontData, null);
 
             Font titleFont = new Font(baseFont, 20, Font.BOLD, BaseColor.BLUE);
             Font normalFont = new Font(baseFont, 14, Font.NORMAL, BaseColor.BLACK);
@@ -469,22 +425,18 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void cancelOrder(String username, Long orderId) {
-        User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
-                () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED)
-        );
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
-        Order order = orderRepository.findByIdAndUserId(orderId, user.getId()).orElseThrow(
-                ()  -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED)
-        );
+        Order order = orderRepository.findByIdAndUserId(orderId, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
 
         if (order.getStatus() == OrderStatus.CANCELLED) {
             throw new InvalidDataException("Order cancelled");
         }
 
-        if (order.getStatus() == OrderStatus.DELIVERED ||
-        order.getStatus() == OrderStatus.COMPLETED ||
-        order.getStatus() == OrderStatus.REFUNDED ||
-        order.getStatus() == OrderStatus.RETURNED) {
+        if (order.getStatus() == OrderStatus.DELIVERED || order.getStatus() == OrderStatus.COMPLETED
+                || order.getStatus() == OrderStatus.REFUNDED || order.getStatus() == OrderStatus.RETURNED) {
             throw new InvalidDataException("Order can not cancel");
         }
 
@@ -493,11 +445,12 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
     }
 
-    private PdfPCell createHeaderCell(InvoiceResponseDto data, Font titleFont, Font normalFont, BaseFont baseFont) throws DocumentException {
+    private PdfPCell createHeaderCell(InvoiceResponseDto data, Font titleFont, Font normalFont, BaseFont baseFont)
+            throws DocumentException {
         // 3 cột: Logo, Tiêu đề, Số Serial
         PdfPTable headerTable = new PdfPTable(3);
         headerTable.setWidthPercentage(100);
-        headerTable.setWidths(new float[]{2f, 5f, 2.5f});
+        headerTable.setWidths(new float[] { 2f, 5f, 2.5f });
 
         // 1. Logo Cell (Cột 1)
         // Thường sử dụng Image.getInstance() nếu có logo
@@ -523,8 +476,8 @@ public class OrderServiceImpl implements OrderService {
 
         // Ngày tháng
         LocalDate orderDate = data.getResponseDto().getOrderDate();
-        String dateStr = String.format("Ngày(day) %d tháng(month) %d năm(year) %d",
-                orderDate.getDayOfMonth(), orderDate.getMonthValue(), orderDate.getYear()); // Lấy từ Order date của bạn
+        String dateStr = String.format("Ngày(day) %d tháng(month) %d năm(year) %d", orderDate.getDayOfMonth(),
+                orderDate.getMonthValue(), orderDate.getYear()); // Lấy từ Order date của bạn
         Paragraph date = new Paragraph(dateStr, new Font(baseFont, 10, Font.NORMAL));
         date.setAlignment(Element.ALIGN_CENTER);
         titleSubTable.addCell(PdfUtil.createCell(date, Rectangle.NO_BORDER));
@@ -534,11 +487,12 @@ public class OrderServiceImpl implements OrderService {
         // 3. Serial Cell (Cột 3)
         PdfPTable serialSubTable = new PdfPTable(1);
         Paragraph serial = new Paragraph("Mẫu số (Serial No.): 2C25TTU", new Font(baseFont, 8, Font.NORMAL));
-        Paragraph invoiceNo = new Paragraph("Số hóa đơn (Invoice No.): " + data.getResponseDto().getId(), new Font(baseFont, 8, Font.BOLD));
+        Paragraph invoiceNo = new Paragraph("Số hóa đơn (Invoice No.): " + data.getResponseDto().getId(),
+                new Font(baseFont, 8, Font.BOLD));
         serialSubTable.addCell(PdfUtil.createCell(serial, Rectangle.NO_BORDER, Element.ALIGN_CENTER));
         serialSubTable.addCell(PdfUtil.createCell(invoiceNo, Rectangle.NO_BORDER, Element.ALIGN_CENTER));
 
-        //QR CODE
+        // QR CODE
         Font smallNormalFont = new Font(baseFont, 6, Font.NORMAL, BaseColor.BLACK);
         PdfUtil.generateQrCode(serialSubTable, data, smallNormalFont);
 
@@ -564,7 +518,8 @@ public class OrderServiceImpl implements OrderService {
         // Hàm tiện ích để thêm cặp Label: Value
         BiConsumer<PdfPTable, String> addRow = (table, text) -> {
             try {
-                PdfPCell cell = PdfUtil.createCell(new Paragraph(text, smallNormalFont), Rectangle.NO_BORDER, Element.ALIGN_LEFT);
+                PdfPCell cell = PdfUtil.createCell(new Paragraph(text, smallNormalFont), Rectangle.NO_BORDER,
+                        Element.ALIGN_LEFT);
                 cell.setPaddingTop(1);
                 cell.setPaddingRight(1);
                 cell.setPaddingBottom(1);
@@ -575,7 +530,7 @@ public class OrderServiceImpl implements OrderService {
         };
 
         // --- 1. THÔNG TIN NGƯỜI BÁN (SELLER) ---
-        PdfPTable sellerTable = new PdfPTable(new float[]{4f, 6f});
+        PdfPTable sellerTable = new PdfPTable(new float[] { 4f, 6f });
         sellerTable.setWidthPercentage(100);
 
         // Tiêu đề
@@ -597,7 +552,7 @@ public class OrderServiceImpl implements OrderService {
         infoTable.addCell(sellerCell);
 
         // --- 2. THÔNG TIN NGƯỜI MUA (BUYER) ---
-        PdfPTable buyerTable = new PdfPTable(new float[]{4f, 6f});
+        PdfPTable buyerTable = new PdfPTable(new float[] { 4f, 6f });
         buyerTable.setWidthPercentage(100);
 
         // Tiêu đề
@@ -607,7 +562,8 @@ public class OrderServiceImpl implements OrderService {
         // Dữ liệu người mua (Lấy từ order.getUser())
         UserResponseDto user = data.getUser();
 
-        addRow.accept(buyerTable, "Tên khách hàng (Full name customer): " + user.getFirstName() + " " + user.getLastName());
+        addRow.accept(buyerTable,
+                "Tên khách hàng (Full name customer): " + user.getFirstName() + " " + user.getLastName());
         addRow.accept(buyerTable, "Điện thoại (Phone number): " + user.getPhone());
         addRow.accept(buyerTable, "Email/Facebook: " + user.getEmail());
         addRow.accept(buyerTable, "Địa chỉ (Address): " + user.getUsername());
@@ -624,11 +580,12 @@ public class OrderServiceImpl implements OrderService {
         return mainCell;
     }
 
-    private PdfPCell createItemsTable(InvoiceResponseDto data, Font headerFont, Font normalFont, Font boldFont) throws DocumentException {
+    private PdfPCell createItemsTable(InvoiceResponseDto data, Font headerFont, Font normalFont, Font boldFont)
+            throws DocumentException {
         // 6 cột: STT, Tên hàng, ĐVT, SL, Đơn giá, Thành tiền
         PdfPTable itemsTable = new PdfPTable(6);
         itemsTable.setWidthPercentage(100);
-        itemsTable.setWidths(new float[]{0.7f, 4f, 1f, 1.3f, 1.5f, 2f});
+        itemsTable.setWidths(new float[] { 0.7f, 4f, 1f, 1.3f, 1.5f, 2f });
         itemsTable.setSpacingBefore(0f);
         itemsTable.setSpacingAfter(0f);
 
@@ -637,11 +594,15 @@ public class OrderServiceImpl implements OrderService {
 
         // Hàng 1: Tiêu đề cột chính
         PdfUtil.addCellWithBorder(itemsTable, "STT", headerFont, Rectangle.BOX, Element.ALIGN_CENTER, 2, 1);
-        PdfUtil.addCellWithBorder(itemsTable, "Tên hàng, dịch vụ\n(Name of good or services)", headerFont, Rectangle.BOX, Element.ALIGN_CENTER, 2, 1);
+        PdfUtil.addCellWithBorder(itemsTable, "Tên hàng, dịch vụ\n(Name of good or services)", headerFont,
+                Rectangle.BOX, Element.ALIGN_CENTER, 2, 1);
         PdfUtil.addCellWithBorder(itemsTable, "ĐVT\n(Unit)", headerFont, Rectangle.BOX, Element.ALIGN_CENTER, 2, 1);
-        PdfUtil.addCellWithBorder(itemsTable, "Số lượng\n(Quantity)", headerFont, Rectangle.BOX, Element.ALIGN_CENTER, 2, 1);
-        PdfUtil.addCellWithBorder(itemsTable, "Đơn giá\n(Unit Price)", headerFont, Rectangle.BOX, Element.ALIGN_CENTER, 2, 1);
-        PdfUtil.addCellWithBorder(itemsTable, "Thành tiền\n(Amount)", headerFont, Rectangle.BOX, Element.ALIGN_CENTER, 2, 1);
+        PdfUtil.addCellWithBorder(itemsTable, "Số lượng\n(Quantity)", headerFont, Rectangle.BOX, Element.ALIGN_CENTER,
+                2, 1);
+        PdfUtil.addCellWithBorder(itemsTable, "Đơn giá\n(Unit Price)", headerFont, Rectangle.BOX, Element.ALIGN_CENTER,
+                2, 1);
+        PdfUtil.addCellWithBorder(itemsTable, "Thành tiền\n(Amount)", headerFont, Rectangle.BOX, Element.ALIGN_CENTER,
+                2, 1);
 
         // --- Data Rows ---
         int count = 1;
@@ -650,7 +611,8 @@ public class OrderServiceImpl implements OrderService {
             subTotal += item.getTotal();
 
             // Cột 1
-            PdfUtil.addCellWithBorder(itemsTable, String.valueOf(count++), normalFont, Rectangle.BOX, Element.ALIGN_CENTER, 0, 0);
+            PdfUtil.addCellWithBorder(itemsTable, String.valueOf(count++), normalFont, Rectangle.BOX,
+                    Element.ALIGN_CENTER, 0, 0);
 
             // Cột 2 (Tên SP + Biến thể)
             String productName = item.getProductName() + " (" + item.getColor() + "/" + item.getSize() + ")";
@@ -660,13 +622,16 @@ public class OrderServiceImpl implements OrderService {
             PdfUtil.addCellWithBorder(itemsTable, "Sản phẩm", normalFont, Rectangle.BOX, Element.ALIGN_CENTER, 0, 0);
 
             // Cột 4 (SL)
-            PdfUtil.addCellWithBorder(itemsTable, String.valueOf(item.getInventoryQuantity()), normalFont, Rectangle.BOX, Element.ALIGN_CENTER, 0, 0);
+            PdfUtil.addCellWithBorder(itemsTable, String.valueOf(item.getInventoryQuantity()), normalFont,
+                    Rectangle.BOX, Element.ALIGN_CENTER, 0, 0);
 
             // Cột 5 (Đơn giá)
-            PdfUtil.addCellWithBorder(itemsTable, String.format(AppConstants.FORMAT_DIGIT_PDF, item.getPrice()), normalFont, Rectangle.BOX, Element.ALIGN_RIGHT, 0, 0);
+            PdfUtil.addCellWithBorder(itemsTable, String.format(AppConstants.FORMAT_DIGIT_PDF, item.getPrice()),
+                    normalFont, Rectangle.BOX, Element.ALIGN_RIGHT, 0, 0);
 
             // Cột 6 (Thành tiền)
-            PdfUtil.addCellWithBorder(itemsTable, String.format(AppConstants.FORMAT_DIGIT_PDF, item.getTotal()), normalFont, Rectangle.BOX, Element.ALIGN_RIGHT, 0, 0);
+            PdfUtil.addCellWithBorder(itemsTable, String.format(AppConstants.FORMAT_DIGIT_PDF, item.getTotal()),
+                    normalFont, Rectangle.BOX, Element.ALIGN_RIGHT, 0, 0);
         }
 
         // --- Empty Rows (Giống mẫu) ---
@@ -690,7 +655,8 @@ public class OrderServiceImpl implements OrderService {
         totalLabelCell.setPadding(7);
         itemsTable.addCell(totalLabelCell);
 
-        PdfPCell totalValueCell = new PdfPCell(new Phrase(String.format(AppConstants.FORMAT_DIGIT_PDF, subTotal), normalFont));
+        PdfPCell totalValueCell = new PdfPCell(
+                new Phrase(String.format(AppConstants.FORMAT_DIGIT_PDF, subTotal), normalFont));
         totalValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         totalValueCell.setBorder(Rectangle.BOX);
         totalValueCell.setPadding(7);
@@ -706,7 +672,8 @@ public class OrderServiceImpl implements OrderService {
             itemsTable.addCell(discountCell);
 
             double discountValue = data.getPromotion().getDiscountPercent() * subTotal;
-            PdfPCell discountValueCell = new PdfPCell(new Phrase("-" + String.format(AppConstants.FORMAT_DIGIT_PDF, discountValue), normalFont));
+            PdfPCell discountValueCell = new PdfPCell(
+                    new Phrase("-" + String.format(AppConstants.FORMAT_DIGIT_PDF, discountValue), normalFont));
             discountValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
             discountValueCell.setBorder(Rectangle.BOX);
             discountValueCell.setPadding(7);
@@ -721,14 +688,16 @@ public class OrderServiceImpl implements OrderService {
         shippingFeeCell.setPadding(7);
         itemsTable.addCell(shippingFeeCell);
 
-        PdfPCell shippingFeeValueCell = new PdfPCell(new Phrase(String.format(AppConstants.FORMAT_DIGIT_PDF, data.getResponseDto().getShippingFee()), normalFont));
+        PdfPCell shippingFeeValueCell = new PdfPCell(new Phrase(
+                String.format(AppConstants.FORMAT_DIGIT_PDF, data.getResponseDto().getShippingFee()), normalFont));
         shippingFeeValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         shippingFeeValueCell.setBorder(Rectangle.BOX);
         shippingFeeValueCell.setPadding(7);
         itemsTable.addCell(shippingFeeValueCell);
 
         // Total price
-        PdfPCell totalFinalLabelCell = new PdfPCell(new Phrase("Tổng cộng tiền cần thanh toán (Total payment):", boldFont));
+        PdfPCell totalFinalLabelCell = new PdfPCell(
+                new Phrase("Tổng cộng tiền cần thanh toán (Total payment):", boldFont));
         totalFinalLabelCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         totalFinalLabelCell.setColspan(5);
         totalFinalLabelCell.setBorder(Rectangle.BOX);
@@ -742,15 +711,18 @@ public class OrderServiceImpl implements OrderService {
         totalValueFinalLabelCell.setPadding(7);
         itemsTable.addCell(totalValueFinalLabelCell);
 
-        //Payment method
-        PdfPCell paymentMethodLabelCell = new PdfPCell(new Phrase("Phương thức thanh toán (Payment method):", boldFont));
+        // Payment method
+        PdfPCell paymentMethodLabelCell = new PdfPCell(
+                new Phrase("Phương thức thanh toán (Payment method):", boldFont));
         paymentMethodLabelCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         paymentMethodLabelCell.setColspan(5);
         paymentMethodLabelCell.setBorder(Rectangle.BOX);
         paymentMethodLabelCell.setPadding(7);
         itemsTable.addCell(paymentMethodLabelCell);
 
-        PdfPCell paymentMethodValueCell = new PdfPCell(new Phrase(data.getPayment().getType() == PaymentType.ONLINE_PAYMENT ? "Thanh toán bằng ngân hàng" : "Thanh toán khi nhân hàng", normalFont));
+        PdfPCell paymentMethodValueCell = new PdfPCell(
+                new Phrase(data.getPayment().getType() == PaymentType.ONLINE_PAYMENT ? "Thanh toán bằng ngân hàng"
+                        : "Thanh toán khi nhân hàng", normalFont));
         paymentMethodValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         paymentMethodValueCell.setBorder(Rectangle.BOX);
         paymentMethodValueCell.setPadding(7);
@@ -763,7 +735,8 @@ public class OrderServiceImpl implements OrderService {
         return mainCell;
     }
 
-    private PdfPCell createTotalAndSignatureCell(Font boldFont, Font normalFont, Font smallNormalFont) throws DocumentException {
+    private PdfPCell createTotalAndSignatureCell(Font boldFont, Font normalFont, Font smallNormalFont)
+            throws DocumentException {
         PdfPTable footerTable = new PdfPTable(2);
         footerTable.setWidthPercentage(100);
         footerTable.setWidths(new float[] { 5f, 5f });
@@ -783,7 +756,8 @@ public class OrderServiceImpl implements OrderService {
         leftTable.addCell(PdfUtil.createCell(buyerTitle, Rectangle.NO_BORDER, Element.ALIGN_CENTER));
 
         // Vùng chữ ký người mua (để trống)
-        leftTable.addCell(PdfUtil.createCell(new Phrase("\n\n\n", normalFont), Rectangle.NO_BORDER, Element.ALIGN_CENTER));
+        leftTable.addCell(
+                PdfUtil.createCell(new Phrase("\n\n\n", normalFont), Rectangle.NO_BORDER, Element.ALIGN_CENTER));
 
         PdfPCell leftCell = PdfUtil.createCell(leftTable, Rectangle.NO_BORDER);
 
@@ -805,7 +779,8 @@ public class OrderServiceImpl implements OrderService {
 
         // Ngày ký
         LocalDate currentDate = LocalDate.now();
-        Paragraph signDate = new Paragraph(String.format("Ngày: %d/%d/%d", currentDate.getDayOfMonth(), currentDate.getMonthValue(), currentDate.getYear()), smallNormalFont);
+        Paragraph signDate = new Paragraph(String.format("Ngày: %d/%d/%d", currentDate.getDayOfMonth(),
+                currentDate.getMonthValue(), currentDate.getYear()), smallNormalFont);
         signDate.setAlignment(Element.ALIGN_CENTER);
         rightTable.addCell(PdfUtil.createCell(signDate, Rectangle.NO_BORDER, Element.ALIGN_CENTER));
 
@@ -830,17 +805,15 @@ public class OrderServiceImpl implements OrderService {
         return mainCell;
     }
 
-
     @Override
     public OrderResponseDto getOrderByOrderNumber(String orderNumber, String username) {
         Order order = orderRepository.findByOrderNumber(orderNumber)
-            .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
 
         User currentUser = userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
-        if (!"ADMIN".equals(currentUser.getRole().name()) &&
-            !order.getUser().getId().equals(currentUser.getId())) {
+        if (!"ADMIN".equals(currentUser.getRole().name()) && !order.getUser().getId().equals(currentUser.getId())) {
             throw new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED);
         }
 

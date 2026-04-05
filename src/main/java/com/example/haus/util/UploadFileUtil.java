@@ -27,7 +27,6 @@ public class UploadFileUtil {
 
     FileValidatorService fileValidatorService;
 
-
     public String uploadFile(MultipartFile multipartFile) {
         fileValidatorService.validateFile(multipartFile, MediaType.IMAGE);
 
@@ -35,15 +34,10 @@ public class UploadFileUtil {
             String safeFilename = fileValidatorService.generateSafeFileName(multipartFile.getOriginalFilename());
             String publicId = extractPublicId(safeFilename);
 
-            Map<String, Object> uploadParams = ObjectUtils.asMap(
-                    "folder", "haus/products",
-                    "resource_type", "image",
-                    "overwrite", true,
-                    "public_id", publicId,
-                    "transformation", "w_400,h_400,c_fill,q_auto");
+            Map<String, Object> uploadParams = ObjectUtils.asMap("folder", "haus/products", "resource_type", "image",
+                    "overwrite", true, "public_id", publicId, "transformation", "w_400,h_400,c_fill,q_auto");
 
-            Map result = cloudinary.uploader().upload(
-                    multipartFile.getBytes(), uploadParams);
+            Map result = cloudinary.uploader().upload(multipartFile.getBytes(), uploadParams);
 
             String secureUrl = result.get("secure_url").toString();
             log.info("File uploaded successfully: {} -> {}", multipartFile.getOriginalFilename(), secureUrl);
@@ -67,19 +61,14 @@ public class UploadFileUtil {
                 fileValidatorService.validateFile(file, MediaType.IMAGE);
 
                 try {
-                    String safeFilename = fileValidatorService.generateSafeFileName(
-                            file.getOriginalFilename());
+                    String safeFilename = fileValidatorService.generateSafeFileName(file.getOriginalFilename());
                     String publicId = extractPublicId(safeFilename);
 
-                    Map<String, Object> uploadParams = ObjectUtils.asMap(
-                            "folder", "haus/products",
-                            "resource_type", "image",
-                            "overwrite", true,
-                            "public_id", publicId,
-                            "transformation", "w_600,h_400,c_fill,q_auto");
+                    Map<String, Object> uploadParams = ObjectUtils.asMap("folder", "haus/products", "resource_type",
+                            "image", "overwrite", true, "public_id", publicId, "transformation",
+                            "w_600,h_400,c_fill,q_auto");
 
-                    var result = cloudinary.uploader().upload(
-                            file.getBytes(), uploadParams);
+                    var result = cloudinary.uploader().upload(file.getBytes(), uploadParams);
 
                     String secureUrl = result.get("secure_url").toString();
                     imageUrls.add(secureUrl);
@@ -100,8 +89,7 @@ public class UploadFileUtil {
     public void destroyFileWithUrl(String url) {
         String publicId = extractPublicIdFromUrl(url);
         try {
-            Map result = cloudinary.uploader().destroy(
-                    publicId, ObjectUtils.emptyMap());
+            Map result = cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
             log.info("Destroyed image public_id={}, result={}", publicId, result);
         } catch (IOException e) {
             log.error("Failed to destroy file: {}", url, e);
@@ -110,7 +98,7 @@ public class UploadFileUtil {
     }
 
     private String extractPublicId(String safeFilename) {
-        if(safeFilename == null || !safeFilename.contains(".")){
+        if (safeFilename == null || !safeFilename.contains(".")) {
             return safeFilename;
         }
         return safeFilename.substring(0, safeFilename.lastIndexOf('.'));
@@ -119,7 +107,7 @@ public class UploadFileUtil {
     private String extractPublicIdFromUrl(String url) {
         int startIndex = url.lastIndexOf("/") + 1;
         int endIndex = url.lastIndexOf(".");
-        if(endIndex > startIndex){
+        if (endIndex > startIndex) {
             return url.substring(startIndex, endIndex);
         }
         return url.substring(startIndex);

@@ -18,14 +18,11 @@ public class RedisBucketStorage implements BucketStorage {
 
     ProxyManager<byte[]> proxyManager;
 
-
     @Override
     public Bucket resolveBucket(String key, long capacity, long refillTokens, Duration refillDuration) {
         BucketConfiguration config = BucketConfiguration.builder()
-                .addLimit(Bandwidth.classic(capacity, Refill.intervally(refillTokens, refillDuration)))
-                .build();
-        return proxyManager.builder()
-                .build(key.getBytes(), () -> config);
+                .addLimit(Bandwidth.classic(capacity, Refill.intervally(refillTokens, refillDuration))).build();
+        return proxyManager.builder().build(key.getBytes(), () -> config);
     }
 
     @Override

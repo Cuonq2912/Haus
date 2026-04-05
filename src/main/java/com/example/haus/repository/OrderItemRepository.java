@@ -16,35 +16,26 @@ import java.util.List;
 @Repository
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
-    @Query(
-        """
-        SELECT CASE WHEN COUNT(oi) > 0 THEN true ELSE false END 
-                FROM OrderItem oi 
-                        WHERE oi.order.user.id = :userId
-                                AND oi.productVariation.product.id = :productId
-                                        AND oi.order.status = :status
-        """
-    )
-    boolean existsByUserIdAndProductIdAndOrderStatus(
-        @Param("userId") String userId,
-        @Param("productId") Long productId,
-        @Param("status") OrderStatus status
-    );
-    @Query(
-            """
-            SELECT oi 
-                    FROM OrderItem oi 
+    @Query("""
+            SELECT CASE WHEN COUNT(oi) > 0 THEN true ELSE false END
+                    FROM OrderItem oi
+                            WHERE oi.order.user.id = :userId
+                                    AND oi.productVariation.product.id = :productId
+                                            AND oi.order.status = :status
+            """)
+    boolean existsByUserIdAndProductIdAndOrderStatus(@Param("userId") String userId, @Param("productId") Long productId,
+            @Param("status") OrderStatus status);
+
+    @Query("""
+            SELECT oi
+                    FROM OrderItem oi
                             WHERE oi.order.user.id = :userId
                                     AND oi.productVariation.product.id = :productId
                                             AND oi.order.status = :status
                             ORDER BY oi.createdAt DESC
-            """
-    )
-    List<OrderItem> findByUserIdAndProductIdAndOrderStatus(
-            @Param("userId") String userId,
-            @Param("productId") Long productId,
-            @Param("status") OrderStatus status
-    );
+            """)
+    List<OrderItem> findByUserIdAndProductIdAndOrderStatus(@Param("userId") String userId,
+            @Param("productId") Long productId, @Param("status") OrderStatus status);
 
     @Query("""
             SELECT p.id as productId, SUM(oi.quantity) as soldQuantity
@@ -56,9 +47,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
             GROUP BY p.id
             ORDER BY SUM(oi.quantity) DESC
             """)
-    Page<BestSellerRow> findBestSellers(@Param("startDate") LocalDate startDate,
-                                        @Param("endDate") LocalDate endDate,
-                                        Pageable pageable);
-
+    Page<BestSellerRow> findBestSellers(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate,
+            Pageable pageable);
 
 }

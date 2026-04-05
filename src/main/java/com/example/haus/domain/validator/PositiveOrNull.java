@@ -17,6 +17,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = PositiveOrNullValidator.class)
 public @interface PositiveOrNull {
     String message() default ErrorMessage.Validator.ERR_INPUT_CONSTRAINT_VALIDATE;
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

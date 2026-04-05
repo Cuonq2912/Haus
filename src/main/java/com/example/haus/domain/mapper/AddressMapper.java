@@ -5,11 +5,7 @@ import com.example.haus.domain.dto.response.address.AddressResponseDto;
 import com.example.haus.domain.entity.address.Address;
 import org.mapstruct.*;
 
-
-@Mapper(componentModel = "spring",
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS
-)
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE, nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface AddressMapper {
     @Mapping(target = "userId", source = "user.id")
     AddressResponseDto addressToAddressResponseDto(Address address);

@@ -16,14 +16,14 @@ public class ReviewResponseDto {
     Long id;
     Integer rating;
     String content;
-    
+
     Long productId;
     String productName;
-    
+
     Long orderItemId;
-    
+
     UserInfo user;
-    
+
     Date createdAt;
     Date updatedAt;
 

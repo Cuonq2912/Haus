@@ -5,10 +5,7 @@ import com.example.haus.domain.dto.response.category.CategoryResponseDto;
 import com.example.haus.domain.entity.product.Category;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring",
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS
-)
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE, nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface CategoryMapper {
 
     @Mapping(target = "parentCategory", ignore = true)

@@ -74,7 +74,7 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = productRepository.findByIdWithActiveVariations(id);
 
-        if(product == null)
+        if (product == null)
             throw new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED);
 
         if (product.getIsDeleted().equals(CommonConstant.TRUE))
@@ -91,21 +91,15 @@ public class ProductServiceImpl implements ProductService {
         }
 
         Sort sort = Sort.by(
-                paginationRequest.getSortType().equalsIgnoreCase("DESC")
-                        ? Sort.Direction.DESC
-                        : Sort.Direction.ASC,
+                paginationRequest.getSortType().equalsIgnoreCase("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC,
                 paginationRequest.getSortBy());
 
-        Pageable pageable = PageRequest.of(
-                paginationRequest.getPageNum(),
-                paginationRequest.getPageSize(),
-                sort);
+        Pageable pageable = PageRequest.of(paginationRequest.getPageNum(), paginationRequest.getPageSize(), sort);
 
         Page<Product> productsPage = productRepository.findAllActiveProducts(pageable);
 
         List<ProductResponseDto> productResponseList = productsPage.getContent().stream()
-                .map(productMapper::productToProductResponse)
-                .toList();
+                .map(productMapper::productToProductResponse).toList();
 
         return PaginationUtil.createPaginationResponse(productsPage, paginationRequest, productResponseList);
     }
@@ -151,11 +145,7 @@ public class ProductServiceImpl implements ProductService {
             List<String> imageUrls = uploadFileUtil.uploadMultipleFiles(imageList);
 
             for (String imageUrl : imageUrls) {
-                Media media = Media.builder()
-                        .url(imageUrl)
-                        .type(MediaType.IMAGE)
-                        .product(savedProduct)
-                        .build();
+                Media media = Media.builder().url(imageUrl).type(MediaType.IMAGE).product(savedProduct).build();
                 media.setCreatedAt(now);
                 media.setUpdatedAt(now);
 
@@ -211,7 +201,8 @@ public class ProductServiceImpl implements ProductService {
 
     private void validateUniqueProductName(Product product, UpdateProductRequestDto request) {
         String newName = request.getProductName();
-        if (newName == null) return;
+        if (newName == null)
+            return;
 
         boolean isChanged = !product.getProductName().equals(newName);
         boolean exists = productRepository.existsByProductNameAndIsDeletedFalse(newName);
@@ -222,7 +213,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private void updateCategoriesIfPresent(Product product, UpdateProductRequestDto request) {
-        if (request.getCategories() == null || request.getCategories().isEmpty()) return;
+        if (request.getCategories() == null || request.getCategories().isEmpty())
+            return;
 
         product.getCategories().clear();
         for (String categoryName : request.getCategories()) {
@@ -233,10 +225,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private void deleteImagesIfRequested(Product product, Long productId, UpdateProductRequestDto request) {
-        if (request.getImageIdsToDelete() == null || request.getImageIdsToDelete().isEmpty()) return;
+        if (request.getImageIdsToDelete() == null || request.getImageIdsToDelete().isEmpty())
+            return;
 
-        List<Media> mediasToDelete = mediaRepository.findByIdsAndProductId(
-                request.getImageIdsToDelete(), productId);
+        List<Media> mediasToDelete = mediaRepository.findByIdsAndProductId(request.getImageIdsToDelete(), productId);
 
         for (Media mediaToDelete : mediasToDelete) {
             deleteMediaSafely(product, mediaToDelete);
@@ -249,13 +241,14 @@ public class ProductServiceImpl implements ProductService {
             product.getMedias().remove(mediaToDelete);
             mediaRepository.delete(mediaToDelete);
         } catch (Exception e) {
-            log.warn("Failed to delete media with ID {} from cloud storage: {}",
-                    mediaToDelete.getId(), e.getMessage(), e);
+            log.warn("Failed to delete media with ID {} from cloud storage: {}", mediaToDelete.getId(), e.getMessage(),
+                    e);
         }
     }
 
     private void addNewImagesIfPresent(Product product, MultipartFile[] images) {
-        if (images == null || images.length == 0) return;
+        if (images == null || images.length == 0)
+            return;
 
         List<String> newImageUrls = uploadFileUtil.uploadMultipleFiles(List.of(images));
         Date now = new Date();
@@ -265,11 +258,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         for (String imageUrl : newImageUrls) {
-            Media media = Media.builder()
-                    .url(imageUrl)
-                    .type(MediaType.IMAGE)
-                    .product(product)
-                    .build();
+            Media media = Media.builder().url(imageUrl).type(MediaType.IMAGE).product(product).build();
             media.setCreatedAt(now);
             media.setUpdatedAt(now);
 
@@ -280,7 +269,6 @@ public class ProductServiceImpl implements ProductService {
     private void touchUpdatedAt(Product product) {
         product.setUpdatedAt(new Date());
     }
-
 
     @Override
     public void deleteProduct(Long productId) {
@@ -297,7 +285,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public PaginationResponseDto<ProductResponseDto> getProductsByCategoryId(Long categoryId,
-                                                                             PaginationRequestDto paginationRequest, String sortBy, String search) {
+            PaginationRequestDto paginationRequest, String sortBy, String search) {
         if (categoryId == null || categoryId <= 0) {
             throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
         }
@@ -305,8 +293,7 @@ public class ProductServiceImpl implements ProductService {
         Page<Product> productsPage = getProductsPageByFilter(categoryId, paginationRequest, sortBy, search);
 
         List<ProductResponseDto> productResponseList = productsPage.getContent().stream()
-                .map(productMapper::productToProductResponse)
-                .toList();
+                .map(productMapper::productToProductResponse).toList();
 
         return PaginationUtil.createPaginationResponse(productsPage, paginationRequest, productResponseList);
     }
@@ -314,29 +301,22 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public PaginationResponseDto<ProductResponseDto> filterProducts(PaginationRequestDto paginationRequest,
-                                                                    String sortBy,
-                                                                    String search) {
+            String sortBy, String search) {
         log.info("Sorting by: {}; Search query: {}", sortBy, search);
 
         PageImpl<Product> productsPage = getProductsPageByFilter(null, paginationRequest, sortBy, search);
 
         List<ProductResponseDto> productResponseDtoList = productsPage.getContent().stream()
-                .map(productMapper::productToProductResponse)
-                .toList();
+                .map(productMapper::productToProductResponse).toList();
 
         PaginationCustom paginationCustom = createPagination(paginationRequest, sortBy, productsPage);
 
-        return PaginationResponseDto.<ProductResponseDto>builder()
-                .pageCustom(paginationCustom)
-                .items(productResponseDtoList)
-                .build();
+        return PaginationResponseDto.<ProductResponseDto> builder().pageCustom(paginationCustom)
+                .items(productResponseDtoList).build();
     }
 
-
     private PageImpl<Product> getProductsPageByFilter(Long categoryId, // Tham số categoryId
-                                                  PaginationRequestDto paginationRequest,
-                                                  String sortBy,
-                                                  String search) {
+            PaginationRequestDto paginationRequest, String sortBy, String search) {
         List<SearchCriteria> searchCriteriaList = new ArrayList<>();
         if (search != null && !search.isEmpty()) {
             String[] newSearch = StringUtils.split(search, "&");
@@ -349,7 +329,7 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
-        List<Product> products = getProducts(categoryId, paginationRequest, searchCriteriaList,  sortBy);
+        List<Product> products = getProducts(categoryId, paginationRequest, searchCriteriaList, sortBy);
         Long totalElements = getTotalElements(categoryId, searchCriteriaList);
 
         Pageable pageable = PageRequest.of(paginationRequest.getPageNum(), paginationRequest.getPageSize());
@@ -357,21 +337,15 @@ public class ProductServiceImpl implements ProductService {
         return new PageImpl<>(products, pageable, totalElements);
     }
 
-
-    private PaginationCustom createPagination(PaginationRequestDto paginationRequest,
-                                              String sortBy,
-                                              PageImpl<?> pages) {
-        return PaginationCustom.builder()
-                .pageNum(paginationRequest.getPageNum() + 1)
-                .pageSize(pages.getSize())
-                .totalElement(pages.getTotalElements())
-                .totalPages(pages.getTotalPages())
-                .sortType(sortBy)
-                .sortBy(determineSortByField(sortBy))
-                .build();
+    private PaginationCustom createPagination(PaginationRequestDto paginationRequest, String sortBy,
+            PageImpl<?> pages) {
+        return PaginationCustom.builder().pageNum(paginationRequest.getPageNum() + 1).pageSize(pages.getSize())
+                .totalElement(pages.getTotalElements()).totalPages(pages.getTotalPages()).sortType(sortBy)
+                .sortBy(determineSortByField(sortBy)).build();
     }
 
-    private List<Product> getProducts(Long categoryId, PaginationRequestDto requestDto, List<SearchCriteria> searchCriteriaList, String sortBy) {
+    private List<Product> getProducts(Long categoryId, PaginationRequestDto requestDto,
+            List<SearchCriteria> searchCriteriaList, String sortBy) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Product> query = cb.createQuery(Product.class);
         Root<Product> root = query.from(Product.class);
@@ -406,8 +380,7 @@ public class ProductServiceImpl implements ProductService {
                 query.orderBy(cb.asc(root.get(CREATED_AT)));
             } else if (CREATED_AT_DESC.equalsIgnoreCase(sortBy)) {
                 query.orderBy(cb.desc(root.get(CREATED_AT)));
-            }
-            else if (DISCOUNT_ASC.equalsIgnoreCase(sortBy) || DISCOUNT_ASC.equalsIgnoreCase(sortBy)) {
+            } else if (DISCOUNT_ASC.equalsIgnoreCase(sortBy) || DISCOUNT_ASC.equalsIgnoreCase(sortBy)) {
                 Join<Product, Category> categoryJoin = root.join(CATEGORIES, JoinType.LEFT);
                 Join<Category, Promotion> promotionJoin = categoryJoin.join(PROMOTION, JoinType.LEFT);
 
@@ -419,12 +392,9 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
-        return entityManager.createQuery(query)
-                .setFirstResult(requestDto.getPageNum() * requestDto.getPageSize())
-                .setMaxResults(requestDto.getPageSize())
-                .getResultList();
+        return entityManager.createQuery(query).setFirstResult(requestDto.getPageNum() * requestDto.getPageSize())
+                .setMaxResults(requestDto.getPageSize()).getResultList();
     }
-
 
     private Long getTotalElements(Long categoryId, List<SearchCriteria> searchCriteriaList) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -448,11 +418,8 @@ public class ProductServiceImpl implements ProductService {
         predicate = cb.and(predicate, deletedPredicate);
 
         if (searchCriteriaList.stream().anyMatch(c -> c.getKey().equalsIgnoreCase("color"))) {
-            List<String> colorValues = searchCriteriaList.stream()
-                    .filter(c -> c.getKey().equalsIgnoreCase(COLOR))
-                    .map(SearchCriteria::getValue)
-                    .map(Object::toString)
-                    .toList();
+            List<String> colorValues = searchCriteriaList.stream().filter(c -> c.getKey().equalsIgnoreCase(COLOR))
+                    .map(SearchCriteria::getValue).map(Object::toString).toList();
             predicate = cb.and(predicate, variantsJoin.get(COLOR).in(colorValues));
         }
 

@@ -54,7 +54,8 @@ public class PromotionServiceImpl implements PromotionService {
     @Override
     public PromotionResponseDto addPromotion(PromotionRequestDto requestDto) {
         // Kiểm tra code đã tồn tại chưa
-        if (Boolean.TRUE.equals(promotionRepository.existsByPromotionCodeAndIsDeletedFalse(requestDto.getPromotionCode()))) {
+        if (Boolean.TRUE
+                .equals(promotionRepository.existsByPromotionCodeAndIsDeletedFalse(requestDto.getPromotionCode()))) {
             throw new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_EXISTED);
         }
 
@@ -76,13 +77,13 @@ public class PromotionServiceImpl implements PromotionService {
     @Override
     public PromotionResponseDto updatePromotion(Long id, PromotionRequestDto requestDto) {
 
-        if (Boolean.TRUE.equals(promotionRepository.existsByPromotionCodeAndIsDeletedTrue(requestDto.getPromotionCode()))) {
+        if (Boolean.TRUE
+                .equals(promotionRepository.existsByPromotionCodeAndIsDeletedTrue(requestDto.getPromotionCode()))) {
             throw new InvalidDataException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED);
         }
 
         Promotion promotion = promotionRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
 
         // Map các field khác
         promotionMapper.updatePromotionFromDto(requestDto, promotion);
@@ -104,31 +105,27 @@ public class PromotionServiceImpl implements PromotionService {
     public PromotionResponseDto getPromotionById(Long id) {
 
         Promotion promotion = promotionRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
         return promotionMapper.promotionToPromotionResponseDto(promotion);
     }
 
     @Override
     public void deletePromotion(Long id) {
         Promotion promotion = promotionRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
         deleteSoft(promotion);
     }
 
     @Override
     public PromotionResponseDto getPromotionByPromotionCode(String promotionCode) {
         Promotion promotion = promotionRepository.findByPromotionCodeAndIsDeletedFalse(promotionCode)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Promotion.ERR_PROMOTION_NOT_EXISTED));
         return promotionMapper.promotionToPromotionResponseDto(promotion);
     }
 
     @Override
     public PaginationResponseDto<PromotionResponseDto> filterPromotions(PaginationRequestDto paginationRequest,
-                                                                        String sortByPrice,
-                                                                        String... search) {
+            String sortByPrice, String... search) {
         // Xử lý search criteria
         List<SearchCriteria> searchCriteriaList = new ArrayList<>();
         if (search != null && search.length > 0) {
@@ -136,14 +133,13 @@ public class PromotionServiceImpl implements PromotionService {
             for (String s : search) {
                 Matcher matcher = pattern.matcher(s);
                 if (matcher.find()) {
-                    searchCriteriaList.add(new SearchCriteria(
-                            matcher.group(1), matcher.group(2), matcher.group(3)));
+                    searchCriteriaList.add(new SearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3)));
                 }
             }
         }
 
-        List<Promotion> promotions = getPromotions(paginationRequest.getPageNum(),
-                paginationRequest.getPageSize(), searchCriteriaList, sortByPrice);
+        List<Promotion> promotions = getPromotions(paginationRequest.getPageNum(), paginationRequest.getPageSize(),
+                searchCriteriaList, sortByPrice);
 
         Long totalElements = getTotalElements(searchCriteriaList);
 
@@ -152,37 +148,26 @@ public class PromotionServiceImpl implements PromotionService {
         Pageable pageable = PageRequest.of(paginationRequest.getPageNum(), paginationRequest.getPageSize());
         Page<Promotion> pages = new PageImpl<>(promotions, pageable, totalElements);
 
-        PaginationCustom paginationCustom = PaginationCustom.builder()
-                .pageNum(paginationRequest.getPageNum() + 1)
-                .pageSize(paginationRequest.getPageSize())
-                .totalElement(pages.getTotalElements())
-                .totalPages(pages.getTotalPages())
-                .sortType(sortByPrice)
-                .sortBy(sortByPrice != null ? "price" : null)
+        PaginationCustom paginationCustom = PaginationCustom.builder().pageNum(paginationRequest.getPageNum() + 1)
+                .pageSize(paginationRequest.getPageSize()).totalElement(pages.getTotalElements())
+                .totalPages(pages.getTotalPages()).sortType(sortByPrice).sortBy(sortByPrice != null ? "price" : null)
                 .build();
 
         List<PromotionResponseDto> promotionResponseDtoList = pages.getContent().stream()
-                .map(promotion ->
-                     promotionMapper.promotionToPromotionResponseDto(promotion)
-                )
-                .toList();
+                .map(promotion -> promotionMapper.promotionToPromotionResponseDto(promotion)).toList();
 
-        return PaginationResponseDto.<PromotionResponseDto>builder()
-                .pageCustom(paginationCustom)
-                .items(promotionResponseDtoList)
-                .build();
+        return PaginationResponseDto.<PromotionResponseDto> builder().pageCustom(paginationCustom)
+                .items(promotionResponseDtoList).build();
     }
 
-    private List<Promotion> getPromotions(int page, int size,
-                                          List<SearchCriteria> searchCriteriaList,
-                                          String sortByPrice) {
+    private List<Promotion> getPromotions(int page, int size, List<SearchCriteria> searchCriteriaList,
+            String sortByPrice) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Promotion> cq = cb.createQuery(Promotion.class);
         Root<Promotion> root = cq.from(Promotion.class);
 
         Predicate predicate = cb.conjunction();
-        SearchQueryCriteriaConsumer<Promotion> consumer =
-                new SearchQueryCriteriaConsumer<>(predicate, cb, root);
+        SearchQueryCriteriaConsumer<Promotion> consumer = new SearchQueryCriteriaConsumer<>(predicate, cb, root);
         searchCriteriaList.forEach(consumer);
         predicate = consumer.getPredicate();
         predicate = cb.and(predicate, cb.isFalse(root.get("isDeleted")));
@@ -197,10 +182,7 @@ public class PromotionServiceImpl implements PromotionService {
             }
         }
 
-        return entityManager.createQuery(cq)
-                .setFirstResult(page * size)
-                .setMaxResults(size)
-                .getResultList();
+        return entityManager.createQuery(cq).setFirstResult(page * size).setMaxResults(size).getResultList();
     }
 
     private Long getTotalElements(List<SearchCriteria> searchCriteriaList) {
@@ -209,12 +191,10 @@ public class PromotionServiceImpl implements PromotionService {
         Root<Promotion> root = countQuery.from(Promotion.class);
 
         Predicate predicate = cb.conjunction();
-        SearchQueryCriteriaConsumer<Promotion> consumer =
-                new SearchQueryCriteriaConsumer<>(predicate, cb, root);
+        SearchQueryCriteriaConsumer<Promotion> consumer = new SearchQueryCriteriaConsumer<>(predicate, cb, root);
         searchCriteriaList.forEach(consumer);
         predicate = consumer.getPredicate();
         predicate = cb.and(predicate, cb.isFalse(root.get("isDeleted")));
-
 
         countQuery.select(cb.count(root));
         countQuery.where(predicate);

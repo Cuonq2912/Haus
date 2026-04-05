@@ -5,5 +5,5 @@ import com.example.haus.domain.dto.response.product.CodPaymentResponseDto;
 
 public interface CodPaymentService {
 
-  CodPaymentResponseDto processCodPayment(CodPaymentRequestDto request, String username);
+    CodPaymentResponseDto processCodPayment(CodPaymentRequestDto request, String username);
 }

@@ -22,7 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Log4j2
 @RequiredArgsConstructor
 @SpringBootApplication(scanBasePackages = "com.example.haus")
-@EnableConfigurationProperties({AdminInfoProperties.class, KeycloakProperties.class, FileUploadProperties.class })
+@EnableConfigurationProperties({ AdminInfoProperties.class, KeycloakProperties.class, FileUploadProperties.class })
 @EnableScheduling
 public class HausApplication {
 
@@ -48,15 +48,10 @@ public class HausApplication {
     @Bean
     CommandLineRunner init(AdminInfoProperties adminInfo) {
         return args -> {
-            if(userRepository.count() == 0) {
-                User admin = User.builder()
-                        .username(adminInfo.getUsername())
-                        .password(passwordEncoder.encode(adminInfo.getPassword()))
-                        .firstName(adminInfo.getFirstName())
-                        .lastName(adminInfo.getLastName())
-                        .email(adminInfo.getEmail())
-                        .role(Role.ADMIN)
-                        .build();
+            if (userRepository.count() == 0) {
+                User admin = User.builder().username(adminInfo.getUsername())
+                        .password(passwordEncoder.encode(adminInfo.getPassword())).firstName(adminInfo.getFirstName())
+                        .lastName(adminInfo.getLastName()).email(adminInfo.getEmail()).role(Role.ADMIN).build();
 
                 userRepository.save(admin);
 
@@ -66,7 +61,8 @@ public class HausApplication {
 
                 cartRepository.save(cart);
 
-                log.info("admin created successful with name: {} and password = {}", admin.getUsername(), admin.getPassword());
+                log.info("admin created successful with name: {} and password = {}", admin.getUsername(),
+                        admin.getPassword());
             }
         };
     }

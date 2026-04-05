@@ -41,18 +41,11 @@ public class FavoriteResponseDto {
 
     }
 
-
-    public FavoriteResponseDto(Long id, Date createdAt, Long productId, 
-                                String productCode, String productName, 
-                                Double price, String imageUrl) {
+    public FavoriteResponseDto(Long id, Date createdAt, Long productId, String productCode, String productName,
+            Double price, String imageUrl) {
         this.id = id;
         this.createdAt = createdAt;
-        this.product = ProductInfo.builder()
-                .id(productId)
-                .productCode(productCode)
-                .productName(productName)
-                .price(price)
-                .imageUrl(imageUrl)
-                .build();
+        this.product = ProductInfo.builder().id(productId).productCode(productCode).productName(productName)
+                .price(price).imageUrl(imageUrl).build();
     }
 }

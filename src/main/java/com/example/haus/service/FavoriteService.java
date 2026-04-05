@@ -13,9 +13,7 @@ public interface FavoriteService {
 
     void removeFavorite(String userId, Long productId);
 
-    PaginationResponseDto<ProductResponseDto> getFavorites(
-            String userId,
-            PaginationRequestDto paginationRequest);
+    PaginationResponseDto<ProductResponseDto> getFavorites(String userId, PaginationRequestDto paginationRequest);
 
     CheckFavoriteResponseDto checkFavorite(String userId, Long productId);
 

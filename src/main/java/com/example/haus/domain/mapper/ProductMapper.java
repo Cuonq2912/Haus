@@ -9,36 +9,28 @@ import com.example.haus.domain.entity.product.Product;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(
-        componentModel = "spring",
-        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-        uses = {CategoryMapper.class, MediaMapper.class, ProductVariationMapper.class}
-)
+@Mapper(componentModel = "spring", nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE, uses = {
+        CategoryMapper.class, MediaMapper.class, ProductVariationMapper.class })
 
 public interface ProductMapper {
     ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
 
-    @Mapping(target = "categoriesName",
-            expression = "java(product.getCategories().stream().map(com.example.haus.domain.entity.product.Category::getCategoryName).collect(java.util.stream.Collectors.toList()))")
-    @Mapping(target = "discountPercent",
-            expression = "java(product.getCategories().stream()" +
-                    "    .map(com.example.haus.domain.entity.product.Category::getPromotion)" +
-                    "    .filter(java.util.Objects::nonNull)" +
-                    "    .filter(p -> com.example.haus.constant.promotion.PromotionStatus.ACTIVE.equals(p.getStatus()))" +
-                    "    .map(com.example.haus.domain.entity.product.Promotion::getDiscountPercent)" +
-                    "    .filter(java.util.Objects::nonNull)" +
-                    "    .max(java.util.Comparator.naturalOrder())" +
-                    "    .orElse(null))")
-    @Mapping(target = "daysRemaining",
-            expression = "java(product.getCategories().stream()" +
-                    "    .map(com.example.haus.domain.entity.product.Category::getPromotion)" +
-                    "    .filter(java.util.Objects::nonNull)" +
-                    "    .filter(p -> p.getEndDate() != null && p.getEndDate().isAfter(java.time.LocalDate.now()))" +
-                    "    .max(java.util.Comparator.comparing(com.example.haus.domain.entity.product.Promotion::getDiscountPercent))" +
-                    "    .map(com.example.haus.domain.entity.product.Promotion::getEndDate)" +
-                    "    .map(ld -> java.time.temporal.ChronoUnit.DAYS.between(java.time.LocalDate.now(), ld))" +
-                    "    .orElse(0L))")
+    @Mapping(target = "categoriesName", expression = "java(product.getCategories().stream().map(com.example.haus.domain.entity.product.Category::getCategoryName).collect(java.util.stream.Collectors.toList()))")
+    @Mapping(target = "discountPercent", expression = "java(product.getCategories().stream()"
+            + "    .map(com.example.haus.domain.entity.product.Category::getPromotion)"
+            + "    .filter(java.util.Objects::nonNull)"
+            + "    .filter(p -> com.example.haus.constant.promotion.PromotionStatus.ACTIVE.equals(p.getStatus()))"
+            + "    .map(com.example.haus.domain.entity.product.Promotion::getDiscountPercent)"
+            + "    .filter(java.util.Objects::nonNull)" + "    .max(java.util.Comparator.naturalOrder())"
+            + "    .orElse(null))")
+    @Mapping(target = "daysRemaining", expression = "java(product.getCategories().stream()"
+            + "    .map(com.example.haus.domain.entity.product.Category::getPromotion)"
+            + "    .filter(java.util.Objects::nonNull)"
+            + "    .filter(p -> p.getEndDate() != null && p.getEndDate().isAfter(java.time.LocalDate.now()))"
+            + "    .max(java.util.Comparator.comparing(com.example.haus.domain.entity.product.Promotion::getDiscountPercent))"
+            + "    .map(com.example.haus.domain.entity.product.Promotion::getEndDate)"
+            + "    .map(ld -> java.time.temporal.ChronoUnit.DAYS.between(java.time.LocalDate.now(), ld))"
+            + "    .orElse(0L))")
     ProductResponseDto productToProductResponse(Product product);
 
     @Mapping(target = "categories", ignore = true)
@@ -51,23 +43,18 @@ public interface ProductMapper {
     @Mapping(target = "productName", source = "productName")
     @Mapping(target = "id", source = "id")
     @Mapping(target = "productVariations", ignore = true)
-    //CartItemResponse === ProductInCart
+    // CartItemResponse === ProductInCart
     ProductInCartResponseDto toProductInCartResponseDto(Product product);
 
-    @Mapping(target = "discountPercent",
-            expression = "java(product.getCategories().stream()" +
-                    "    .map(com.example.haus.domain.entity.product.Category::getPromotion)" +
-                    "    .filter(java.util.Objects::nonNull)" +
-                    "    .filter(p -> com.example.haus.constant.promotion.PromotionStatus.ACTIVE.equals(p.getStatus()))" +
-                    "    .map(com.example.haus.domain.entity.product.Promotion::getDiscountPercent)" +
-                    "    .filter(java.util.Objects::nonNull)" +
-                    "    .max(java.util.Comparator.naturalOrder())" +
-                    "    .orElse(null))")
-    @Mapping(
-            target = "image",
-            expression = "java( product.getProductVariations().isEmpty() ? null : " +
-                    "product.getProductVariations().iterator().next().getMedia() == null ? null : " +
-                    "product.getProductVariations().iterator().next().getMedia().getUrl() )"
-    )
+    @Mapping(target = "discountPercent", expression = "java(product.getCategories().stream()"
+            + "    .map(com.example.haus.domain.entity.product.Category::getPromotion)"
+            + "    .filter(java.util.Objects::nonNull)"
+            + "    .filter(p -> com.example.haus.constant.promotion.PromotionStatus.ACTIVE.equals(p.getStatus()))"
+            + "    .map(com.example.haus.domain.entity.product.Promotion::getDiscountPercent)"
+            + "    .filter(java.util.Objects::nonNull)" + "    .max(java.util.Comparator.naturalOrder())"
+            + "    .orElse(null))")
+    @Mapping(target = "image", expression = "java( product.getProductVariations().isEmpty() ? null : "
+            + "product.getProductVariations().iterator().next().getMedia() == null ? null : "
+            + "product.getProductVariations().iterator().next().getMedia().getUrl() )")
     ProductStatisticResponseDto toProductStatisticResponseDto(Product product);
 }

@@ -34,22 +34,13 @@ public class CodPaymentController {
 
     CodPaymentService codPaymentService;
 
-    @Operation(
-            summary = "Thanh toán khi nhận hàng (COD)",
-            description = "Xử lý thanh toán COD - Cash on Delivery. Khách hàng sẽ thanh toán khi nhận hàng.",
-            security = @SecurityRequirement(name = "Bearer Token")
-    )
+    @Operation(summary = "Thanh toán khi nhận hàng (COD)", description = "Xử lý thanh toán COD - Cash on Delivery. Khách hàng sẽ thanh toán khi nhận hàng.", security = @SecurityRequirement(name = "Bearer Token"))
     @PostMapping(UrlConstant.Payment.COD_PAYMENT)
     public ResponseEntity<ResponseData<CodPaymentResponseDto>> processCodPayment(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @Valid @RequestBody CodPaymentRequestDto request) {
+            @AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody CodPaymentRequestDto request) {
 
         CodPaymentResponseDto response = codPaymentService.processCodPayment(request, userDetails.getUsername());
 
-        return ResponseUtil.success(
-                HttpStatus.OK,
-                SuccessMessage.Payment.COD_PAYMENT_SUCCESS,
-                response
-        );
+        return ResponseUtil.success(HttpStatus.OK, SuccessMessage.Payment.COD_PAYMENT_SUCCESS, response);
     }
 }

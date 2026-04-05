@@ -150,7 +150,7 @@ public class ErrorMessage {
         public static final String ERR_INSUFFICIENT_STOCK = "exception.order.insufficient.stock";
         public static final String ERR_INVALID_QUANTITY = "exception.order.invalid.quantity";
 
-        //request
+        // request
         public static final String ERR_PRODUCTS_EMPTY = "exception.products.empty";
         public static final String ERR_ORDER_NUMBER_EMPTY = "exception.order.number.empty";
         public static final String ERR_SHIPPING_FEE_EMPTY = "exception.shipping.fee.empty";
@@ -224,7 +224,7 @@ public class ErrorMessage {
 
         private Review() {
         }
-        
+
         public static final String ERR_REVIEW_NOT_FOUND = "exception.review.not.found";
         public static final String ERR_REVIEW_CAN_NOT_BEFORE_BUY = "exception.review.not.review.before.buy";
         public static final String ERR_REVIEW_YOU_REVIEWED_THIS_ORDER = "exception.review.reviewed.this.order";
@@ -233,7 +233,6 @@ public class ErrorMessage {
         public static final String ERR_REVIEW_RATING_INVALID = "exception.review.rating.invalid";
         public static final String ERR_REVIEW_TAG_INVALID = "exception.review.tag.invalid";
     }
-
 
     public static class FileUpload {
 

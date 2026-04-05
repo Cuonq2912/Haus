@@ -20,9 +20,9 @@ public interface ProductService {
     void deleteProduct(Long productId);
 
     PaginationResponseDto<ProductResponseDto> getProductsByCategoryId(Long categoryId,
-                                                                      PaginationRequestDto paginationRequest, String sortBy, String search);
-
-    PaginationResponseDto<ProductResponseDto> filterProducts(
             PaginationRequestDto paginationRequest, String sortBy, String search);
+
+    PaginationResponseDto<ProductResponseDto> filterProducts(PaginationRequestDto paginationRequest, String sortBy,
+            String search);
 
 }

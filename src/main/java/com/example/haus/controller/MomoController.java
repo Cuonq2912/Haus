@@ -38,70 +38,39 @@ public class MomoController {
 
     MomoService momoService;
 
-    @Operation(
-            summary = "Tạo đơn hàng thanh toán MoMo",
-            description = "Khởi tạo giao dịch thanh toán với MoMo và trả về payUrl để điều hướng khách hàng",
-            security = @SecurityRequirement(name = "Bearer Token")
-    )
+    @Operation(summary = "Tạo đơn hàng thanh toán MoMo", description = "Khởi tạo giao dịch thanh toán với MoMo và trả về payUrl để điều hướng khách hàng", security = @SecurityRequirement(name = "Bearer Token"))
     @PostMapping(UrlConstant.Payment.MOMO_CREATE_ORDER)
-    public ResponseEntity<ResponseData<Object>> createMomoOrder(
-            @AuthenticationPrincipal UserDetails userDetails,
+    public ResponseEntity<ResponseData<Object>> createMomoOrder(@AuthenticationPrincipal UserDetails userDetails,
             @RequestParam Long orderId) throws JsonProcessingException {
 
         Map<String, String> result = momoService.createPaymentOrder(orderId, userDetails.getUsername());
         String resultCode = result.get("resultCode");
         boolean success = "0".equals(resultCode);
 
-        return success
-                ? ResponseUtil.success(
-                HttpStatus.OK,
-                SuccessMessage.Payment.CREATE_MOMO_ORDER_SUCCESS,
-                result)
-                : ResponseUtil.success(
-                HttpStatus.BAD_REQUEST,
-                ErrorMessage.Payment.CREATE_MOMO_ORDER_FAIL + ": " + result.get("message"),
-                null);
+        return success ? ResponseUtil.success(HttpStatus.OK, SuccessMessage.Payment.CREATE_MOMO_ORDER_SUCCESS, result)
+                : ResponseUtil.success(HttpStatus.BAD_REQUEST,
+                        ErrorMessage.Payment.CREATE_MOMO_ORDER_FAIL + ": " + result.get("message"), null);
     }
 
-    @Operation(
-            summary = "MoMo IPN (Instant Payment Notification)",
-            description = "API này nhận thông báo thanh toán trực tiếp từ MoMo server (Server-to-Server)"
-    )
+    @Operation(summary = "MoMo IPN (Instant Payment Notification)", description = "API này nhận thông báo thanh toán trực tiếp từ MoMo server (Server-to-Server)")
     @PostMapping(UrlConstant.Payment.MOMO_IPN)
     public ResponseEntity<ResponseData<Void>> momoIPN(@RequestBody MomoIpnRequestDto request) {
 
         boolean success = momoService.handleIpnCallback(request);
 
-        return success
-                ? ResponseUtil.success(
-                HttpStatus.OK,
-                SuccessMessage.Payment.MOMO_IPN_SUCCESS)
-                :ResponseUtil.success(
-                HttpStatus.BAD_REQUEST,
-                ErrorMessage.Payment.MOMO_IPN_VERIFY_FAIL,
-                null);
+        return success ? ResponseUtil.success(HttpStatus.OK, SuccessMessage.Payment.MOMO_IPN_SUCCESS)
+                : ResponseUtil.success(HttpStatus.BAD_REQUEST, ErrorMessage.Payment.MOMO_IPN_VERIFY_FAIL, null);
     }
 
-
-    @Operation(
-            summary = "Xử lý MoMo return callback",
-            description = "MoMo gọi về khi thanh toán xong (Redirect URL từ Browser)"
-    )
+    @Operation(summary = "Xử lý MoMo return callback", description = "MoMo gọi về khi thanh toán xong (Redirect URL từ Browser)")
     @GetMapping(UrlConstant.Payment.MOMO_CALLBACK)
     public ResponseEntity<ResponseData<Object>> momoReturn(@RequestParam Map<String, String> allParams) {
-        
+
         Map<String, String> result = momoService.handleRedirectCallback(allParams);
         boolean success = "success".equals(result.get("status"));
 
-        return success
-                ? ResponseUtil.success(
-                HttpStatus.OK,
-                SuccessMessage.Payment.MOMO_CALLBACK_SUCCESS,
-                result)
-                : ResponseUtil.success(
-                HttpStatus.BAD_REQUEST,
-                ErrorMessage.Payment.MOMO_CALLBACK_FAIL,
-                null);
+        return success ? ResponseUtil.success(HttpStatus.OK, SuccessMessage.Payment.MOMO_CALLBACK_SUCCESS, result)
+                : ResponseUtil.success(HttpStatus.BAD_REQUEST, ErrorMessage.Payment.MOMO_CALLBACK_FAIL, null);
 
     }
 

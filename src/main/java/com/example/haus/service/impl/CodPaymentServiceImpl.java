@@ -58,16 +58,9 @@ public class CodPaymentServiceImpl implements CodPaymentService {
         order.setStatus(OrderStatus.CONFIRMED);
         orderRepository.save(order);
 
-
-        return CodPaymentResponseDto.builder()
-                .orderId(order.getId())
-                .orderNumber(order.getOrderNumber())
-                .totalAmount(order.getTotalAmount())
-                .orderStatus(order.getStatus())
-                .paymentStatus(payment.getStatus())
-                .paymentId(payment.getId())
-                .message(request.getNote())
-                .build();
+        return CodPaymentResponseDto.builder().orderId(order.getId()).orderNumber(order.getOrderNumber())
+                .totalAmount(order.getTotalAmount()).orderStatus(order.getStatus()).paymentStatus(payment.getStatus())
+                .paymentId(payment.getId()).message(request.getNote()).build();
     }
 
     private Order getAccessibleOrder(Long orderId, String username) {
@@ -84,10 +77,8 @@ public class CodPaymentServiceImpl implements CodPaymentService {
         return order;
     }
 
-
     private Payment getOrCreateCodPayment(Order order) {
-        Optional<Payment> existingPaymentOpt = paymentRepository.findByOrderId(
-                order.getId());
+        Optional<Payment> existingPaymentOpt = paymentRepository.findByOrderId(order.getId());
 
         if (existingPaymentOpt.isPresent()) {
             Payment payment = existingPaymentOpt.get();
@@ -102,8 +93,7 @@ public class CodPaymentServiceImpl implements CodPaymentService {
                 throw new InvalidDataException(ErrorMessage.Payment.COD_PAYMENT_ALREADY_COMPLETED);
             }
 
-            if (payment.getStatus() == PaymentStatus.CANCELLED ||
-                payment.getStatus() == PaymentStatus.EXPIRED) {
+            if (payment.getStatus() == PaymentStatus.CANCELLED || payment.getStatus() == PaymentStatus.EXPIRED) {
                 payment.setStatus(PaymentStatus.PENDING);
                 return paymentRepository.save(payment);
             }
@@ -114,20 +104,13 @@ public class CodPaymentServiceImpl implements CodPaymentService {
         return createCodPaymentRecord(order);
     }
 
-
     private Payment createCodPaymentRecord(Order order) {
-        Payment payment = Payment.builder()
-                .amount(order.getTotalAmount())
-                .gateway(null)
-                .type(PaymentType.COD)
-                .status(PaymentStatus.PENDING)
-                .order(order)
-                .build();
+        Payment payment = Payment.builder().amount(order.getTotalAmount()).gateway(null).type(PaymentType.COD)
+                .status(PaymentStatus.PENDING).order(order).build();
 
         Payment savedPayment = paymentRepository.save(payment);
-        log.info("Created new COD payment record: {} for order: {}", 
-                 savedPayment.getId(), order.getId());
-        
+        log.info("Created new COD payment record: {} for order: {}", savedPayment.getId(), order.getId());
+
         return savedPayment;
     }
 }

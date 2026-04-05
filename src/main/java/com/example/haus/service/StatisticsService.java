@@ -13,9 +13,11 @@ public interface StatisticsService {
 
     Map<String, Object> getSales(LocalDate startDate, LocalDate endDate);
 
-    PaginationResponseDto<RecentOrderResponseDto> getRecentOrders(PaginationRequestDto paginationRequest, LocalDate startDate, LocalDate endDate);
+    PaginationResponseDto<RecentOrderResponseDto> getRecentOrders(PaginationRequestDto paginationRequest,
+            LocalDate startDate, LocalDate endDate);
 
-    PaginationResponseDto<ProductStatisticResponseDto> getBestSellers(PaginationRequestDto paginationRequest, LocalDate startDate, LocalDate endDate);
+    PaginationResponseDto<ProductStatisticResponseDto> getBestSellers(PaginationRequestDto paginationRequest,
+            LocalDate startDate, LocalDate endDate);
 
     Map<String, Double> getSaleByCategories(LocalDate startDate, LocalDate endDate);
 

@@ -14,12 +14,9 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    @Query("SELECT DISTINCT p FROM Product p " +
-            "LEFT JOIN FETCH p.categories c " +
-            "LEFT JOIN FETCH p.medias m " +
-            "LEFT JOIN FETCH p.productVariations pv " +
-            "WHERE p.id = :id AND p.isDeleted = false " +
-            "AND (pv IS NULL OR pv.isDeleted = false)")
+    @Query("SELECT DISTINCT p FROM Product p " + "LEFT JOIN FETCH p.categories c " + "LEFT JOIN FETCH p.medias m "
+            + "LEFT JOIN FETCH p.productVariations pv " + "WHERE p.id = :id AND p.isDeleted = false "
+            + "AND (pv IS NULL OR pv.isDeleted = false)")
     Product findByIdWithActiveVariations(@Param("id") Long id);
 
     Boolean existsByProductNameAndIsDeletedFalse(String name);
@@ -29,10 +26,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p WHERE (p.isDeleted IS NULL OR p.isDeleted = false)")
     Page<Product> findAllActiveProducts(Pageable pageable);
 
-    @EntityGraph(attributePaths = {
-            "medias",
-            "categories",
-            "categories.promotion"
-    })
+    @EntityGraph(attributePaths = { "medias", "categories", "categories.promotion" })
     List<Product> findByIdIn(List<Long> ids);
 }

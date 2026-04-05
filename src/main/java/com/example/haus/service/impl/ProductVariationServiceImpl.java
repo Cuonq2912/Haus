@@ -67,9 +67,8 @@ public class ProductVariationServiceImpl implements ProductVariationService {
             throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
         }
 
-        ProductVariation productVariation = productVariationRepository.findById(productVariationId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
+        ProductVariation productVariation = productVariationRepository.findById(productVariationId).orElseThrow(
+                () -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
 
         if (CommonConstant.TRUE.equals(productVariation.getIsDeleted()))
             throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_ALREADY_DELETED);
@@ -79,7 +78,8 @@ public class ProductVariationServiceImpl implements ProductVariationService {
 
     @Override
     @Transactional
-    public ProductVariationResponseDto createProductVariation(CreateProductVariationRequestDto request, MultipartFile image) {
+    public ProductVariationResponseDto createProductVariation(CreateProductVariationRequestDto request,
+            MultipartFile image) {
         if (request == null) {
             throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
         }
@@ -101,10 +101,7 @@ public class ProductVariationServiceImpl implements ProductVariationService {
         }
 
         if (StringUtils.isNotBlank(imageUrl)) {
-            Media media = Media.builder()
-                    .url(imageUrl)
-                    .type(MediaType.IMAGE)
-                    .productVariation(productVariation)
+            Media media = Media.builder().url(imageUrl).type(MediaType.IMAGE).productVariation(productVariation)
                     .build();
             productVariation.setMedia(media);
         }
@@ -117,10 +114,10 @@ public class ProductVariationServiceImpl implements ProductVariationService {
     }
 
     @Override
-    public ProductVariationResponseDto updateProductVariation(Long productVariantId, UpdateProductVariationRequestDto request, MultipartFile image) {
-        ProductVariation existingVariation = productVariationRepository.findById(productVariantId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
+    public ProductVariationResponseDto updateProductVariation(Long productVariantId,
+            UpdateProductVariationRequestDto request, MultipartFile image) {
+        ProductVariation existingVariation = productVariationRepository.findById(productVariantId).orElseThrow(
+                () -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
 
         if (CommonConstant.TRUE.equals(existingVariation.getIsDeleted()))
             throw new InvalidDataException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_ALREADY_DELETED);
@@ -146,10 +143,7 @@ public class ProductVariationServiceImpl implements ProductVariationService {
             if (existingVariation.getMedia() != null) {
                 existingVariation.getMedia().setUrl(imageUrl);
             } else {
-                Media media = Media.builder()
-                        .url(imageUrl)
-                        .type(MediaType.IMAGE)
-                        .productVariation(existingVariation)
+                Media media = Media.builder().url(imageUrl).type(MediaType.IMAGE).productVariation(existingVariation)
                         .build();
                 existingVariation.setMedia(media);
             }
@@ -170,9 +164,9 @@ public class ProductVariationServiceImpl implements ProductVariationService {
             throw new InvalidDataException(ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED);
         }
 
-        ProductVariation productVariation = productVariationRepository
-                .findByIdAndIsDeletedFalse(productVariationId)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
+        ProductVariation productVariation = productVariationRepository.findByIdAndIsDeletedFalse(productVariationId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
 
         Product product = productVariation.getProduct();
 
@@ -189,8 +183,7 @@ public class ProductVariationServiceImpl implements ProductVariationService {
 
     private int calculateTotalInventoryQuantity(Long productId, Long excludeVariationId, Integer overrideQuantity,
             Long overrideVariationId) {
-        List<ProductVariation> allVariations = productVariationRepository
-                .findByProductIdAndIsDeletedFalse(productId);
+        List<ProductVariation> allVariations = productVariationRepository.findByProductIdAndIsDeletedFalse(productId);
         int totalQuantity = 0;
 
         for (ProductVariation variation : allVariations) {

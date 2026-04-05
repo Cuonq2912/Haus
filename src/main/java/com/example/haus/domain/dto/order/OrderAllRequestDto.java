@@ -15,13 +15,13 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderAllRequestDto {
 
-    //order-item
+    // order-item
     @NotEmpty(message = ErrorMessage.Order.ERR_PRODUCTS_EMPTY)
     List<OrderItemRequestDto> orderItems;
 
-    //order
+    // order
     OrderRequestDto order;
-    //payment
+    // payment
     PaymentRequestDto payment;
 
 }

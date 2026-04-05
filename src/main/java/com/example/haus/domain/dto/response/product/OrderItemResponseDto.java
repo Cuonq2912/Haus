@@ -15,12 +15,12 @@ public class OrderItemResponseDto {
 
     Long orderItemId;
 
-    String productCode;      // từ snapshotProductCode
-    String productName;      // từ snapshotProductName
-    String color;            // từ snapshotColor
-    String size;             // từ snapshotSize
-    String material;         // từ snapshotMaterial
-    String imageUrl;         // từ snapshotImageUrl
+    String productCode; // từ snapshotProductCode
+    String productName; // từ snapshotProductName
+    String color; // từ snapshotColor
+    String size; // từ snapshotSize
+    String material; // từ snapshotMaterial
+    String imageUrl; // từ snapshotImageUrl
 
     Integer quantity;
     Double priceAtSale;

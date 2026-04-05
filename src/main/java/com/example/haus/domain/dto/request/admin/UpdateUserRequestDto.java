@@ -34,7 +34,6 @@ public class UpdateUserRequestDto {
     @Schema(description = "Email", example = "example@gmail.com")
     String email;
 
-
     @Schema(description = "Quốc tịch", example = "Việt nam")
     String nationality;
 

@@ -9,11 +9,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring",
-    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-    nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
-    uses = { AddressMapper.class, OrderItemMapper.class, MediaMapper.class }
-)
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE, nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, uses = {
+        AddressMapper.class, OrderItemMapper.class, MediaMapper.class })
 public interface OrderMapper {
     @Mapping(target = "recipientInfo", source = "shippingAddress")
     @Mapping(target = "products", source = "orderItems")
@@ -25,7 +22,6 @@ public interface OrderMapper {
 
     @Mapping(target = "customerName", source = "recipientName")
     RecentOrderResponseDto orderToRecentOrderResponseDto(Order order);
-
 
     @Mapping(target = "orderNumber", source = "orderNumber")
     @Mapping(target = "shippingFee", source = "shippingFee")

@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CategoryRequestDto {
 
-//    @NotNull(message = "Category parent must be not null")
+    // @NotNull(message = "Category parent must be not null")
     Long parentId;
 
     @NotEmpty(message = "Category name is required")

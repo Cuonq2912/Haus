@@ -19,22 +19,18 @@ import java.io.InputStream;
 @Slf4j(topic = "PDF-UTIL")
 public class PdfUtil {
 
-    private PdfUtil () {}
+    private PdfUtil() {
+    }
 
-    //1. Mảng đơn vị
-    private static final String[] units = {
-            "không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"
-    };
+    // 1. Mảng đơn vị
+    private static final String[] units = { "không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín" };
 
     // 2. Mảng start with 1
-    private static final String[] teens = {
-            "mười", "mười một", "mười hai", "mười ba", "mười bốn", "mười lăm", "mười sáu", "mười bảy", "mười tám", "mười chín"
-    };
+    private static final String[] teens = { "mười", "mười một", "mười hai", "mười ba", "mười bốn", "mười lăm",
+            "mười sáu", "mười bảy", "mười tám", "mười chín" };
 
     // 3. Mảng chứa các từ hàng lớn (nghìn, triệu, tỷ)
-    private static final String[] scales = {
-            "", "nghìn", "triệu", "tỷ", "nghìn tỷ", "triệu tỷ"
-    };
+    private static final String[] scales = { "", "nghìn", "triệu", "tỷ", "nghìn tỷ", "triệu tỷ" };
 
     public static String convert(long number) {
         if (number == 0) {
@@ -82,7 +78,10 @@ public class PdfUtil {
 
     /**
      * Hàm chuyển đổi một nhóm 3 chữ số (0-999) thành chữ
-     * @param number Nhóm 3 chữ số
+     *
+     * @param number
+     *            Nhóm 3 chữ số
+     *
      * @return Chuỗi chữ Tiếng Việt cho nhóm đó
      */
     private static String convertChunk(int number) {
@@ -148,7 +147,8 @@ public class PdfUtil {
     }
 
     // Hàm tiện ích cho bảng chi tiết để kiểm soát border, rowspan/colspan
-    public static void addCellWithBorder(PdfPTable table, String text, Font font, int border, int alignment, int rowspan, int colspan) {
+    public static void addCellWithBorder(PdfPTable table, String text, Font font, int border, int alignment,
+            int rowspan, int colspan) {
         PdfPCell cell = new PdfPCell(new Phrase(text, font));
         cell.setHorizontalAlignment(alignment);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
@@ -193,7 +193,8 @@ public class PdfUtil {
         }
     }
 
-    public static Image generateQrCodeImage(String content, int width, int height) throws IOException, BadElementException, com.google.zxing.WriterException {
+    public static Image generateQrCodeImage(String content, int width, int height)
+            throws IOException, BadElementException, com.google.zxing.WriterException {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         // Cố gắng sử dụng nội dung (content) để tạo BitMatrix
         BitMatrix bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, width, height);
@@ -208,11 +209,12 @@ public class PdfUtil {
         return Image.getInstance(baos.toByteArray());
     }
 
-    //Tạo mã qr
-    public static void generateQrCode(PdfPTable mainTable, InvoiceResponseDto data, Font font) throws DocumentException {
+    // Tạo mã qr
+    public static void generateQrCode(PdfPTable mainTable, InvoiceResponseDto data, Font font)
+            throws DocumentException {
         // 2. TẠO VÀ CHÈN MÃ QR
 
-        //Endpoint redirect
+        // Endpoint redirect
         String baseUrl = "https://haus.com.vn/invoice/view?id=";
         String invoiceId = String.valueOf(data.getResponseDto().getId());
         String qrContent = baseUrl + invoiceId;
@@ -232,7 +234,7 @@ public class PdfUtil {
 
             // Đặt QR và chú thích vào một bảng con 1 hàng 2 cột
             PdfPTable qrSubTable = new PdfPTable(2);
-            qrSubTable.setWidths(new float[]{1.2f, 2.3f});
+            qrSubTable.setWidths(new float[] { 1.2f, 2.3f });
 
             // Cột 1: QR Code
             qrCell.setHorizontalAlignment(Element.ALIGN_LEFT);

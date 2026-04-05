@@ -1,6 +1,5 @@
 package com.example.haus.domain.entity.product.payment;
 
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -8,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public enum PaymentGateway {
     @JsonProperty("VNPAY")
     VNPAY,
-    
+
     @JsonProperty("MOMO")
     MOMO;
 

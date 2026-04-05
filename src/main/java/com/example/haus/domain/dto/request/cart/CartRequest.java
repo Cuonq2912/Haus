@@ -7,14 +7,7 @@ import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "Yêu cầu thêm sản phẩm vào giỏ hàng")
 public record CartRequest(
-        @Schema(description = "ID của biến thể sản phẩm", example = "1")
-        @NotNull(message = "ID biến thể sản phẩm không được để trống")
-        Long variantId,
+        @Schema(description = "ID của biến thể sản phẩm", example = "1") @NotNull(message = "ID biến thể sản phẩm không được để trống") Long variantId,
 
-        @Schema(description = "Số lượng sản phẩm muốn thêm vào giỏ hàng", example = "2", minimum = "1")
-        @NotNull(message = "Số lượng sản phẩm không được để trống")
-        @Min(value = 1, message = "Số lượng sản phẩm phải lớn hơn 0")
-        @JsonProperty("quantity")
-        Integer quantity
-) {
+        @Schema(description = "Số lượng sản phẩm muốn thêm vào giỏ hàng", example = "2", minimum = "1") @NotNull(message = "Số lượng sản phẩm không được để trống") @Min(value = 1, message = "Số lượng sản phẩm phải lớn hơn 0") @JsonProperty("quantity") Integer quantity) {
 }

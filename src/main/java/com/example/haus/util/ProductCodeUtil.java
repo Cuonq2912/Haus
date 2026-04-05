@@ -4,7 +4,8 @@ import java.security.SecureRandom;
 
 public class ProductCodeUtil {
 
-    private ProductCodeUtil() {}
+    private ProductCodeUtil() {
+    }
 
     private static final String PREFIX = "SKU";
     private static final SecureRandom random = new SecureRandom();

@@ -9,7 +9,6 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
-
 @Data
 @Validated
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -22,11 +21,7 @@ public class FileUploadProperties {
 
     long maxImageSize = 5 * 1024 * 1024;
 
-    List<String> allowedImageTypes = List.of(
-        "image/jpeg",
-        "image/png",
-        "image/gif",
-        "image/webp");
+    List<String> allowedImageTypes = List.of("image/jpeg", "image/png", "image/gif", "image/webp");
 
     List<String> allowedDocumentTypes = List.of("application/pdf");
 
