@@ -13,19 +13,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class WebMvcConfig implements WebMvcConfigurer {
 
-  RateLimitInterceptor rateLimitInterceptor;
+    RateLimitInterceptor rateLimitInterceptor;
 
-  @Override
-  public void addInterceptors(InterceptorRegistry registry) {
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
 
-      registry.addInterceptor(rateLimitInterceptor)
-          .addPathPatterns("/api/**", "/auth/**")
-          .excludePathPatterns(
-              "/swagger-ui/**",
-              "/swagger-ui.html",
-              "/v3/api-docs/**",
-              "/swagger-resources/**",
-              "/webjars/**",
-              "/actuator/**");
-  }
+        registry.addInterceptor(rateLimitInterceptor).addPathPatterns("/api/**", "/auth/**").excludePathPatterns(
+                "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**",
+                "/actuator/**");
+    }
 }

@@ -21,7 +21,6 @@ import java.util.Map;
 import static com.example.haus.constant.CommonConstant.ADMIN_REALM;
 import static com.example.haus.constant.CommonConstant.USER_END_POINT;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Component
 @Slf4j(topic = "EMAIL-KEYCLOAK")
@@ -41,9 +40,8 @@ public class KeycloakUtil {
     }
 
     public void sendResetPasswordEmail(String userId) {
-        final String url = serverUrl()
-                + ADMIN_REALM + keycloakProperties.realm()
-                + USER_END_POINT + userId + "/execute-actions-email";
+        final String url = serverUrl() + ADMIN_REALM + keycloakProperties.realm() + USER_END_POINT + userId
+                + "/execute-actions-email";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, CommonConstant.BEARER_TOKEN + " " + getAdminToken());
@@ -57,16 +55,14 @@ public class KeycloakUtil {
         if (response.getStatusCode().is2xxSuccessful()) {
             log.info("Reset password email sent successfully to userId = {}", userId);
         } else {
-            log.error("Reset password email sent failed to userId = {}, status = {}, body = {}",
-                    userId, response.getStatusCode(), response.getBody());
+            log.error("Reset password email sent failed to userId = {}, status = {}, body = {}", userId,
+                    response.getStatusCode(), response.getBody());
             throw new KeycloakException(ErrorMessage.Auth.ERR_CAN_NOT_SEND_RESET_PASSWORD_EMAIL);
         }
     }
 
-
     public boolean verifyEmail(String userId, boolean status) {
-        final String url = serverUrl()
-                + ADMIN_REALM + keycloakProperties.realm() + USER_END_POINT + userId;
+        final String url = serverUrl() + ADMIN_REALM + keycloakProperties.realm() + USER_END_POINT + userId;
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, CommonConstant.BEARER_TOKEN + " " + getAdminToken());
@@ -83,8 +79,8 @@ public class KeycloakUtil {
                 log.info("Verification email in Keycloak successfully by userId = {}", userId);
                 return true;
             } else {
-                log.error("Verification email in Keycloak failed by userId = {}, status = {}, body = {}",
-                        userId, response.getStatusCode(), response.getBody());
+                log.error("Verification email in Keycloak failed by userId = {}, status = {}, body = {}", userId,
+                        response.getStatusCode(), response.getBody());
                 return false;
             }
         } catch (Exception ex) {
@@ -94,9 +90,8 @@ public class KeycloakUtil {
     }
 
     public boolean resetPassword(String userId, String newPassword) {
-        final String url = serverUrl()
-                + "admin/realms/" + keycloakProperties.realm()
-                + "/users/" + userId + "/reset-password";
+        final String url = serverUrl() + "admin/realms/" + keycloakProperties.realm() + "/users/" + userId
+                + "/reset-password";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
@@ -113,15 +108,14 @@ public class KeycloakUtil {
         HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
 
         try {
-            ResponseEntity<String> response =
-                    restTemplate.exchange(url, HttpMethod.PUT, entity, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.PUT, entity, String.class);
 
             if (response.getStatusCode().is2xxSuccessful()) {
                 log.info("Password reset successfully in Keycloak for userId = {}", userId);
                 return true;
             } else {
-                log.error("Reset password failed in Keycloak for userId = {}, status = {}, body = {}",
-                        userId, response.getStatusCode(), response.getBody());
+                log.error("Reset password failed in Keycloak for userId = {}, status = {}, body = {}", userId,
+                        response.getStatusCode(), response.getBody());
                 return false;
             }
         } catch (Exception ex) {
@@ -131,9 +125,7 @@ public class KeycloakUtil {
     }
 
     public void deleteUser(String userId) {
-        final String url = serverUrl()
-                + "admin/realms/" + keycloakProperties.realm()
-                + "/users/" + userId;
+        final String url = serverUrl() + "admin/realms/" + keycloakProperties.realm() + "/users/" + userId;
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, CommonConstant.BEARER_TOKEN + " " + getAdminToken());
@@ -147,18 +139,14 @@ public class KeycloakUtil {
                 return;
             }
 
-            log.error("Failed to delete Keycloak user {}, status = {}, body = {}",
-                    userId, response.getStatusCode(), response.getBody());
+            log.error("Failed to delete Keycloak user {}, status = {}, body = {}", userId, response.getStatusCode(),
+                    response.getBody());
             throw new KeycloakException("Failed to delete user in Keycloak");
         } catch (Exception ex) {
             log.error("Error deleting Keycloak user {}", userId, ex);
             throw new KeycloakException("Failed to delete user in Keycloak");
         }
     }
-
-
-
-
 
     public String getAdminToken() {
         final String adminUrl = serverUrl() + "realms/" + keycloakProperties.realm() + "/protocol/openid-connect/token";
@@ -234,9 +222,8 @@ public class KeycloakUtil {
 
     public void assignRoleToUser(String userId, String roleId) {
 
-        String url = serverUrl()
-                + "admin/realms/" + keycloakProperties.realm()
-                + "/users/" + userId + "/role-mappings/realm";
+        String url = serverUrl() + "admin/realms/" + keycloakProperties.realm() + "/users/" + userId
+                + "/role-mappings/realm";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, CommonConstant.BEARER_TOKEN + " " + getAdminToken());
@@ -262,9 +249,7 @@ public class KeycloakUtil {
 
     public String getRoleId(String roleName) {
 
-        String url = serverUrl()
-                + "admin/realms/" + keycloakProperties.realm()
-                + "/roles/" + roleName;
+        String url = serverUrl() + "admin/realms/" + keycloakProperties.realm() + "/roles/" + roleName;
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, CommonConstant.BEARER_TOKEN + " " + getAdminToken());
@@ -272,8 +257,7 @@ public class KeycloakUtil {
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
         // Dùng Map để Spring tự parse JSON trả về
-        var response =
-                restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
+        var response = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
 
         if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
             throw new KeycloakException("Failed to get role from Keycloak");
@@ -287,7 +271,5 @@ public class KeycloakUtil {
 
         return (String) role.get("id");
     }
-
-
 
 }

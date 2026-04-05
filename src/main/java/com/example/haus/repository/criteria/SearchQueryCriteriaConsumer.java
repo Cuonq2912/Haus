@@ -1,13 +1,16 @@
 package com.example.haus.repository.criteria;
 
+import com.example.haus.constant.AppConstants;
 import com.example.haus.constant.PriceRange;
 import com.example.haus.constant.promotion.PromotionStatus;
 import com.example.haus.domain.entity.product.Category;
 import com.example.haus.domain.entity.product.Product;
 import com.example.haus.domain.entity.product.ProductVariation;
-import com.example.haus.constant.AppConstants;
 import jakarta.persistence.criteria.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
@@ -32,18 +35,24 @@ public class SearchQueryCriteriaConsumer<T> implements Consumer<SearchCriteria> 
         }
 
         // 1) Handle các key đặc biệt trước (mỗi cái 1 method)
-        if (handleCategoryId(sc, value)) return;
-        if (handleColor(sc, value)) return;
-        if (handleMaterial(sc, value)) return;
-        if (handlePriceRange(sc, value)) return;
-        if (handleKeyword(sc, value)) return;
+        if (handleCategoryId(sc, value))
+            return;
+        if (handleColor(sc, value))
+            return;
+        if (handleMaterial(sc, value))
+            return;
+        if (handlePriceRange(sc, value))
+            return;
+        if (handleKeyword(sc, value))
+            return;
 
         // 2) Default: convert type + build predicate theo operation/array
         handleDefault(sc, value);
     }
 
     private boolean handleCategoryId(SearchCriteria sc, Object value) {
-        if (!"categoryId".equals(sc.getKey())) return false;
+        if (!"categoryId".equals(sc.getKey()))
+            return false;
 
         log.info("Consumer category id");
         Join<Product, Category> categoryJoin = root.join("categories", JoinType.INNER);
@@ -57,7 +66,8 @@ public class SearchQueryCriteriaConsumer<T> implements Consumer<SearchCriteria> 
     }
 
     private boolean handleColor(SearchCriteria sc, Object value) {
-        if (!"color".equals(sc.getKey())) return false;
+        if (!"color".equals(sc.getKey()))
+            return false;
 
         log.info("Consumer colors");
         Join<Product, ProductVariation> variationJoin = root.join("productVariations", JoinType.INNER);
@@ -66,7 +76,8 @@ public class SearchQueryCriteriaConsumer<T> implements Consumer<SearchCriteria> 
     }
 
     private boolean handleMaterial(SearchCriteria sc, Object value) {
-        if (!"material".equals(sc.getKey())) return false;
+        if (!"material".equals(sc.getKey()))
+            return false;
 
         log.info("Consumer material");
         predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("material"), value));
@@ -74,7 +85,8 @@ public class SearchQueryCriteriaConsumer<T> implements Consumer<SearchCriteria> 
     }
 
     private boolean handlePriceRange(SearchCriteria sc, Object value) {
-        if (!"priceRange".equalsIgnoreCase(sc.getKey())) return false;
+        if (!"priceRange".equalsIgnoreCase(sc.getKey()))
+            return false;
 
         log.info("Consumer price range");
         PriceRange range = PriceRange.fromString(value.toString());
@@ -87,22 +99,19 @@ public class SearchQueryCriteriaConsumer<T> implements Consumer<SearchCriteria> 
     }
 
     private boolean handleKeyword(SearchCriteria sc, Object value) {
-        if (!"keyword".equals(sc.getKey())) return false;
+        if (!"keyword".equals(sc.getKey()))
+            return false;
 
         log.info("Consumer keyword");
         String keyword = value.toString();
 
-        predicate = criteriaBuilder.and(
-                predicate,
-                criteriaBuilder.or(
-                        criteriaBuilder.like(root.get("productName"), "%" + keyword + "%"),
-                        criteriaBuilder.like(root.get("description"), "%" + keyword + "%")
-                )
-        );
+        predicate = criteriaBuilder.and(predicate,
+                criteriaBuilder.or(criteriaBuilder.like(root.get("productName"), "%" + keyword + "%"),
+                        criteriaBuilder.like(root.get("description"), "%" + keyword + "%")));
         return true;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private void handleDefault(SearchCriteria sc, Object rawValue) {
         String key = sc.getKey();
         Class<?> fieldType = root.get(key).getJavaType();
@@ -119,30 +128,27 @@ public class SearchQueryCriteriaConsumer<T> implements Consumer<SearchCriteria> 
         }
 
         switch (sc.getOperation()) {
-            case ">":
-                predicate = criteriaBuilder.and(
-                        predicate,
-                        criteriaBuilder.greaterThanOrEqualTo(root.get(key), (Comparable) typedValue)
-                );
-                return;
+        case ">":
+            predicate = criteriaBuilder.and(predicate,
+                    criteriaBuilder.greaterThanOrEqualTo(root.get(key), (Comparable) typedValue));
+            return;
 
-            case "<":
-                predicate = criteriaBuilder.and(
-                        predicate,
-                        criteriaBuilder.lessThanOrEqualTo(root.get(key), (Comparable) typedValue)
-                );
-                return;
+        case "<":
+            predicate = criteriaBuilder.and(predicate,
+                    criteriaBuilder.lessThanOrEqualTo(root.get(key), (Comparable) typedValue));
+            return;
 
-            case ":":
-                predicate = criteriaBuilder.and(predicate, buildEqualsOrLikePredicate(key, fieldType, typedValue));
-                return;
+        case ":":
+            predicate = criteriaBuilder.and(predicate, buildEqualsOrLikePredicate(key, fieldType, typedValue));
+            return;
 
-            default:
+        default:
         }
     }
 
     private Object convertValue(Class<?> fieldType, Object raw) {
-        if (raw == null) return null;
+        if (raw == null)
+            return null;
 
         if (fieldType.equals(LocalDate.class)) {
             return LocalDate.parse(raw.toString());
@@ -157,10 +163,7 @@ public class SearchQueryCriteriaConsumer<T> implements Consumer<SearchCriteria> 
 
     private Predicate buildEqualsOrLikePredicate(String key, Class<?> fieldType, Object typedValue) {
         if (fieldType.equals(String.class)) {
-            return criteriaBuilder.like(
-                    root.get(key),
-                    String.format(AppConstants.STR_FORMAT, typedValue)
-            );
+            return criteriaBuilder.like(root.get(key), String.format(AppConstants.STR_FORMAT, typedValue));
         }
         return criteriaBuilder.equal(root.get(key), typedValue);
     }

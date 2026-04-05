@@ -19,8 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Implementation của FileValidatorService
- * Cung cấp validation cho MIME type, magic bytes, file size và virus scanning
+ * Implementation của FileValidatorService Cung cấp validation cho MIME type, magic bytes, file size và virus scanning
  */
 @Service
 @RequiredArgsConstructor
@@ -30,12 +29,11 @@ public class FileValidatorServiceImpl implements FileValidatorService {
     private final FileUploadProperties properties;
     private final Optional<VirusScanService> virusScanService;
 
-    private static final Map<String, byte[]> MAGIC_BYTES = Map.of(
-        "image/jpeg", new byte[] { (byte) 0xFF, (byte) 0xD8, (byte) 0xFF },
-        "image/png", new byte[] { (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A },
-        "image/gif", new byte[] { 0x47, 0x49, 0x46, 0x38 },
-        "image/webp", new byte[] { 0x52, 0x49, 0x46, 0x46 },
-        "application/pdf", new byte[] { 0x25, 0x50, 0x44, 0x46 });
+    private static final Map<String, byte[]> MAGIC_BYTES = Map.of("image/jpeg",
+            new byte[] { (byte) 0xFF, (byte) 0xD8, (byte) 0xFF }, "image/png",
+            new byte[] { (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A }, "image/gif",
+            new byte[] { 0x47, 0x49, 0x46, 0x38 }, "image/webp", new byte[] { 0x52, 0x49, 0x46, 0x46 },
+            "application/pdf", new byte[] { 0x25, 0x50, 0x44, 0x46 });
 
     @Override
     public void validateFile(MultipartFile file, MediaType mediaType) {
@@ -50,8 +48,8 @@ public class FileValidatorServiceImpl implements FileValidatorService {
         validateMagicBytes(file);
         scanForVirus(file);
 
-        log.info("File validation passed: name={}, size={}, type={}",
-            file.getOriginalFilename(), file.getSize(), file.getContentType());
+        log.info("File validation passed: name={}, size={}, type={}", file.getOriginalFilename(), file.getSize(),
+                file.getContentType());
     }
 
     @Override
@@ -65,9 +63,7 @@ public class FileValidatorServiceImpl implements FileValidatorService {
     private void validateNotEmpty(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             log.warn("File validation failed: file is empty or null");
-            throw new FileValidationException(
-                "File không được để trống",
-                FileValidationErrorCode.EMPTY_FILE);
+            throw new FileValidationException("File không được để trống", FileValidationErrorCode.EMPTY_FILE);
         }
     }
 
@@ -75,12 +71,11 @@ public class FileValidatorServiceImpl implements FileValidatorService {
         long maxSize = getMaxSizeForType(mediaType);
 
         if (file.getSize() > maxSize) {
-            log.warn("File validation failed: size {} exceeds max {} for type {}",
-                file.getSize(), maxSize, mediaType);
+            log.warn("File validation failed: size {} exceeds max {} for type {}", file.getSize(), maxSize, mediaType);
             throw new FileValidationException(
-                String.format("Kích thước file (%s) vượt quá giới hạn cho phép (%s)",
-                    formatFileSize(file.getSize()), formatFileSize(maxSize)),
-                FileValidationErrorCode.FILE_TOO_LARGE);
+                    String.format("Kích thước file (%s) vượt quá giới hạn cho phép (%s)",
+                            formatFileSize(file.getSize()), formatFileSize(maxSize)),
+                    FileValidationErrorCode.FILE_TOO_LARGE);
         }
     }
 
@@ -89,12 +84,9 @@ public class FileValidatorServiceImpl implements FileValidatorService {
         List<String> allowedTypes = getAllowedTypesForType(mediaType);
 
         if (contentType == null || !allowedTypes.contains(contentType)) {
-            log.warn("File validation failed: MIME type '{}' not allowed. Allowed: {}",
-                contentType, allowedTypes);
-            throw new FileValidationException(
-                String.format("Loại file '%s' không được hỗ trợ. Các loại được phép: %s",
-                    contentType, String.join(", ", allowedTypes)),
-                FileValidationErrorCode.INVALID_MIME_TYPE);
+            log.warn("File validation failed: MIME type '{}' not allowed. Allowed: {}", contentType, allowedTypes);
+            throw new FileValidationException(String.format("Loại file '%s' không được hỗ trợ. Các loại được phép: %s",
+                    contentType, String.join(", ", allowedTypes)), FileValidationErrorCode.INVALID_MIME_TYPE);
         }
     }
 
@@ -111,17 +103,15 @@ public class FileValidatorServiceImpl implements FileValidatorService {
 
             if (fileBytes.length < expectedMagic.length) {
                 log.warn("File too small to validate magic bytes: {} bytes", fileBytes.length);
-                throw new FileValidationException(
-                    "File quá nhỏ để xác thực nội dung",
-                    FileValidationErrorCode.INVALID_MAGIC_BYTES);
+                throw new FileValidationException("File quá nhỏ để xác thực nội dung",
+                        FileValidationErrorCode.INVALID_MAGIC_BYTES);
             }
 
             for (int i = 0; i < expectedMagic.length; i++) {
                 if (fileBytes[i] != expectedMagic[i]) {
                     log.warn("Magic bytes mismatch for file: {}", file.getOriginalFilename());
-                    throw new FileValidationException(
-                        "Nội dung file không khớp với loại file được khai báo",
-                        FileValidationErrorCode.INVALID_MAGIC_BYTES);
+                    throw new FileValidationException("Nội dung file không khớp với loại file được khai báo",
+                            FileValidationErrorCode.INVALID_MAGIC_BYTES);
                 }
             }
 
@@ -129,10 +119,8 @@ public class FileValidatorServiceImpl implements FileValidatorService {
 
         } catch (IOException e) {
             log.error("Failed to read file for magic bytes validation", e);
-            throw new FileValidationException(
-                "Không thể đọc file để xác thực",
-                FileValidationErrorCode.INVALID_MAGIC_BYTES,
-                e);
+            throw new FileValidationException("Không thể đọc file để xác thực",
+                    FileValidationErrorCode.INVALID_MAGIC_BYTES, e);
         }
     }
 
@@ -142,19 +130,17 @@ public class FileValidatorServiceImpl implements FileValidatorService {
             return;
         }
 
-      virusScanService.ifPresent(scanner -> {
-          log.info("Scanning file for viruses: {}", file.getOriginalFilename());
-          VirusScanResult result = scanner.scan(file);
+        virusScanService.ifPresent(scanner -> {
+            log.info("Scanning file for viruses: {}", file.getOriginalFilename());
+            VirusScanResult result = scanner.scan(file);
 
-          if (result.isInfected()) {
-              log.error("Virus detected in file {}: {}",
-                  file.getOriginalFilename(), result.getVirusName());
-              throw new FileValidationException(
-                  "Phát hiện virus trong file: " + result.getVirusName(),
-                  FileValidationErrorCode.VIRUS_DETECTED);
-          }
+            if (result.isInfected()) {
+                log.error("Virus detected in file {}: {}", file.getOriginalFilename(), result.getVirusName());
+                throw new FileValidationException("Phát hiện virus trong file: " + result.getVirusName(),
+                        FileValidationErrorCode.VIRUS_DETECTED);
+            }
 
-          log.info("Virus scan passed for file: {}", file.getOriginalFilename());
+            log.info("Virus scan passed for file: {}", file.getOriginalFilename());
         });
     }
 
@@ -175,16 +161,16 @@ public class FileValidatorServiceImpl implements FileValidatorService {
 
     private long getMaxSizeForType(MediaType mediaType) {
         return switch (mediaType) {
-            case IMAGE -> properties.getMaxImageSize();
-            case DOCUMENT, VIDEO -> properties.getMaxFileSize();
+        case IMAGE -> properties.getMaxImageSize();
+        case DOCUMENT, VIDEO -> properties.getMaxFileSize();
         };
     }
 
     private List<String> getAllowedTypesForType(MediaType mediaType) {
         return switch (mediaType) {
-            case IMAGE -> properties.getAllowedImageTypes();
-            case DOCUMENT -> properties.getAllowedDocumentTypes();
-            case VIDEO -> List.of();
+        case IMAGE -> properties.getAllowedImageTypes();
+        case DOCUMENT -> properties.getAllowedDocumentTypes();
+        case VIDEO -> List.of();
         };
     }
 

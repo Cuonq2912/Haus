@@ -53,16 +53,13 @@ public class SecurityConfig {
 
     final CustomizePreFilter customizePreFilter;
 
-
     @Bean
     public SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
+        httpSecurity.csrf(AbstractHttpConfigurer::disable).cors(Customizer.withDefaults())
                 .authorizeHttpRequests(
                         authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
-                                .requestMatchers(publicEndpoints).permitAll()
-                                .requestMatchers(swaggerEndpoints).permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/category").permitAll()
+                                .requestMatchers(publicEndpoints).permitAll().requestMatchers(swaggerEndpoints)
+                                .permitAll().requestMatchers(HttpMethod.GET, "/api/v1/category").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/category/sub").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/promotion").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/product").permitAll()
@@ -92,18 +89,20 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/api/v1/product/favorites/check/**")
                                 .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
                                 .requestMatchers(HttpMethod.GET, "/api/v1/product/review/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/order").hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
-                                .requestMatchers(HttpMethod.PATCH, "/api/v1/order/**").hasAnyAuthority(RoleConstant.ADMIN)
-                                .requestMatchers(HttpMethod.POST, "/api/v1/orders").hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
-                                .requestMatchers(HttpMethod.GET, "/api/v1/order/**").hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
-                                .requestMatchers(HttpMethod.GET, "/api/v1/orders/**").hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
-                                .requestMatchers(userEndpoints).hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
-                                .requestMatchers(adminEndpoints).hasAnyAuthority(RoleConstant.ADMIN)
-                                .anyRequest().authenticated())
+                                .requestMatchers(HttpMethod.GET, "/api/v1/order")
+                                .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
+                                .requestMatchers(HttpMethod.PATCH, "/api/v1/order/**")
+                                .hasAnyAuthority(RoleConstant.ADMIN).requestMatchers(HttpMethod.POST, "/api/v1/orders")
+                                .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
+                                .requestMatchers(HttpMethod.GET, "/api/v1/order/**")
+                                .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
+                                .requestMatchers(HttpMethod.GET, "/api/v1/orders/**")
+                                .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN).requestMatchers(userEndpoints)
+                                .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN).requestMatchers(adminEndpoints)
+                                .hasAnyAuthority(RoleConstant.ADMIN).anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        httpSecurity.oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(jwt ->
-                        jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+        httpSecurity.oauth2ResourceServer(
+                oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
         return httpSecurity.build();
     }
@@ -116,13 +115,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(
-                "https://socko-stratagemical-abdullah.ngrok-free.dev/",
-                "http://localhost:5173",
-                "https://ahistorical-undelusory-soren.ngrok-free.dev",
+        configuration.setAllowedOrigins(Arrays.asList("https://socko-stratagemical-abdullah.ngrok-free.dev/",
+                "http://localhost:5173", "https://ahistorical-undelusory-soren.ngrok-free.dev",
                 "https://nonrestrained-karima-unexclaiming.ngrok-free.dev/",
-                "https://83fj4w28-5173.asse.devtunnels.ms/",
-                "https://sandbox.vnpayment.vn",
+                "https://83fj4w28-5173.asse.devtunnels.ms/", "https://sandbox.vnpayment.vn",
                 "https://test-payment.momo.vn")); // domain FE + ngrok + VNPay + MoMo
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));

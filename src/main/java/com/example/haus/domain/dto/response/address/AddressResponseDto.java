@@ -16,16 +16,16 @@ public class AddressResponseDto {
     String recipientName;
 
     String phoneNumber;
-    
+
     String country;
-    
+
     String city;
-    
+
     String district;
-    
+
     String commune;
 
     String detailAddress;
-    
+
     String userId;
 }

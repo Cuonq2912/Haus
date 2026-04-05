@@ -18,7 +18,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
-
 @Service
 @ConditionalOnProperty(name = "file-upload.virus-scan.enabled", havingValue = "true")
 @RequiredArgsConstructor
@@ -69,7 +68,8 @@ public class ClamAVVirusScanService implements VirusScanService {
             // Parse response
             if (response == null) {
                 log.warn("No response from ClamAV");
-                throw new FileValidationException("Không nhận được phản hồi từ virus scanner", FileValidationErrorCode.SCAN_FAILED);
+                throw new FileValidationException("Không nhận được phản hồi từ virus scanner",
+                        FileValidationErrorCode.SCAN_FAILED);
             }
 
             if (response.contains("FOUND")) {
@@ -87,15 +87,15 @@ public class ClamAVVirusScanService implements VirusScanService {
             // Unexpected response
             log.warn("Unexpected ClamAV response: {}", response);
             throw new FileValidationException("Phản hồi không hợp lệ từ virus scanner: " + response,
-                FileValidationErrorCode.SCAN_FAILED);
+                    FileValidationErrorCode.SCAN_FAILED);
         } catch (FileValidationException e) {
             throw e;
         } catch (Exception e) {
             log.error("Virus scan failed for file: {}", file.getOriginalFilename(), e);
-            throw new FileValidationException("Virus scan thất bại: " + e.getMessage(), FileValidationErrorCode.SCAN_FAILED, e);
+            throw new FileValidationException("Virus scan thất bại: " + e.getMessage(),
+                    FileValidationErrorCode.SCAN_FAILED, e);
         }
     }
-
 
     private String extractVirusName(String response) {
         try {

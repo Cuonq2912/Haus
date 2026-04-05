@@ -9,7 +9,7 @@ import com.example.haus.domain.dto.response.statistic.BestSellerRow;
 import com.example.haus.domain.dto.response.statistic.RecentOrderResponseDto;
 import com.example.haus.domain.dto.response.statistic.RevenueDetailResponseDto;
 import com.example.haus.domain.entity.product.*;
-import com.example.haus.domain.mapper.*;
+import com.example.haus.domain.mapper.OrderMapper;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.repository.CategoryRepository;
 import com.example.haus.repository.OrderItemRepository;
@@ -46,13 +46,11 @@ public class StatisticsServiceImpl implements StatisticsService {
     OrderItemRepository orderItemRepository;
     CategoryRepository categoryRepository;
 
-
     @Override
     public Map<String, Object> getOrderByMonth() {
         Map<String, Object> map = new HashMap<>();
 
-
-        List <Order> sales = orderRepository.findAll();
+        List<Order> sales = orderRepository.findAll();
 
         Map<Integer, Double> monthlyRevenue = new HashMap<>();
         for (int i = 0; i < 12; i++) {
@@ -60,10 +58,8 @@ public class StatisticsServiceImpl implements StatisticsService {
             LocalDate monthEnd = monthStart.plusMonths(1);
 
             double amount = sales.stream()
-                    .filter(o -> !o.getOrderDate().isBefore(monthStart)
-                            && o.getOrderDate().isBefore(monthEnd))
-                    .mapToDouble(Order::getTotalAmount)
-                    .sum();
+                    .filter(o -> !o.getOrderDate().isBefore(monthStart) && o.getOrderDate().isBefore(monthEnd))
+                    .mapToDouble(Order::getTotalAmount).sum();
 
             int monthNumber = monthStart.getMonthValue();
             monthlyRevenue.put(monthNumber, amount);
@@ -89,10 +85,10 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         List<Order> previous = orderRepository.findByQuarter(prevQuarter, prevYear, startDate, endDate);
 
-        final double[] total = {0.0, 0.0};
-        final double[] totalPending = {0.0, 0.0};
-        final double[] totalCompleted = {0.0, 0.0};
-        final double[] totalReturned = {0.0, 0.0};
+        final double[] total = { 0.0, 0.0 };
+        final double[] totalPending = { 0.0, 0.0 };
+        final double[] totalCompleted = { 0.0, 0.0 };
+        final double[] totalReturned = { 0.0, 0.0 };
 
         ToDoubleFunction<double[]> calcPercent = arr -> {
             double prev = arr[0];
@@ -106,70 +102,59 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         current.forEach(order -> {
             switch (order.getStatus()) {
-                case PENDING -> totalPending[1] += order.getTotalAmount();
-                case COMPLETED -> totalCompleted[1] += order.getTotalAmount();
-                case RETURNED -> totalReturned[1] += order.getTotalAmount();
-                default -> log.error("Unexpected value: {}", order.getStatus());
+            case PENDING -> totalPending[1] += order.getTotalAmount();
+            case COMPLETED -> totalCompleted[1] += order.getTotalAmount();
+            case RETURNED -> totalReturned[1] += order.getTotalAmount();
+            default -> log.error("Unexpected value: {}", order.getStatus());
             }
             total[1] += order.getTotalAmount();
         });
 
         previous.forEach(order -> {
             switch (order.getStatus()) {
-                case PENDING -> totalPending[0] += order.getTotalAmount();
-                case COMPLETED -> totalCompleted[0] += order.getTotalAmount();
-                case RETURNED -> totalReturned[0] += order.getTotalAmount();
-                default -> log.error("Unexpected value: {}", order.getStatus());
+            case PENDING -> totalPending[0] += order.getTotalAmount();
+            case COMPLETED -> totalCompleted[0] += order.getTotalAmount();
+            case RETURNED -> totalReturned[0] += order.getTotalAmount();
+            default -> log.error("Unexpected value: {}", order.getStatus());
             }
             log.info("DEv = {}", order.getTotalAmount());
             total[0] += order.getTotalAmount();
         });
 
-        map.put("totalOrders", RevenueDetailResponseDto.builder()
-                .totalOrder(total[1])
-                .percentIncrease(calcPercent.applyAsDouble(total))
-                .build());
+        map.put("totalOrders", RevenueDetailResponseDto.builder().totalOrder(total[1])
+                .percentIncrease(calcPercent.applyAsDouble(total)).build());
 
-        map.put("pendingOrders", RevenueDetailResponseDto.builder()
-                .totalOrder(totalPending[1])
-                .percentIncrease(calcPercent.applyAsDouble(totalPending))
-                .build());
+        map.put("pendingOrders", RevenueDetailResponseDto.builder().totalOrder(totalPending[1])
+                .percentIncrease(calcPercent.applyAsDouble(totalPending)).build());
 
-        map.put("completedOrders", RevenueDetailResponseDto.builder()
-                .totalOrder(totalCompleted[1])
-                .percentIncrease(calcPercent.applyAsDouble(totalCompleted))
-                .build());
+        map.put("completedOrders", RevenueDetailResponseDto.builder().totalOrder(totalCompleted[1])
+                .percentIncrease(calcPercent.applyAsDouble(totalCompleted)).build());
 
-        map.put("returnOrders", RevenueDetailResponseDto.builder()
-                .totalOrder(totalReturned[1])
-                .percentIncrease(calcPercent.applyAsDouble(totalReturned))
-                .build());
+        map.put("returnOrders", RevenueDetailResponseDto.builder().totalOrder(totalReturned[1])
+                .percentIncrease(calcPercent.applyAsDouble(totalReturned)).build());
 
         return map;
     }
 
-
     @Override
     @Transactional(readOnly = true)
-    public PaginationResponseDto<RecentOrderResponseDto> getRecentOrders(PaginationRequestDto paginationRequest, LocalDate startDate, LocalDate endDate) {
+    public PaginationResponseDto<RecentOrderResponseDto> getRecentOrders(PaginationRequestDto paginationRequest,
+            LocalDate startDate, LocalDate endDate) {
 
-        Pageable pageable = PageRequest.of(
-                paginationRequest.getPageNum(),
-                paginationRequest.getPageSize(),
+        Pageable pageable = PageRequest.of(paginationRequest.getPageNum(), paginationRequest.getPageSize(),
                 Sort.by("orderDate").descending());
 
         Page<Order> orderPage = orderRepository.findByDateTime(startDate, endDate, pageable);
 
-
         List<RecentOrderResponseDto> orderResponseList = orderPage.getContent().stream()
-                .map(orderMapper::orderToRecentOrderResponseDto)
-                .toList();
+                .map(orderMapper::orderToRecentOrderResponseDto).toList();
 
         return PaginationUtil.createPaginationResponse(orderPage, paginationRequest, orderResponseList);
     }
 
     @Override
-    public PaginationResponseDto<ProductStatisticResponseDto> getBestSellers(PaginationRequestDto paginationRequest, LocalDate startDate, LocalDate endDate) {
+    public PaginationResponseDto<ProductStatisticResponseDto> getBestSellers(PaginationRequestDto paginationRequest,
+            LocalDate startDate, LocalDate endDate) {
         if (startDate.isAfter(endDate)) {
             throw new InvalidDataException("startDate is after endDate");
         }
@@ -178,43 +163,30 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         Page<BestSellerRow> page = orderItemRepository.findBestSellers(startDate, endDate, pageable);
 
-        List<Long> ids = page.getContent().stream()
-                .map(BestSellerRow::getProductId)
-                .toList();
+        List<Long> ids = page.getContent().stream().map(BestSellerRow::getProductId).toList();
 
         Map<Long, Long> soldMap = page.getContent().stream()
                 .collect(Collectors.toMap(BestSellerRow::getProductId, BestSellerRow::getSoldQuantity));
 
         List<Product> productList = productRepository.findByIdIn(ids);
 
-        Map<Long, Product> productMap = productList.stream()
-                .collect(Collectors.toMap(Product::getId, p -> p));
+        Map<Long, Product> productMap = productList.stream().collect(Collectors.toMap(Product::getId, p -> p));
 
-        List<ProductStatisticResponseDto> dtos = ids.stream()
-                .map(id -> {
-                    Product product = productMap.get(id);
-                    Long sold = soldMap.getOrDefault(id, 0L);
+        List<ProductStatisticResponseDto> dtos = ids.stream().map(id -> {
+            Product product = productMap.get(id);
+            Long sold = soldMap.getOrDefault(id, 0L);
 
-                    return ProductStatisticResponseDto.builder()
-                            .id(product.getId())
-                            .productName(product.getProductName())
-                            .price(product.getPrice())
-                            .image(product.getMedias().stream()
-                                    .findFirst()
-                                    .map(Media::getUrl)
-                                    .orElse(null))
-                            .soldQuantity(sold.intValue()) // hoặc đổi DTO sang Long cho chuẩn
-                            .discountPercent(product.getCategories().stream()
-                                    .map(Category::getPromotion)
-                                    .filter(Objects::nonNull)
+            return ProductStatisticResponseDto.builder().id(product.getId()).productName(product.getProductName())
+                    .price(product.getPrice())
+                    .image(product.getMedias().stream().findFirst().map(Media::getUrl).orElse(null))
+                    .soldQuantity(sold.intValue()) // hoặc đổi DTO sang Long cho chuẩn
+                    .discountPercent(
+                            product.getCategories().stream().map(Category::getPromotion).filter(Objects::nonNull)
                                     .filter(p -> !p.getIsDeleted() && p.getStatus() == PromotionStatus.ACTIVE)
                                     .max(Comparator.comparing(Promotion::getDiscountPercent))
-                                    .map(Promotion::getDiscountPercent)
-                                    .orElse(0.0f))
-                            .build();
-                })
-                .toList();
-
+                                    .map(Promotion::getDiscountPercent).orElse(0.0f))
+                    .build();
+        }).toList();
 
         return PaginationUtil.createPaginationResponse(page, paginationRequest, dtos);
     }
@@ -223,27 +195,18 @@ public class StatisticsServiceImpl implements StatisticsService {
     public Map<String, Double> getSaleByCategories(LocalDate startDate, LocalDate endDate) {
         List<Order> orders = orderRepository.findByOrderDateBetween(startDate, endDate, OrderStatus.COMPLETED);
 
-        List<Product> products = orders.stream()
-                .flatMap(order -> order.getOrderItems().stream())
-                .map(OrderItem::getProductVariation)
-                .map(ProductVariation::getProduct)
-                .distinct()
-                .toList();
+        List<Product> products = orders.stream().flatMap(order -> order.getOrderItems().stream())
+                .map(OrderItem::getProductVariation).map(ProductVariation::getProduct).distinct().toList();
 
-        Map<String, List<Product>> productByCategoryName =
-                products.stream()
-                        .flatMap(product ->
-                                product.getCategories().stream()
-                                        .map(category -> Map.entry(new StringBuilder().append(category.getId()).append(".").append(category.getCategoryName()).toString(), product))
-                        )
-                        .collect(Collectors.groupingBy(
-                                Map.Entry::getKey,
-                                Collectors.mapping(Map.Entry::getValue, Collectors.toList())
-                        ));
-
+        Map<String, List<Product>> productByCategoryName = products.stream()
+                .flatMap(product -> product.getCategories().stream()
+                        .map(category -> Map.entry(new StringBuilder().append(category.getId()).append(".")
+                                .append(category.getCategoryName()).toString(), product)))
+                .collect(Collectors.groupingBy(Map.Entry::getKey,
+                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
 
         Map<String, Double> result = new HashMap<>();
-        for(Map.Entry<String, List<Product>> entry : productByCategoryName.entrySet()) {
+        for (Map.Entry<String, List<Product>> entry : productByCategoryName.entrySet()) {
             result.put(entry.getKey(), entry.getValue().stream().mapToDouble(Product::getPrice).sum());
         }
 

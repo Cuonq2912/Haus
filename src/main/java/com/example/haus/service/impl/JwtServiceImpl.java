@@ -42,7 +42,8 @@ public class JwtServiceImpl implements JwtService {
     final InvalidatedTokenRepository invalidatedTokenRepository;
 
     @Override
-    public String generateAccessToken(String userId, String username, Collection<? extends GrantedAuthority> authorities) {
+    public String generateAccessToken(String userId, String username,
+            Collection<? extends GrantedAuthority> authorities) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("role", authorities);
@@ -51,7 +52,8 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String generateRefreshToken(String userId, String username, Collection<? extends GrantedAuthority> authorities) {
+    public String generateRefreshToken(String userId, String username,
+            Collection<? extends GrantedAuthority> authorities) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("role", authorities);
@@ -80,36 +82,28 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private String generateAccessToken(Map<String, Object> claims, String username) {
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(username)
-                .setId(UUID.randomUUID().toString())
+        return Jwts.builder().setClaims(claims).setSubject(username).setId(UUID.randomUUID().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * expiryHour))
-                .signWith(getKey(TokenType.ACCESS_TOKEN), SignatureAlgorithm.HS256)
-                .compact();
+                .signWith(getKey(TokenType.ACCESS_TOKEN), SignatureAlgorithm.HS256).compact();
     }
 
     private String generateRefreshToken(Map<String, Object> claims, String username) {
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(username)
-                .setId(UUID.randomUUID().toString()) // fixed
+        return Jwts.builder().setClaims(claims).setSubject(username).setId(UUID.randomUUID().toString()) // fixed
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * expiryDay))
-                .signWith(getKey(TokenType.REFRESH_TOKEN), SignatureAlgorithm.HS256)
-                .compact();
+                .signWith(getKey(TokenType.REFRESH_TOKEN), SignatureAlgorithm.HS256).compact();
     }
 
     private Key getKey(TokenType type) {
         switch (type) {
-            case ACCESS_TOKEN -> {
-                return Keys.hmacShaKeyFor(Decoders.BASE64.decode(accessKey));
-            }
-            case REFRESH_TOKEN -> {
-                return Keys.hmacShaKeyFor(Decoders.BASE64.decode(refreshKey));
-            }
-            default -> throw new InvalidDataException("Invalid Token type");
+        case ACCESS_TOKEN -> {
+            return Keys.hmacShaKeyFor(Decoders.BASE64.decode(accessKey));
+        }
+        case REFRESH_TOKEN -> {
+            return Keys.hmacShaKeyFor(Decoders.BASE64.decode(refreshKey));
+        }
+        default -> throw new InvalidDataException("Invalid Token type");
         }
     }
 
@@ -123,7 +117,7 @@ public class JwtServiceImpl implements JwtService {
             return Jwts.parserBuilder().setSigningKey(getKey(type)).build().parseClaimsJws(token).getBody();
         } catch (Exception e) {
             log.error("Extra all claim failed, message = {}", e.getMessage());
-            throw new AccessDeniedException("Access denied: "+  e.getMessage());
+            throw new AccessDeniedException("Access denied: " + e.getMessage());
         }
     }
 

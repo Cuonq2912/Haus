@@ -28,11 +28,10 @@ public class AddressServiceImpl implements AddressService {
 
     UserRepository userRepository;
 
-
     @Override
     public AddressResponseDto addAddress(String email, AddressRequestDto addressRequestDto) {
-        User user = userRepository.findByUsernameAndIsDeletedFalse(email).orElseThrow(() ->
-                new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+        User user = userRepository.findByUsernameAndIsDeletedFalse(email)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         Address address = addressMapper.addressRequestDtoToAddress(addressRequestDto);
 
@@ -44,8 +43,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public AddressResponseDto updateAddress(String email, Long id, AddressRequestDto addressRequestDto) {
-        Address address = addressRepository
-                .findByIdAndUserUsernameAndIsDeletedFalse(id, email)
+        Address address = addressRepository.findByIdAndUserUsernameAndIsDeletedFalse(id, email)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Address.ERR_ADDRESS_NOT_FOUND));
 
         addressMapper.updateAddressFromDto(addressRequestDto, address);
@@ -54,16 +52,15 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public AddressResponseDto getAddressById(Long id) {
-        Address address = addressRepository.findByIdAndIsDeletedFalse(id).orElseThrow(
-                () -> new ResourceNotFoundException(ErrorMessage.Address.ERR_ADDRESS_NOT_FOUND)
-        );
+        Address address = addressRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Address.ERR_ADDRESS_NOT_FOUND));
         return addressMapper.addressToAddressResponseDto(address);
     }
 
     @Override
     public List<AddressResponseDto> getAddressesByUserId(String email) {
-        User user = userRepository.findByUsernameAndIsDeletedFalse(email).orElseThrow(() ->
-                new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+        User user = userRepository.findByUsernameAndIsDeletedFalse(email)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         List<Address> addresses = addressRepository.getAddressByUserId(user.getId());
 
@@ -72,8 +69,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public void deleteAddress(String email, Long id) {
-        Address address = addressRepository
-                .findByIdAndUserUsernameAndIsDeletedFalse(id, email)
+        Address address = addressRepository.findByIdAndUserUsernameAndIsDeletedFalse(id, email)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Address.ERR_ADDRESS_NOT_FOUND));
 
         address.setIsDeleted(true);

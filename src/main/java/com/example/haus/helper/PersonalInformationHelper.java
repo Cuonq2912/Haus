@@ -6,8 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PersonalInformationHelper {
 
-    public UpdateUserRequestDto handleEmptyStrings(
-            UpdateUserRequestDto personalInformation) {
+    public UpdateUserRequestDto handleEmptyStrings(UpdateUserRequestDto personalInformation) {
         if (personalInformation == null) {
             return null;
         }
@@ -28,7 +27,7 @@ public class PersonalInformationHelper {
             personalInformation.setNationality(null);
         }
 
-        if(personalInformation.getEmail() != null && personalInformation.getEmail().trim().isEmpty()) {
+        if (personalInformation.getEmail() != null && personalInformation.getEmail().trim().isEmpty()) {
             personalInformation.setEmail(null);
         }
 

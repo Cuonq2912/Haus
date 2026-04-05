@@ -1,15 +1,12 @@
 package com.example.haus.service.impl;
 
-import com.example.haus.constant.AppConstants;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.domain.dto.pagination.PaginationCustom;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.category.CategoryRequestDto;
 import com.example.haus.domain.dto.response.category.CategoryResponseDto;
-import com.example.haus.domain.dto.response.product.ProductResponseDto;
 import com.example.haus.domain.entity.product.Category;
-import com.example.haus.domain.entity.product.Product;
 import com.example.haus.domain.mapper.CategoryMapper;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
@@ -22,20 +19,12 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -74,15 +63,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponseDto updateCategory(Long id, CategoryRequestDto categoryRequest) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
 
         categoryMapper.updateCategoryFromDto(categoryRequest, category);
 
         if (categoryRequest.getParentId() != null) {
             Category parent = categoryRepository.findById(categoryRequest.getParentId())
-                    .orElseThrow(() ->
-                            new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
+                    .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
             category.setParentCategory(parent);
         } else {
             category.setParentCategory(null);
@@ -92,12 +79,10 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryMapper.categoryToCategoryResponseDto(saved);
     }
 
-
     @Override
     public CategoryResponseDto getCategoryById(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
         return categoryMapper.categoryToCategoryResponseDto(category);
     }
 
@@ -116,7 +101,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Category.ERR_CATEGORY_NOT_EXISTED));
 
         if (!category.getProducts().isEmpty()) {
             throw new InvalidDataException(ErrorMessage.Category.ERR_CATEGORY_BEING_USED);
@@ -127,8 +112,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public PaginationResponseDto<CategoryResponseDto> searchCategoryByKeywordAndSortByKeyword(
-            String keyword,
+    public PaginationResponseDto<CategoryResponseDto> searchCategoryByKeywordAndSortByKeyword(String keyword,
             PaginationRequestDto paginationRequest) {
 
         // Pageable của Spring bắt đầu từ 0
@@ -143,7 +127,8 @@ public class CategoryServiceImpl implements CategoryService {
         List<Category> parentCategories = queryParent.getResultList();
 
         // 1.1. Query count của category con (parentCategory NOT NULL, theo keyword)
-        StringBuilder jpqlChildCount = new StringBuilder("SELECT COUNT(c) FROM Category c WHERE c.parentCategory IS NOT NULL");
+        StringBuilder jpqlChildCount = new StringBuilder(
+                "SELECT COUNT(c) FROM Category c WHERE c.parentCategory IS NOT NULL");
         if (StringUtils.hasLength(keyword)) {
             jpqlChildCount.append(" AND lower(c.categoryName) LIKE lower(:keyword) ");
             jpqlChildCount.append(" OR lower(c.description) LIKE lower(:keyword) ");
@@ -170,8 +155,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         // 3. Map parentCategories sang DTO
         List<CategoryResponseDto> categoryDtos = parentCategories.stream()
-                .map(categoryMapper::categoryToCategoryResponseDto)
-                .toList();
+                .map(categoryMapper::categoryToCategoryResponseDto).toList();
 
         // Tạo map parentId -> DTO
         Map<Long, CategoryResponseDto> parentMap = categoryDtos.stream()
@@ -196,12 +180,8 @@ public class CategoryServiceImpl implements CategoryService {
 
         log.info("page = {}; size = {}", page, size);
 
-        PaginationCustom paginationCustom = PaginationCustom.builder()
-                .pageNum(page + 1)
-                .pageSize(size)
-                .totalElement(totalElements)
-                .totalPages(totalPages)
-                .build();
+        PaginationCustom paginationCustom = PaginationCustom.builder().pageNum(page + 1).pageSize(size)
+                .totalElement(totalElements).totalPages(totalPages).build();
 
         return new PaginationResponseDto<>(paginationCustom, categoryDtos);
     }

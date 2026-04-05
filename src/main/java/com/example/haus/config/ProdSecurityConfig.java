@@ -26,7 +26,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,54 +57,54 @@ public class ProdSecurityConfig {
 
     @Bean
     public SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(publicEndpoints).permitAll()
-                        .requestMatchers(swaggerEndpoints).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/category").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/category/sub").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/promotion").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/product").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/product/category/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/product/category-id/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/product/search").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/product/filter").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/category/search").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/promotion/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/product/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/product/filter/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/payment/momo/callback").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/payment/momo/ipn-handler").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/review/top").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/product/review")
-                        .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/review/*")
-                        .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/review/*")
-                        .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
-                        .requestMatchers(HttpMethod.POST, "/api/v1/product/favorites")
-                        .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/product/favorites/**")
-                        .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
-                        .requestMatchers(HttpMethod.GET, "/api/v1/product/favorites")
-                        .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
-                        .requestMatchers(HttpMethod.GET, "/api/v1/product/favorites/check/**")
-                        .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
-                        .requestMatchers(HttpMethod.GET, "/api/v1/product/review/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/order").hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
-                        .requestMatchers(HttpMethod.PATCH, "/api/v1/order/**").hasAnyAuthority(RoleConstant.ADMIN)
-                        .requestMatchers(HttpMethod.POST, "/api/v1/orders").hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
-                        .requestMatchers(HttpMethod.GET, "/api/v1/order/**").hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
-                        .requestMatchers(HttpMethod.GET, "/api/v1/orders/**").hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
-                        .requestMatchers(userEndpoints).hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
-                        .requestMatchers(adminEndpoints).hasAnyAuthority(RoleConstant.ADMIN)
-                        .anyRequest().authenticated())
+        httpSecurity.csrf(AbstractHttpConfigurer::disable).cors(Customizer.withDefaults())
+                .authorizeHttpRequests(
+                        auth -> auth.requestMatchers(publicEndpoints).permitAll().requestMatchers(swaggerEndpoints)
+                                .permitAll().requestMatchers(HttpMethod.GET, "/api/v1/category").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/category/sub").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/promotion").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/product").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/product/category/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/product/category-id/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/product/search").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/v1/product/filter").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/category/search").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/promotion/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/product/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/product/filter/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/payment/momo/callback").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/v1/payment/momo/ipn-handler").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/review/top").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/v1/product/review")
+                                .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
+                                .requestMatchers(HttpMethod.PUT, "/api/v1/review/*")
+                                .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
+                                .requestMatchers(HttpMethod.DELETE, "/api/v1/review/*")
+                                .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
+                                .requestMatchers(HttpMethod.POST, "/api/v1/product/favorites")
+                                .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
+                                .requestMatchers(HttpMethod.DELETE, "/api/v1/product/favorites/**")
+                                .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
+                                .requestMatchers(HttpMethod.GET, "/api/v1/product/favorites")
+                                .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
+                                .requestMatchers(HttpMethod.GET, "/api/v1/product/favorites/check/**")
+                                .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
+                                .requestMatchers(HttpMethod.GET, "/api/v1/product/review/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/order")
+                                .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
+                                .requestMatchers(HttpMethod.PATCH, "/api/v1/order/**")
+                                .hasAnyAuthority(RoleConstant.ADMIN).requestMatchers(HttpMethod.POST, "/api/v1/orders")
+                                .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
+                                .requestMatchers(HttpMethod.GET, "/api/v1/order/**")
+                                .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN)
+                                .requestMatchers(HttpMethod.GET, "/api/v1/orders/**")
+                                .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN).requestMatchers(userEndpoints)
+                                .hasAnyAuthority(RoleConstant.USER, RoleConstant.ADMIN).requestMatchers(adminEndpoints)
+                                .hasAnyAuthority(RoleConstant.ADMIN).anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        httpSecurity.oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(jwt ->
-                                jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+        httpSecurity.oauth2ResourceServer(
+                oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
 
         return httpSecurity.build();
@@ -119,8 +118,7 @@ public class ProdSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        List<String> allowedOrigins = Arrays.stream(corsAllowedOrigins.split(","))
-                .map(String::trim)
+        List<String> allowedOrigins = Arrays.stream(corsAllowedOrigins.split(",")).map(String::trim)
                 .filter(origin -> !origin.isBlank()).collect(Collectors.toList());
         allowedOrigins.add("https://sandbox.vnpayment.vn");
         allowedOrigins.add("https://test-payment.momo.vn");

@@ -65,12 +65,12 @@ public class UrlConstant {
 
         private static final String PRE_FIX = "/cart";
 
-        public static final String ADD_CART = PRE_FIX ;
+        public static final String ADD_CART = PRE_FIX;
         public static final String UPDATE_CART = PRE_FIX;
         public static final String DELETE_CART = PRE_FIX;
         public static final String GET_CART_BY_USER_ID = PRE_FIX;
-        public static final String GET_ALL_CART= PRE_FIX + "/list";
-        public static final String REMOVE_CART_ITEM_FROM_CART= PRE_FIX + "/{variantId}";
+        public static final String GET_ALL_CART = PRE_FIX + "/list";
+        public static final String REMOVE_CART_ITEM_FROM_CART = PRE_FIX + "/{variantId}";
     }
 
     public static class Promotion {
@@ -109,7 +109,7 @@ public class UrlConstant {
 
         public static final String SEARCH_PRODUCTS_BY_KEYWORD = PRE_FIX + "/search";
         public static final String FILTER_PRODUCTS = PRE_FIX + "/filter";
-        
+
         public static final String ADD_FAVORITE = PRE_FIX + "/favorites";
         public static final String REMOVE_FAVORITE = PRE_FIX + "/favorites/{productId}";
         public static final String GET_FAVORITES = PRE_FIX + "/favorites";
@@ -138,7 +138,6 @@ public class UrlConstant {
         }
     }
 
-
     public static class Order {
         private static final String PRE_FIX = "/order";
 
@@ -160,11 +159,12 @@ public class UrlConstant {
         public static final String UPDATE_REVIEW = PRE_FIX + "/{reviewId}";
         public static final String DELETE_REVIEW = PRE_FIX + "/{reviewId}";
         public static final String GET_REVIEW_BY_ID = PRE_FIX + "/{reviewId}";
-        
+
         public static final String GET_PRODUCT_REVIEWS = PRODUCT_ID + PRE_FIX;
-        public static final String GET_PRODUCT_REVIEWS_BY_RATING = "/product/{productId}" + PRE_FIX + "/rating/{rating}";
+        public static final String GET_PRODUCT_REVIEWS_BY_RATING = "/product/{productId}" + PRE_FIX
+                + "/rating/{rating}";
         public static final String GET_PRODUCT_RATING_STATISTICS = "/product/{productId}" + PRE_FIX + "/statistics";
-        
+
         public static final String GET_MY_REVIEWS = "/user/me" + PRE_FIX;
         public static final String GET_TOP_REVIEWS = PRE_FIX + "/top";
 

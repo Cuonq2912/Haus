@@ -22,8 +22,6 @@ public class ResetPasswordRequestDto {
 
     @Schema(description = "Mật khẩu mới", example = "User123@")
     @NotBlank(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_])[A-Za-z\\d\\W_]{8,}$",
-            message = ErrorMessage.INVALID_FORMAT_PASSWORD
-    )
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_])[A-Za-z\\d\\W_]{8,}$", message = ErrorMessage.INVALID_FORMAT_PASSWORD)
     String newPassword;
 }

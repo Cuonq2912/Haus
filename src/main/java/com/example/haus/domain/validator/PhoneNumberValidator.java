@@ -8,9 +8,8 @@ import java.util.regex.Pattern;
 public class PhoneNumberValidator implements ConstraintValidator<PhoneNumber, String> {
 
     // 10 digits OR 123-456-7890 / 123.456.7890 / 123 456 7890 OR (123)-456-7890
-    private static final Pattern PHONE_PATTERN = Pattern.compile(
-            "^(?:\\d{10}|\\d{3}[-.\\s]\\d{3}[-.\\s]\\d{4}|\\(\\d{3}\\)-\\d{3}-\\d{4})$"
-    );
+    private static final Pattern PHONE_PATTERN = Pattern
+            .compile("^(?:\\d{10}|\\d{3}[-.\\s]\\d{3}[-.\\s]\\d{4}|\\(\\d{3}\\)-\\d{3}-\\d{4})$");
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {

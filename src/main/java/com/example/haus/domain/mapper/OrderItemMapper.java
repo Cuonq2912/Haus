@@ -1,18 +1,16 @@
 package com.example.haus.domain.mapper;
 
-
 import com.example.haus.domain.dto.order.OrderItemRequestDto;
 import com.example.haus.domain.dto.response.product.OrderItemResponseDto;
 import com.example.haus.domain.entity.product.OrderItem;
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.NullValueCheckStrategy;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring",
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
-        uses = {MediaMapper.class}
-)
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE, nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, uses = {
+        MediaMapper.class })
 public interface OrderItemMapper {
-
 
     OrderItem orderItemRequestDtoToOrderItem(OrderItemRequestDto orderItemRequestDto);
 

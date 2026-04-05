@@ -19,11 +19,10 @@ import java.util.stream.Collectors;
 public class PaymentUtil {
 
     public static String createPaymentUrl(Map<String, String> params) {
-        return params.entrySet().stream()
-                .filter(entry -> entry.getValue() != null && !entry.getValue().isEmpty())
+        return params.entrySet().stream().filter(entry -> entry.getValue() != null && !entry.getValue().isEmpty())
                 .sorted(Map.Entry.comparingByKey())
-                .map(entry -> URLEncoder.encode(entry.getKey(), StandardCharsets.US_ASCII)
-                        + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.US_ASCII))
+                .map(entry -> URLEncoder.encode(entry.getKey(), StandardCharsets.US_ASCII) + "="
+                        + URLEncoder.encode(entry.getValue(), StandardCharsets.US_ASCII))
                 .collect(Collectors.joining("&"));
     }
 
@@ -104,8 +103,7 @@ public class PaymentUtil {
             String fieldName = itr.next();
             String fieldValue = fields.get(fieldName);
             if ((fieldValue != null) && (!fieldValue.isEmpty())) {
-                hashData.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII))
-                        .append("=")
+                hashData.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII)).append("=")
                         .append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
                 if (itr.hasNext()) {
                     hashData.append("&");
@@ -116,23 +114,22 @@ public class PaymentUtil {
         return PaymentUtil.hmacSHA512(hashSecret, hashData.toString());
     }
 
-    public static String createOrderRawSignature(
-            String accessKey, Long amount, String extraData, String ipnUrl, String orderId, String orderInfo,
-            String partnerCode, String redirectUrl, String requestId, String requestType) {
+    public static String createOrderRawSignature(String accessKey, Long amount, String extraData, String ipnUrl,
+            String orderId, String orderInfo, String partnerCode, String redirectUrl, String requestId,
+            String requestType) {
         return String.format(
                 "accessKey=%s&amount=%s&extraData=%s&ipnUrl=%s&orderId=%s&orderInfo=%s&partnerCode=%s&redirectUrl=%s&requestId=%s&requestType=%s",
                 accessKey, amount, extraData, ipnUrl, orderId, orderInfo, partnerCode, redirectUrl, requestId,
                 requestType);
     }
 
-    public static String createIpnRawSignature(
-            String accessKey, Long amount, String extraData, String message,
-            String orderId, String orderInfo, String orderType, String partnerCode,
-            String payType, String requestId, Long responseTime, String resultCode, String transId) {
+    public static String createIpnRawSignature(String accessKey, Long amount, String extraData, String message,
+            String orderId, String orderInfo, String orderType, String partnerCode, String payType, String requestId,
+            Long responseTime, String resultCode, String transId) {
         return String.format(
                 "accessKey=%s&amount=%s&extraData=%s&message=%s&orderId=%s&orderInfo=%s&orderType=%s&partnerCode=%s&payType=%s&requestId=%s&responseTime=%s&resultCode=%s&transId=%s",
-                accessKey, amount, extraData, message, orderId, orderInfo, orderType,
-                partnerCode, payType, requestId, responseTime, resultCode, transId);
+                accessKey, amount, extraData, message, orderId, orderInfo, orderType, partnerCode, payType, requestId,
+                responseTime, resultCode, transId);
     }
 
     public static String encodeExtraData(ObjectMapper objectMapper, Map<String, Object> data) {

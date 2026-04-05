@@ -17,6 +17,7 @@ public interface PromotionService {
 
     PromotionResponseDto getPromotionByPromotionCode(String promotionCode);
 
-    PaginationResponseDto<PromotionResponseDto> filterPromotions(PaginationRequestDto paginationRequest, String sortByPrice, String... search);
+    PaginationResponseDto<PromotionResponseDto> filterPromotions(PaginationRequestDto paginationRequest,
+            String sortByPrice, String... search);
 
 }

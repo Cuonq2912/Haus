@@ -29,7 +29,7 @@ public class Promotion extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
-    PromotionType type; //Order, Category
+    PromotionType type; // Order, Category
 
     @Column(name = "description", nullable = false)
     String description;
@@ -64,10 +64,9 @@ public class Promotion extends BaseEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
-
     // ---------------- Helper methods ----------------
 
-    //Order Promotion
+    // Order Promotion
     public void addOrder(Order order) {
         if (!orders.contains(order)) {
             orders.add(order);

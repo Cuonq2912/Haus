@@ -6,7 +6,6 @@ import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.request.user.profile.ConfirmPasswordUpdateUserRequestDto;
 import com.example.haus.domain.dto.request.user.profile.UpdatePasswordRequestDto;
-import com.example.haus.domain.dto.response.product.ReviewResponseDto;
 import com.example.haus.domain.dto.response.user.UserResponseDto;
 import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.service.UserService;
@@ -36,78 +35,41 @@ public class UserController {
 
     UserService userService;
 
-    @Operation(
-            summary = "Xóa tài khoản",
-            description = "Dùng để người dùng xóa tài khoản của mình (soft delete)",
-            security = @SecurityRequirement(name = "Bearer Token")
-    )
+    @Operation(summary = "Xóa tài khoản", description = "Dùng để người dùng xóa tài khoản của mình (soft delete)", security = @SecurityRequirement(name = "Bearer Token"))
     @DeleteMapping(UrlConstant.User.DELETE_MY_ACCOUNT)
     public ResponseEntity<ResponseData<Void>> deleteMyAccount(Authentication authentication) {
         userService.deleteAccount(authentication);
-          return ResponseUtil.success(
-                  HttpStatus.OK,
-                  SuccessMessage.User.SOFT_DELETE_SUCCESS
-          );
+        return ResponseUtil.success(HttpStatus.OK, SuccessMessage.User.SOFT_DELETE_SUCCESS);
     }
 
-    @Operation(
-            summary = "Lấy thông tin profile",
-            description = "Dùng để người dùng lấy thông tin profile",
-            security = @SecurityRequirement(name = "Bearer Token")
-    )
+    @Operation(summary = "Lấy thông tin profile", description = "Dùng để người dùng lấy thông tin profile", security = @SecurityRequirement(name = "Bearer Token"))
     @GetMapping(UrlConstant.User.GET_PROFILE)
     public ResponseEntity<ResponseData<UserResponseDto>> getMyProfile(Authentication authentication) {
-        return ResponseUtil.success(
-                SuccessMessage.User.GET_MY_PROFILE_SUCCESS,
-                userService.getDetailProfile(authentication)
-        );
+        return ResponseUtil.success(SuccessMessage.User.GET_MY_PROFILE_SUCCESS,
+                userService.getDetailProfile(authentication));
     }
 
-    @Operation(
-            summary = "Cập nhật thông tin cá nhân",
-            description = "Dùng để người dùng cập nhật thông tin cá nhân",
-            security = @SecurityRequirement(name = "Bearer Token")
-    )
+    @Operation(summary = "Cập nhật thông tin cá nhân", description = "Dùng để người dùng cập nhật thông tin cá nhân", security = @SecurityRequirement(name = "Bearer Token"))
     @PutMapping(UrlConstant.User.UPDATE_PROFILE)
     public ResponseEntity<ResponseData<UserResponseDto>> updateProfile(
-            @Valid @RequestBody ConfirmPasswordUpdateUserRequestDto request,
-            Authentication authentication
-    ) {
-        return ResponseUtil.success(
-                SuccessMessage.User.UPDATE_PROFILE_SUCCESS,
-                userService.updateDetailProfile(request, authentication)
-        );
+            @Valid @RequestBody ConfirmPasswordUpdateUserRequestDto request, Authentication authentication) {
+        return ResponseUtil.success(SuccessMessage.User.UPDATE_PROFILE_SUCCESS,
+                userService.updateDetailProfile(request, authentication));
     }
 
-    @Operation(
-            summary = "Cập nhật mật khẩu",
-            description = "Dùng để người dùng cập nhật mật khẩu",
-            security = @SecurityRequirement(name = "Bearer Token")
-    )
+    @Operation(summary = "Cập nhật mật khẩu", description = "Dùng để người dùng cập nhật mật khẩu", security = @SecurityRequirement(name = "Bearer Token"))
     @PatchMapping(UrlConstant.User.UPDATE_PASSWORD)
-    public ResponseEntity<ResponseData<Void>> updatePassword(
-            @Valid @RequestBody UpdatePasswordRequestDto request,
-            Authentication authentication
-    ) {
+    public ResponseEntity<ResponseData<Void>> updatePassword(@Valid @RequestBody UpdatePasswordRequestDto request,
+            Authentication authentication) {
         userService.updatePassword(request, authentication);
-        return ResponseUtil.success(
-                HttpStatus.OK,
-                SuccessMessage.User.UPDATE_PASSWORD_SUCCESS
-        );
+        return ResponseUtil.success(HttpStatus.OK, SuccessMessage.User.UPDATE_PASSWORD_SUCCESS);
     }
 
-    @Operation(
-            summary = "Tải lên ảnh đại diện",
-            description = "Dùng để người dùng tải lên ảnh đại diện",
-            security = @SecurityRequirement(name = "Bearer Token")
-    )
+    @Operation(summary = "Tải lên ảnh đại diện", description = "Dùng để người dùng tải lên ảnh đại diện", security = @SecurityRequirement(name = "Bearer Token"))
     @PostMapping(value = UrlConstant.User.UPLOAD_AVATAR, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseData<UserResponseDto>> uploadAvatar(
-            @RequestParam("file") MultipartFile file,
-            Authentication authentication
-    ) throws IOException {
+    public ResponseEntity<ResponseData<UserResponseDto>> uploadAvatar(@RequestParam("file") MultipartFile file,
+            Authentication authentication) throws IOException {
         return ResponseUtil.success(SuccessMessage.User.UPDATE_AVATAR_SUCCESS,
-                userService.uploadAvatar(file, authentication)
-        );
+                userService.uploadAvatar(file, authentication));
     }
 }

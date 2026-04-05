@@ -32,11 +32,10 @@ public class RateLimitConfig {
     @Value("${spring.redis.password}")
     String redisPassword;
 
-
     // dev - environment
     @Bean
     @ConditionalOnProperty(name = "rate-limit.storage-type", havingValue = "memory", matchIfMissing = true)
-    public BucketStorage inMemoryBucketStorage(){
+    public BucketStorage inMemoryBucketStorage() {
         log.info("Initializing in-memory rate limit storage");
         return new InMemoryBucketStorage();
     }
@@ -56,15 +55,14 @@ public class RateLimitConfig {
         poolConfig.setBlockWhenExhausted(true);
 
         JedisPool jedisPool;
-        if(redisPassword != null && !redisPassword.isEmpty()){
+        if (redisPassword != null && !redisPassword.isEmpty()) {
             jedisPool = new JedisPool(poolConfig, redisHost, redisPort, 2000, redisPassword);
         } else {
             jedisPool = new JedisPool(poolConfig, redisHost, redisPort);
         }
 
-        ProxyManager<byte[]> proxyManager = JedisBasedProxyManager.builderFor(jedisPool)
-                .withExpirationStrategy(ExpirationAfterWriteStrategy.basedOnTimeForRefillingBucketUpToMax(Duration.ofHours(1)))
-                .build();
+        ProxyManager<byte[]> proxyManager = JedisBasedProxyManager.builderFor(jedisPool).withExpirationStrategy(
+                ExpirationAfterWriteStrategy.basedOnTimeForRefillingBucketUpToMax(Duration.ofHours(1))).build();
 
         return new RedisBucketStorage(proxyManager);
     }

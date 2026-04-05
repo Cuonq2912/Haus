@@ -15,7 +15,8 @@ public interface ProductVariationService {
 
     ProductVariationResponseDto createProductVariation(CreateProductVariationRequestDto request, MultipartFile image);
 
-    ProductVariationResponseDto updateProductVariation(Long productVariantId, UpdateProductVariationRequestDto request, MultipartFile image);
+    ProductVariationResponseDto updateProductVariation(Long productVariantId, UpdateProductVariationRequestDto request,
+            MultipartFile image);
 
     void deleteProductVariation(Long productVariationId);
 

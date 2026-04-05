@@ -9,9 +9,9 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class ResponseData<T> implements Serializable {
-    private  int status;
+    private int status;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private  String message;
+    private String message;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private transient T data;
 

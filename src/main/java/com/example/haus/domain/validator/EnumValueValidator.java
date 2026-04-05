@@ -13,14 +13,15 @@ public class EnumValueValidator implements ConstraintValidator<EnumValue, CharSe
     @Override
     public void initialize(EnumValue constraintAnnotation) {
         if (constraintAnnotation != null) {
-            this.acceptedValue = Stream.of(constraintAnnotation.enumClass().getEnumConstants())
-                    .map(Enum::name).toList();
+            this.acceptedValue = Stream.of(constraintAnnotation.enumClass().getEnumConstants()).map(Enum::name)
+                    .toList();
         }
     }
 
     @Override
     public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
-        if (value == null) return true;
+        if (value == null)
+            return true;
         return acceptedValue.contains(value.toString().toUpperCase());
     }
 }

@@ -45,4 +45,3 @@ public class Review extends BaseEntity {
     OrderItem orderItem;
 
 }
-

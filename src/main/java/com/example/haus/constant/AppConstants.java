@@ -1,8 +1,8 @@
 package com.example.haus.constant;
 
-
 public class AppConstants {
-    private AppConstants() {}
+    private AppConstants() {
+    }
 
     public static final String SORT_BY = "(\\w+?)(:)(.*)";
 

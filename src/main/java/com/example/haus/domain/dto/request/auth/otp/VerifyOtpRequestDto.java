@@ -21,4 +21,3 @@ public class VerifyOtpRequestDto {
     @NotBlank(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
     String otp;
 }
-

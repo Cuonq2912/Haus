@@ -35,10 +35,8 @@ public class MomoConfig {
     @Value("${payment.momo.request-type}")
     String requestType;
 
-
-    public Map<String, Object> buildCreateOrderParams(String requestId, String orderId, 
-                                                       Long amount, String orderInfo, 
-                                                       String extraData) {
+    public Map<String, Object> buildCreateOrderParams(String requestId, String orderId, Long amount, String orderInfo,
+            String extraData) {
         Map<String, Object> params = new HashMap<>();
         params.put("partnerCode", this.partnerCode);
         params.put("storeId", "HausStore");

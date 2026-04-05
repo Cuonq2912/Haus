@@ -1,10 +1,8 @@
 package com.example.haus.service.impl;
 
 import com.example.haus.config.VNPayConfig;
-import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.OrderStatus;
-import com.example.haus.domain.dto.request.auth.otp.PendingResetPasswordRequestDto;
 import com.example.haus.domain.entity.product.Order;
 import com.example.haus.domain.entity.product.OrderItem;
 import com.example.haus.domain.entity.product.ProductVariation;
@@ -28,9 +26,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.A;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,7 +71,8 @@ public class VNPayServiceImpl implements VNPayService {
     public String createVNPayUrl(Long orderId, String username, HttpServletRequest request) {
         Order order = getAccessibleOrder(orderId, username);
 
-        if (!order.getPayment().getGateway().equals(PaymentGateway.VNPAY) || !order.getPayment().getType().equals(PaymentType.ONLINE_PAYMENT)) {
+        if (!order.getPayment().getGateway().equals(PaymentGateway.VNPAY)
+                || !order.getPayment().getType().equals(PaymentType.ONLINE_PAYMENT)) {
             throw new InvalidDataException("Payment type invalid");
         }
 
@@ -87,7 +84,7 @@ public class VNPayServiceImpl implements VNPayService {
         Date expireTime = payment.getExpireAt();
 
         buildTimeParams(params, expireTime, currentTime);
-        
+
         long amountInVND = Math.round(payment.getAmount() * 100);
         params.put("vnp_Amount", String.valueOf(amountInVND));
 
@@ -150,7 +147,7 @@ public class VNPayServiceImpl implements VNPayService {
         if (payment.getStatus() == PaymentStatus.EXPIRED || payment.getStatus() == PaymentStatus.CANCELLED) {
             Calendar newExpireTime = Calendar.getInstance(TimeZone.getTimeZone(ETC_GMT7));
             newExpireTime.add(Calendar.SECOND, maxPaymentTime);
-            
+
             payment.setStatus(PaymentStatus.PENDING);
             payment.setExpireAt(newExpireTime.getTime());
             return paymentRepository.save(payment);
@@ -161,11 +158,11 @@ public class VNPayServiceImpl implements VNPayService {
         if (payment.getStatus() == PaymentStatus.PENDING && !currentTime.before(payment.getExpireAt())) {
             Calendar newExpireTime = Calendar.getInstance(TimeZone.getTimeZone(ETC_GMT7));
             newExpireTime.add(Calendar.SECOND, maxPaymentTime);
-            
+
             payment.setExpireAt(newExpireTime.getTime());
             return paymentRepository.save(payment);
         }
-        
+
         return payment;
     }
 
@@ -173,15 +170,10 @@ public class VNPayServiceImpl implements VNPayService {
         Calendar expireTime = Calendar.getInstance(TimeZone.getTimeZone(ETC_GMT7));
         expireTime.add(Calendar.SECOND, maxPaymentTime);
 
-        Payment payment = Payment.builder()
-                .amount(order.getTotalAmount())
-                .gateway(PaymentGateway.VNPAY)
-                .type(PaymentType.ONLINE_PAYMENT)
-                .status(PaymentStatus.PENDING)
-                .expireAt(expireTime.getTime())
-                .order(order)
-                .build();
-        
+        Payment payment = Payment.builder().amount(order.getTotalAmount()).gateway(PaymentGateway.VNPAY)
+                .type(PaymentType.ONLINE_PAYMENT).status(PaymentStatus.PENDING).expireAt(expireTime.getTime())
+                .order(order).build();
+
         return paymentRepository.save(payment);
     }
 
@@ -190,7 +182,7 @@ public class VNPayServiceImpl implements VNPayService {
         if (expiredTime == null || currentTime == null) {
             throw new InvalidDataException("Expired time and current time must not be null");
         }
-        
+
         TimeZone vnTimeZone = TimeZone.getTimeZone(ETC_GMT7);
         Calendar now = Calendar.getInstance(vnTimeZone);
 
@@ -219,65 +211,65 @@ public class VNPayServiceImpl implements VNPayService {
     public Map<String, String> processVNPayIPN(Map<String, String> params) {
         Map<String, String> response = new HashMap<>();
 
-            log.info("IPN: Received params: {}", params);
-            
-            if (!verifySignature(params)) {  // ✅ ĐÚNG: Nếu signature KHÔNG hợp lệ
-                log.error("IPN: Invalid signature!");
-                response.put(RSP_CODE, "97");
-                response.put(MESSAGE, "Invalid signature");
-                return response;
-            }
-            
-            log.info("IPN: Signature verified successfully");
+        log.info("IPN: Received params: {}", params);
 
-            String txnRef = params.get(VNP_TXN_REF);
-            String responseCode = params.get("vnp_ResponseCode");
-            Long amount = Long.parseLong(params.get("vnp_Amount")) / 100;
+        if (!verifySignature(params)) { // ✅ ĐÚNG: Nếu signature KHÔNG hợp lệ
+            log.error("IPN: Invalid signature!");
+            response.put(RSP_CODE, "97");
+            response.put(MESSAGE, "Invalid signature");
+            return response;
+        }
 
-            String[] p = txnRef.split("-");
-            Long orderId = Long.valueOf(p[0]);
-            
-            log.info("IPN: Processing order {} with responseCode: {}", orderId, responseCode);
-            
-            Order order = orderRepository.findById(orderId)
-                    .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
+        log.info("IPN: Signature verified successfully");
 
-            Payment payment = order.getPayment();
+        String txnRef = params.get(VNP_TXN_REF);
+        String responseCode = params.get("vnp_ResponseCode");
+        Long amount = Long.parseLong(params.get("vnp_Amount")) / 100;
 
-            if (payment.getStatus() == PaymentStatus.COMPLETED) {
-                log.warn("IPN: Order {} already processed as COMPLETED", orderId);
-                response.put(RSP_CODE, "02");
-                response.put(MESSAGE, "Order already confirmed");
-                return response;
-            }
+        String[] p = txnRef.split("-");
+        Long orderId = Long.valueOf(p[0]);
 
-            long expectedAmount = Math.round(payment.getAmount());
-            if (expectedAmount != amount) {
-                log.error("IPN: Amount mismatch! Expected: {}, Got: {}", expectedAmount, amount);
-                response.put(RSP_CODE, "04");
-                response.put(MESSAGE, "Invalid amount");
-                return response;
-            }
+        log.info("IPN: Processing order {} with responseCode: {}", orderId, responseCode);
 
-            if (SUCCESS_CODE.equals(responseCode)) {
-                updateInventoryForCompletedOrder(order);
-                payment.setStatus(PaymentStatus.COMPLETED);
-                order.setStatus(OrderStatus.COMPLETED);
-                log.info("IPN: Order {} marked as COMPLETED", orderId);
-            } else {
-                payment.setStatus(PaymentStatus.CANCELLED);
-                order.setStatus(OrderStatus.CANCELLED);
-                log.info("IPN: Order {} marked as CANCELLED", orderId);
-            }
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
 
-            paymentRepository.save(payment);
-            orderRepository.save(order);
-            
-            log.info("IPN: Database updated successfully for order{}", orderId);
+        Payment payment = order.getPayment();
 
-            response.put("RspCode", "00");
-            response.put("Message", "Confirm Success");
-            checkIpnList.put(params.get(VNP_TXN_REF).split("-")[0], true);
+        if (payment.getStatus() == PaymentStatus.COMPLETED) {
+            log.warn("IPN: Order {} already processed as COMPLETED", orderId);
+            response.put(RSP_CODE, "02");
+            response.put(MESSAGE, "Order already confirmed");
+            return response;
+        }
+
+        long expectedAmount = Math.round(payment.getAmount());
+        if (expectedAmount != amount) {
+            log.error("IPN: Amount mismatch! Expected: {}, Got: {}", expectedAmount, amount);
+            response.put(RSP_CODE, "04");
+            response.put(MESSAGE, "Invalid amount");
+            return response;
+        }
+
+        if (SUCCESS_CODE.equals(responseCode)) {
+            updateInventoryForCompletedOrder(order);
+            payment.setStatus(PaymentStatus.COMPLETED);
+            order.setStatus(OrderStatus.COMPLETED);
+            log.info("IPN: Order {} marked as COMPLETED", orderId);
+        } else {
+            payment.setStatus(PaymentStatus.CANCELLED);
+            order.setStatus(OrderStatus.CANCELLED);
+            log.info("IPN: Order {} marked as CANCELLED", orderId);
+        }
+
+        paymentRepository.save(payment);
+        orderRepository.save(order);
+
+        log.info("IPN: Database updated successfully for order{}", orderId);
+
+        response.put("RspCode", "00");
+        response.put("Message", "Confirm Success");
+        checkIpnList.put(params.get(VNP_TXN_REF).split("-")[0], true);
 
         return response;
     }
@@ -287,7 +279,7 @@ public class VNPayServiceImpl implements VNPayService {
     public Map<String, Object> handleVNPayReturn(Map<String, String> params) {
         Map<String, Object> result = new HashMap<>();
 
-        if (!verifySignature(params)) {  // ĐÚNG: Nếu signature KHÔNG hợp lệ
+        if (!verifySignature(params)) { // ĐÚNG: Nếu signature KHÔNG hợp lệ
             log.error("Return: Invalid signature!");
             result.put("success", false);
             result.put("message", "Invalid signature");
@@ -316,7 +308,7 @@ public class VNPayServiceImpl implements VNPayService {
 
         String calculatedHash = PaymentUtil.hashAllFields(fieldsToHash, vnPayConfig.getVnPayHashSecret());
 
-        return calculatedHash.equalsIgnoreCase(receivedHash);  // ✅ ĐÚNG: TRUE = valid, FALSE = invalid
+        return calculatedHash.equalsIgnoreCase(receivedHash); // ✅ ĐÚNG: TRUE = valid, FALSE = invalid
     }
 
     public void updateInventoryForCompletedOrder(Order order) {

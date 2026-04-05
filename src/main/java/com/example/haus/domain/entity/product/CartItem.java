@@ -15,20 +15,19 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CartItem extends BaseEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
 
-  @Column(name = "quantity", nullable = false)
-  Integer quantity;
+    @Column(name = "quantity", nullable = false)
+    Integer quantity;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "cart_id", nullable = false)
-  Cart cart;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cart_id", nullable = false)
+    Cart cart;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "product_variation_id", nullable = false)
-  ProductVariation productVariation;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_variation_id", nullable = false)
+    ProductVariation productVariation;
 
 }

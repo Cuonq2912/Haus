@@ -9,13 +9,10 @@ public class DotenvInitializer implements ApplicationContextInitializer<Configur
     @Override
     public void initialize(ConfigurableApplicationContext applicationContext) {
         // Load .env
-        Dotenv dotenv = Dotenv.configure()
-                .ignoreIfMissing()  // không lỗi nếu không có file .env
+        Dotenv dotenv = Dotenv.configure().ignoreIfMissing() // không lỗi nếu không có file .env
                 .load();
 
         // Đưa tất cả biến từ .env vào system properties
-        dotenv.entries().forEach(entry ->
-                System.setProperty(entry.getKey(), entry.getValue())
-        );
+        dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
     }
 }

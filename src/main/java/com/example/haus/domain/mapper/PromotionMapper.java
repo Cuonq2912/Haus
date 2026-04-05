@@ -5,13 +5,10 @@ import com.example.haus.domain.dto.response.promotion.PromotionResponseDto;
 import com.example.haus.domain.entity.product.Promotion;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring",
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL,
-        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS
-)
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL, nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface PromotionMapper {
 
-    Promotion promotionRequestDtoToPromotion (PromotionRequestDto requestDto);
+    Promotion promotionRequestDtoToPromotion(PromotionRequestDto requestDto);
 
     void updatePromotionFromDto(PromotionRequestDto requestDto, @MappingTarget Promotion promotion);
 

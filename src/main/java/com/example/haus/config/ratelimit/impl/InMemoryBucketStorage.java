@@ -17,15 +17,12 @@ public class InMemoryBucketStorage implements BucketStorage {
 
     @Override
     public Bucket resolveBucket(String key, long capacity, long refillTokens, Duration refillDuration) {
-        return buckets.computeIfAbsent(key, k -> createBucket(capacity, refillTokens, refillDuration)
-        );
+        return buckets.computeIfAbsent(key, k -> createBucket(capacity, refillTokens, refillDuration));
     }
 
     private Bucket createBucket(long capacity, long refillTokens, Duration refillDuration) {
         Bandwidth limit = Bandwidth.classic(capacity, Refill.intervally(refillTokens, refillDuration));
-        return Bucket.builder()
-                .addLimit(limit)
-                .build();
+        return Bucket.builder().addLimit(limit).build();
     }
 
     @Override

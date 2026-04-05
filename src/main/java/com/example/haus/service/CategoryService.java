@@ -21,5 +21,6 @@ public interface CategoryService {
 
     void deleteCategory(Long id);
 
-    PaginationResponseDto<CategoryResponseDto> searchCategoryByKeywordAndSortByKeyword(String keyword, PaginationRequestDto paginationRequest);
+    PaginationResponseDto<CategoryResponseDto> searchCategoryByKeywordAndSortByKeyword(String keyword,
+            PaginationRequestDto paginationRequest);
 }

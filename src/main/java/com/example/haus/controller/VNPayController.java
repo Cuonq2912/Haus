@@ -1,6 +1,5 @@
 package com.example.haus.controller;
 
-
 import com.example.haus.base.ResponseUtil;
 import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.ErrorMessage;
@@ -36,54 +35,31 @@ public class VNPayController {
 
     VNPayService vnPayService;
 
-    @Operation(
-            summary = "Lấy VNPay URL",
-            description = "Tạo VNPay URL cho thanh toán VNPay với orderId",
-            security = @SecurityRequirement(name = "Bearer Token")
-    )
+    @Operation(summary = "Lấy VNPay URL", description = "Tạo VNPay URL cho thanh toán VNPay với orderId", security = @SecurityRequirement(name = "Bearer Token"))
     @GetMapping(UrlConstant.Payment.GET_PAYMENT_URL)
-    public ResponseEntity<ResponseData<String>> getVNPayUrl(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @RequestParam(value = "orderId") Long orderId,
-            HttpServletRequest request
-    ) {
-            String vnPayUrl = vnPayService.createVNPayUrl(orderId, userDetails.getUsername(), request);
-            return ResponseUtil.success(
-                            HttpStatus.OK,
-                            SuccessMessage.Payment.GET_VNPAYURL_SUCCESS,
-                    vnPayUrl);
+    public ResponseEntity<ResponseData<String>> getVNPayUrl(@AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(value = "orderId") Long orderId, HttpServletRequest request) {
+        String vnPayUrl = vnPayService.createVNPayUrl(orderId, userDetails.getUsername(), request);
+        return ResponseUtil.success(HttpStatus.OK, SuccessMessage.Payment.GET_VNPAYURL_SUCCESS, vnPayUrl);
 
     }
 
-    @Operation(
-        summary = "VNPay IPN (Instant Payment Notification)",
-        description = "API này nhận thông báo thanh toán trực tiếp từ VNPay server (Trước vnpay return api) (Server-to-Server)"
-    )
+    @Operation(summary = "VNPay IPN (Instant Payment Notification)", description = "API này nhận thông báo thanh toán trực tiếp từ VNPay server (Trước vnpay return api) (Server-to-Server)")
     @GetMapping(UrlConstant.Payment.VNPAY_IPN)
     public ResponseEntity<ResponseData<Map<String, String>>> vnPayIPN(@RequestParam Map<String, String> allParams) {
 
         Map<String, String> response = vnPayService.processVNPayIPN(allParams);
-        return ResponseUtil.success(
-                HttpStatus.OK,
-                SuccessMessage.Payment.IPN_RECEIVED_SUCCESS,
-                response);
+        return ResponseUtil.success(HttpStatus.OK, SuccessMessage.Payment.IPN_RECEIVED_SUCCESS, response);
     }
-    
 
-    @Operation(
-            summary = "Xử lý VNPay return",
-            description = "VNPay gọi về khi thanh toán xong (Callback URL)"
-    )
+    @Operation(summary = "Xử lý VNPay return", description = "VNPay gọi về khi thanh toán xong (Callback URL)")
     @GetMapping(UrlConstant.Payment.VNPAY_RETURN)
     public ResponseEntity<ResponseData<Object>> vnPayReturn(@RequestParam Map<String, String> allParams) {
         Map<String, Object> result = vnPayService.handleVNPayReturn(allParams);
         log.info("success = {}", result.get("success"));
         boolean success = (boolean) result.get("success");
-        return success
-                ? ResponseUtil.success(HttpStatus.OK, SuccessMessage.Payment.CALLBACK_VNPAY_SUCCESS, result)
+        return success ? ResponseUtil.success(HttpStatus.OK, SuccessMessage.Payment.CALLBACK_VNPAY_SUCCESS, result)
                 : ResponseUtil.success(HttpStatus.BAD_REQUEST, ErrorMessage.Payment.CALLBACK_VNPAY_FAIL, null);
     }
-
-    
 
 }

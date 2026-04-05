@@ -51,8 +51,8 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartResponseDto addToCart(String email, CartRequest cartRequest) {
 
-        User user = userRepository.findByUsernameAndIsDeletedFalse(email).orElseThrow(
-                () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+        User user = userRepository.findByUsernameAndIsDeletedFalse(email)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Cart.ERR_CART_NOT_FOUND));
@@ -61,76 +61,70 @@ public class CartServiceImpl implements CartService {
             throw new InvalidDataException(ErrorMessage.Cart.ERR_CART_QUANTITY_INVALID);
         }
 
-        ProductVariation productVariation = productVariationRepository.findByIdAndIsDeletedFalse(cartRequest.variantId())
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
+        ProductVariation productVariation = productVariationRepository
+                .findByIdAndIsDeletedFalse(cartRequest.variantId()).orElseThrow(
+                        () -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
 
         CartItem cartItem = cart.getCartItems().stream()
-                .filter(item -> item.getProductVariation().getId().equals(cartRequest.variantId()))
-                .findFirst()
+                .filter(item -> item.getProductVariation().getId().equals(cartRequest.variantId())).findFirst()
                 .orElse(null);
 
-        if(productVariation.getInventoryQuantity() < (cartRequest.quantity() + (cartItem != null ? cartItem.getQuantity() : 0))) {
+        if (productVariation
+                .getInventoryQuantity() < (cartRequest.quantity() + (cartItem != null ? cartItem.getQuantity() : 0))) {
             throw new InvalidDataException(ErrorMessage.Cart.ERR_CART_QUANTITY_INVALID);
         }
 
         if (cartItem != null) {
             cartItem.setQuantity(cartItem.getQuantity() + cartRequest.quantity());
-        }
-        else {
-            CartItem newItem = CartItem.builder()
-                    .quantity(cartRequest.quantity())
-                    .cart(cart)
-                    .productVariation(productVariation)
-                    .build();
+        } else {
+            CartItem newItem = CartItem.builder().quantity(cartRequest.quantity()).cart(cart)
+                    .productVariation(productVariation).build();
             cart.getCartItems().add(newItem);
         }
 
         Cart updatedCart = cartRepository.save(cart);
 
         return getAllProductVariantInCart(cartMapper.cartToCartResponse(CartItemResponseDto.builder()
-                .products(cartItemMapper.groupCartItemByProduct(updatedCart.getCartItems()))
-                .build()));
+                .products(cartItemMapper.groupCartItemByProduct(updatedCart.getCartItems())).build()));
     }
 
     @Override
     @Transactional
     public CartResponseDto getCart(String email) {
-        User user = userRepository.findByUsernameAndIsDeletedFalse(email).orElseThrow(
-                () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+        User user = userRepository.findByUsernameAndIsDeletedFalse(email)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Cart.ERR_CART_NOT_FOUND));
 
         return getAllProductVariantInCart(cartMapper.cartToCartResponse(CartItemResponseDto.builder()
-                        .products(cartItemMapper.groupCartItemByProduct(cart.getCartItems()))
-                .build()));
+                .products(cartItemMapper.groupCartItemByProduct(cart.getCartItems())).build()));
     }
 
     @Override
     @Transactional
     public CartResponseDto removeItem(String email, Long productVariationId) {
-        User user = userRepository.findByUsernameAndIsDeletedFalse(email).orElseThrow(
-                () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+        User user = userRepository.findByUsernameAndIsDeletedFalse(email)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Cart.ERR_CART_NOT_FOUND));
 
-
-        boolean removed = cart.getCartItems().removeIf(item -> item.getProductVariation().getId().equals(productVariationId));
+        boolean removed = cart.getCartItems()
+                .removeIf(item -> item.getProductVariation().getId().equals(productVariationId));
 
         if (!removed) {
             throw new InvalidDataException(ErrorMessage.Cart.ERR_CART_ITEM_NOT_EXISTED_IN_CART);
         }
 
         return getAllProductVariantInCart(cartMapper.cartToCartResponse(CartItemResponseDto.builder()
-                .products(cartItemMapper.groupCartItemByProduct(cartRepository.save(cart).getCartItems()))
-                .build()));
+                .products(cartItemMapper.groupCartItemByProduct(cartRepository.save(cart).getCartItems())).build()));
     }
 
     @Override
     public void clearCart(String email) {
-        User user = userRepository.findByUsernameAndIsDeletedFalse(email).orElseThrow(
-                () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+        User user = userRepository.findByUsernameAndIsDeletedFalse(email)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Cart.ERR_CART_NOT_FOUND));
@@ -142,12 +136,12 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public CartResponseDto updateCart(String email, UpdateCartRequest updateCartRequest) {
-            if (updateCartRequest.quantity() <= 0) {
+        if (updateCartRequest.quantity() <= 0) {
             throw new InvalidDataException(ErrorMessage.Cart.ERR_CART_QUANTITY_INVALID);
         }
 
-        User user = userRepository.findByUsernameAndIsDeletedFalse(email).orElseThrow(
-                () -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+        User user = userRepository.findByUsernameAndIsDeletedFalse(email)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
 
         Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Cart.ERR_CART_NOT_FOUND));
@@ -157,20 +151,21 @@ public class CartServiceImpl implements CartService {
         if (updateCartRequest.oldVariantId() != null) {
             existingItem = cart.getCartItems().stream()
                     .filter(item -> item.getProductVariation().getId().equals(updateCartRequest.oldVariantId()))
-                    .findFirst()
-                    .orElse(null);
+                    .findFirst().orElse(null);
 
             if (existingItem == null) {
                 throw new InvalidDataException(ErrorMessage.Cart.ERR_CURR_CART_ITEM_NOT_EXISTED_IN_CART);
             }
         }
 
-        var currentVariantInCart = updateCartRequest.newVariantId() != null ? updateCartRequest.newVariantId() : updateCartRequest.oldVariantId();
+        var currentVariantInCart = updateCartRequest.newVariantId() != null ? updateCartRequest.newVariantId()
+                : updateCartRequest.oldVariantId();
 
         ProductVariation productVariation = productVariationRepository.findByIdAndIsDeletedFalse(currentVariantInCart)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_VARIATION_NOT_EXISTED));
 
-        if(productVariation.getInventoryQuantity() < updateCartRequest.quantity() ) {
+        if (productVariation.getInventoryQuantity() < updateCartRequest.quantity()) {
             throw new InvalidDataException(ErrorMessage.Cart.ERR_CART_QUANTITY_INVALID);
         }
 
@@ -181,8 +176,7 @@ public class CartServiceImpl implements CartService {
         cartItemRepository.save(existingItem);
 
         return getAllProductVariantInCart(cartMapper.cartToCartResponse(CartItemResponseDto.builder()
-                .products(cartItemMapper.groupCartItemByProduct(cart.getCartItems()))
-                .build()));
+                .products(cartItemMapper.groupCartItemByProduct(cart.getCartItems())).build()));
     }
 
     private CartResponseDto getAllProductVariantInCart(CartResponseDto cartResponseDto) {
@@ -198,17 +192,14 @@ public class CartServiceImpl implements CartService {
                         .map(com.example.haus.domain.dto.response.cart.ProductVariationInCartResponseDto::getId)
                         .toList();
 
-                List<ProductVariation> missingVariations = product.getProductVariations()
-                        .stream()
-                        .filter(dbVariant -> !existingVariantIds.contains(dbVariant.getId()))
-                        .toList();
+                List<ProductVariation> missingVariations = product.getProductVariations().stream()
+                        .filter(dbVariant -> !existingVariantIds.contains(dbVariant.getId())).toList();
 
                 for (var variant : missingVariations) {
-                    ProductVariationInCartResponseDto productVariationInCartResponseDto = ProductVariationMapper.INSTANCE.productVariationToProductVariationInCartDto(variant);
+                    ProductVariationInCartResponseDto productVariationInCartResponseDto = ProductVariationMapper.INSTANCE
+                            .productVariationToProductVariationInCartDto(variant);
                     productVariationInCartResponseDto.setIsSelected(false);
-                    item.getProductVariations().add(
-                            productVariationInCartResponseDto
-                    );
+                    item.getProductVariations().add(productVariationInCartResponseDto);
                 }
             }
         }

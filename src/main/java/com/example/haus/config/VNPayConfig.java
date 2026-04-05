@@ -1,6 +1,5 @@
 package com.example.haus.config;
 
-
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -38,8 +37,6 @@ public class VNPayConfig {
 
     @Value("${payment.vnPay.locale:vn}")
     private String vnPayLocale;
-
-
 
     public Map<String, String> getConfig() {
         Map<String, String> vnpParamsMap = new HashMap<>();

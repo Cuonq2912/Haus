@@ -4,7 +4,6 @@ import com.example.haus.domain.dto.response.product.MediaResponseDto;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-
 @Getter
 @Setter
 @AllArgsConstructor

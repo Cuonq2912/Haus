@@ -17,13 +17,12 @@ public class RateLimitInterceptor implements HandlerInterceptor {
     private final RateLimitService rateLimitService;
 
     @Override
-    public boolean preHandle(HttpServletRequest request,
-                             @NotNull HttpServletResponse response,
-                             @NotNull Object handler) throws Exception {
-        
-        if("OPTIONS".equalsIgnoreCase(request.getMethod())){
+    public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler)
+            throws Exception {
+
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             return true;
         }
-            return rateLimitService.allowRequest(request);
+        return rateLimitService.allowRequest(request);
     }
 }

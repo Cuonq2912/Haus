@@ -44,5 +44,4 @@ public class OrderRequestDto {
     @Schema(example = "1")
     Long promotionId;
 
-
 }

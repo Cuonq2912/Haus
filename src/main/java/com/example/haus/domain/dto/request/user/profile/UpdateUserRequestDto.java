@@ -11,7 +11,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -41,7 +40,7 @@ public class UpdateUserRequestDto {
     String phone;
 
     @Schema(description = "Giới tính", example = "MALE / FEMALE / OTHER")
-    @GenderSubset(anyOf = {Gender.MALE, Gender.FEMALE, Gender.OTHER})
+    @GenderSubset(anyOf = { Gender.MALE, Gender.FEMALE, Gender.OTHER })
     Gender gender;
 
     @Schema(description = "Quốc tịch", example = "Việt Nam")

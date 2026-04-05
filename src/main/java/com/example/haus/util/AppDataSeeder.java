@@ -104,10 +104,7 @@ public class AppDataSeeder implements ApplicationRunner {
                         List<Media> mediaList = new ArrayList<>();
                         if (dto.images != null) {
                             for (String imageUrl : dto.images) {
-                                Media media = Media.builder()
-                                        .url(imageUrl)
-                                        .type(MediaType.IMAGE)
-                                        .product(product)
+                                Media media = Media.builder().url(imageUrl).type(MediaType.IMAGE).product(product)
                                         .build();
                                 media = mediaRepository.save(media);
                                 mediaList.add(media);
@@ -117,17 +114,12 @@ public class AppDataSeeder implements ApplicationRunner {
 
                         if (dto.variations != null) {
                             for (VariationJsonDto variationDto : dto.variations) {
-                                ProductVariation variation = ProductVariation.builder()
-                                        .color(variationDto.color)
+                                ProductVariation variation = ProductVariation.builder().color(variationDto.color)
                                         .size(variationDto.size != null ? variationDto.size : "")
-                                        .price(variationDto.price)
-                                        .inventoryQuantity(variationDto.inventoryQuantity)
+                                        .price(variationDto.price).inventoryQuantity(variationDto.inventoryQuantity)
                                         .soldQuantity(variationDto.soldQuantity != null ? variationDto.soldQuantity : 0)
                                         .isDeleted(variationDto.isDeleted != null ? variationDto.isDeleted : false)
-                                        .imageIndex(variationDto.imageIndex)
-                                        .product(product)
-                                        .build();
-
+                                        .imageIndex(variationDto.imageIndex).product(product).build();
 
                                 variation = productVariationRepository.save(variation);
                                 variationCount++;
@@ -143,8 +135,8 @@ public class AppDataSeeder implements ApplicationRunner {
                 }
             }
 
-            log.info("Seeding completed: {} products, {} variations, {} media files",
-                    productCount, variationCount, mediaCount);
+            log.info("Seeding completed: {} products, {} variations, {} media files", productCount, variationCount,
+                    mediaCount);
 
         } catch (IOException e) {
             log.warn("Seeding product from JSON fail: " + e.getMessage(), e);
@@ -153,17 +145,10 @@ public class AppDataSeeder implements ApplicationRunner {
 
     private Product convertToProduct(ProductJsonDto dto) {
         try {
-            return Product.builder()
-                    .productCode(dto.productCode)
-                    .productName(dto.productName)
-                    .price(dto.price)
-                    .description(dto.description)
-                    .detailDescription(dto.detailDescription)
-                    .inventoryQuantity(dto.inventoryQuantity)
-                    .material(dto.material)
-                    .soldQuantity(dto.soldQuantity != null ? dto.soldQuantity : 0)
-                    .isDeleted(false)
-                    .build();
+            return Product.builder().productCode(dto.productCode).productName(dto.productName).price(dto.price)
+                    .description(dto.description).detailDescription(dto.detailDescription)
+                    .inventoryQuantity(dto.inventoryQuantity).material(dto.material)
+                    .soldQuantity(dto.soldQuantity != null ? dto.soldQuantity : 0).isDeleted(false).build();
         } catch (Exception e) {
             log.warn("Failed to convert ProductJsonDto to Product for productCode: " + dto.productCode);
             return null;

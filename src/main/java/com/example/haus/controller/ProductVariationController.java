@@ -6,8 +6,6 @@ import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.request.product.CreateProductVariationRequestDto;
 import com.example.haus.domain.dto.request.product.UpdateProductVariationRequestDto;
-import com.example.haus.domain.dto.response.category.CategoryResponseDto;
-import com.example.haus.domain.dto.response.product.ProductResponseDto;
 import com.example.haus.domain.dto.response.product.ProductVariationResponseDto;
 import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.service.ProductVariationService;
@@ -35,89 +33,57 @@ import java.util.List;
 @Tag(name = "admin-product-variation-controller", description = "APIs for managing product variations")
 public class ProductVariationController {
 
-        ProductVariationService productVariationService;
+    ProductVariationService productVariationService;
 
-        @GetMapping(UrlConstant.Product.GET_PRODUCT_VARIATIONS_BY_PRODUCT_ID)
-        @Operation(
-                summary = "Lấy danh sách biến thể theo ID sản phẩm",
-                description = "Lấy tất cả các biến thể của một sản phẩm cụ thể",
-                security = @SecurityRequirement(name = "Bearer Token")
-        )
-        public ResponseEntity<ResponseData<List<ProductVariationResponseDto>>> getProductVariationsByProductId(
-                        @Parameter(description = "ID sản phẩm", example = "1") @PathVariable Long productId) {
+    @GetMapping(UrlConstant.Product.GET_PRODUCT_VARIATIONS_BY_PRODUCT_ID)
+    @Operation(summary = "Lấy danh sách biến thể theo ID sản phẩm", description = "Lấy tất cả các biến thể của một sản phẩm cụ thể", security = @SecurityRequirement(name = "Bearer Token"))
+    public ResponseEntity<ResponseData<List<ProductVariationResponseDto>>> getProductVariationsByProductId(
+            @Parameter(description = "ID sản phẩm", example = "1") @PathVariable Long productId) {
 
-                List<ProductVariationResponseDto> variations = productVariationService
-                                .getProductVariationsByProductId(productId);
-                return ResponseUtil.success(
-                                HttpStatus.OK,
-                                SuccessMessage.Product.GET_PRODUCT_VARIATIONS_SUCCESS,
-                                variations);
-        }
+        List<ProductVariationResponseDto> variations = productVariationService
+                .getProductVariationsByProductId(productId);
+        return ResponseUtil.success(HttpStatus.OK, SuccessMessage.Product.GET_PRODUCT_VARIATIONS_SUCCESS, variations);
+    }
 
-        @GetMapping(UrlConstant.Product.GET_PRODUCT_VARIATION_BY_ID)
-        @Operation(
-                summary = "Lấy thông tin biến thể theo ID",
-                description = "Lấy thông tin chi tiết của một biến thể sản phẩm theo ID",
-                security = @SecurityRequirement(name = "Bearer Token")
-        )
-        public ResponseEntity<ResponseData<ProductVariationResponseDto>> getProductVariationById(
-                        @Parameter(description = "ID biến thể sản phẩm", example = "1") @PathVariable Long variationId) {
+    @GetMapping(UrlConstant.Product.GET_PRODUCT_VARIATION_BY_ID)
+    @Operation(summary = "Lấy thông tin biến thể theo ID", description = "Lấy thông tin chi tiết của một biến thể sản phẩm theo ID", security = @SecurityRequirement(name = "Bearer Token"))
+    public ResponseEntity<ResponseData<ProductVariationResponseDto>> getProductVariationById(
+            @Parameter(description = "ID biến thể sản phẩm", example = "1") @PathVariable Long variationId) {
 
-                ProductVariationResponseDto variation = productVariationService.getProductVariationById(variationId);
-                return ResponseUtil.success(
-                                HttpStatus.OK,
-                                SuccessMessage.Product.GET_PRODUCT_VARIATION_SUCCESS,
-                                variation);
-        }
+        ProductVariationResponseDto variation = productVariationService.getProductVariationById(variationId);
+        return ResponseUtil.success(HttpStatus.OK, SuccessMessage.Product.GET_PRODUCT_VARIATION_SUCCESS, variation);
+    }
 
-        @PostMapping(value = UrlConstant.Product.CREATE_PRODUCT_VARIATION, consumes = "multipart/form-data")
-        @Operation(
-                summary = "Tạo mới biến thể sản phẩm",
-                description = "Tạo một biến thể mới cho sản phẩm đã có",
-                security = @SecurityRequirement(name = "Bearer Token")
-        )
-        public ResponseEntity<ResponseData<ProductVariationResponseDto>> createProductVariation(
-                @Valid @RequestPart("request") CreateProductVariationRequestDto request,
-                @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
-                ProductVariationResponseDto createdVariation = productVariationService.createProductVariation(request, imageFile);
-                return ResponseUtil.success(
-                        HttpStatus.CREATED,
-                        SuccessMessage.Product.CREATE_PRODUCT_VARIATION_SUCCESS,
-                        createdVariation);
-        }
+    @PostMapping(value = UrlConstant.Product.CREATE_PRODUCT_VARIATION, consumes = "multipart/form-data")
+    @Operation(summary = "Tạo mới biến thể sản phẩm", description = "Tạo một biến thể mới cho sản phẩm đã có", security = @SecurityRequirement(name = "Bearer Token"))
+    public ResponseEntity<ResponseData<ProductVariationResponseDto>> createProductVariation(
+            @Valid @RequestPart("request") CreateProductVariationRequestDto request,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
+        ProductVariationResponseDto createdVariation = productVariationService.createProductVariation(request,
+                imageFile);
+        return ResponseUtil.success(HttpStatus.CREATED, SuccessMessage.Product.CREATE_PRODUCT_VARIATION_SUCCESS,
+                createdVariation);
+    }
 
+    @PutMapping(value = UrlConstant.Product.UPDATE_PRODUCT_VARIATION, consumes = "multipart/form-data")
+    @Operation(summary = "Cập nhật biến thể sản phẩm", description = "Cập nhật thông tin của một biến thể sản phẩm đã có", security = @SecurityRequirement(name = "Bearer Token"))
+    public ResponseEntity<ResponseData<ProductVariationResponseDto>> updateProductVariation(Long productVariantId,
+            @Valid @RequestPart("request") UpdateProductVariationRequestDto request,
+            @RequestPart(value = "imageFile", required = false) MultipartFile file) {
 
-        @PutMapping(value = UrlConstant.Product.UPDATE_PRODUCT_VARIATION, consumes = "multipart/form-data")
-        @Operation(
-                summary = "Cập nhật biến thể sản phẩm",
-                description = "Cập nhật thông tin của một biến thể sản phẩm đã có",
-                security = @SecurityRequirement(name = "Bearer Token")
-        )
-        public ResponseEntity<ResponseData<ProductVariationResponseDto>> updateProductVariation(
-                        Long productVariantId,
-                        @Valid @RequestPart("request") UpdateProductVariationRequestDto request,
-                        @RequestPart(value = "imageFile", required = false) MultipartFile file) {
+        ProductVariationResponseDto updatedVariation = productVariationService.updateProductVariation(productVariantId,
+                request, file);
+        return ResponseUtil.success(HttpStatus.OK, SuccessMessage.Product.UPDATE_PRODUCT_VARIATION_SUCCESS,
+                updatedVariation);
+    }
 
-                ProductVariationResponseDto updatedVariation = productVariationService.updateProductVariation(productVariantId, request, file);
-                return ResponseUtil.success(
-                                HttpStatus.OK,
-                                SuccessMessage.Product.UPDATE_PRODUCT_VARIATION_SUCCESS,
-                                updatedVariation);
-        }
+    @DeleteMapping(UrlConstant.Product.DELETE_PRODUCT_VARIATION)
+    @Operation(summary = "Xóa biến thể sản phẩm", description = "Xóa một biến thể sản phẩm theo ID", security = @SecurityRequirement(name = "Bearer Token"))
+    @ApiResponse(responseCode = "200", description = "Xóa biến thể sản phẩm thành công")
+    public ResponseEntity<ResponseData<Void>> deleteProductVariation(
+            @Parameter(description = "ID biến thể sản phẩm", example = "1") @PathVariable Long variationId) {
 
-        @DeleteMapping(UrlConstant.Product.DELETE_PRODUCT_VARIATION)
-        @Operation(
-                summary = "Xóa biến thể sản phẩm",
-                description = "Xóa một biến thể sản phẩm theo ID",
-                security = @SecurityRequirement(name = "Bearer Token")
-        )
-        @ApiResponse(responseCode = "200", description = "Xóa biến thể sản phẩm thành công")
-        public ResponseEntity<ResponseData<Void>> deleteProductVariation(
-                        @Parameter(description = "ID biến thể sản phẩm", example = "1") @PathVariable Long variationId) {
-
-                productVariationService.deleteProductVariation(variationId);
-                return ResponseUtil.success(
-                                HttpStatus.OK,
-                                SuccessMessage.Product.DELETE_PRODUCT_VARIATION_SUCCESS);
-        }
+        productVariationService.deleteProductVariation(variationId);
+        return ResponseUtil.success(HttpStatus.OK, SuccessMessage.Product.DELETE_PRODUCT_VARIATION_SUCCESS);
+    }
 }

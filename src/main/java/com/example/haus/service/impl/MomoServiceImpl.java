@@ -1,25 +1,20 @@
 package com.example.haus.service.impl;
 
 import com.example.haus.config.MomoConfig;
-import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.OrderStatus;
 import com.example.haus.domain.dto.request.product.momo.MomoIpnRequestDto;
 import com.example.haus.domain.dto.response.product.momo.MomoCreateOrderResponseDto;
 import com.example.haus.domain.entity.product.Order;
-import com.example.haus.domain.entity.product.payment.Payment;
-import com.example.haus.domain.entity.product.payment.PaymentGateway;
-import com.example.haus.domain.entity.product.payment.PaymentStatus;
-import com.example.haus.domain.entity.product.payment.PaymentType;
-import com.example.haus.domain.entity.product.payment.MomoTransaction;
+import com.example.haus.domain.entity.product.payment.*;
 import com.example.haus.domain.entity.user.Role;
 import com.example.haus.domain.entity.user.User;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.helper.MomoHelper;
+import com.example.haus.repository.MomoTransactionRepository;
 import com.example.haus.repository.OrderRepository;
 import com.example.haus.repository.PaymentRepository;
-import com.example.haus.repository.MomoTransactionRepository;
 import com.example.haus.repository.UserRepository;
 import com.example.haus.service.MomoService;
 import com.example.haus.util.PaymentUtil;
@@ -75,7 +70,8 @@ public class MomoServiceImpl implements MomoService {
 
         Order order = getAccessibleOrder(orderId, username);
 
-        if (!order.getPayment().getGateway().equals(PaymentGateway.MOMO) || !order.getPayment().getType().equals(PaymentType.ONLINE_PAYMENT)) {
+        if (!order.getPayment().getGateway().equals(PaymentGateway.MOMO)
+                || !order.getPayment().getType().equals(PaymentType.ONLINE_PAYMENT)) {
             throw new InvalidDataException("Payment gateway | type invalid");
         }
 
@@ -102,12 +98,8 @@ public class MomoServiceImpl implements MomoService {
         extraDataMap.put("userId", order.getUser().getId());
         String extraData = PaymentUtil.encodeExtraData(objectMapper, extraDataMap);
 
-        Map<String, Object> params = momoConfig.buildCreateOrderParams(
-                requestId,
-                orderIdMomo,
-                amount,
-                "Thanh toán đơn hàng #" + order.getOrderNumber(),
-                extraData);
+        Map<String, Object> params = momoConfig.buildCreateOrderParams(requestId, orderIdMomo, amount,
+                "Thanh toán đơn hàng #" + order.getOrderNumber(), extraData);
 
         String signature = momoHelper.createSignature(params);
         params.put("signature", signature);
@@ -124,7 +116,7 @@ public class MomoServiceImpl implements MomoService {
         MomoCreateOrderResponseDto responseDto = objectMapper.readValue(response.getBody(),
                 MomoCreateOrderResponseDto.class);
 
-        // Lưu MoMo transaction payment 
+        // Lưu MoMo transaction payment
         createMomoTransaction(orderId, payment.getId(), orderIdMomo, requestId, order.getTotalAmount());
 
         Map<String, String> result = new HashMap<>();
@@ -134,8 +126,8 @@ public class MomoServiceImpl implements MomoService {
         result.put(RESULT_CODE, responseDto.getResultCode());
         result.put(MESSAGE, responseDto.getMessage());
 
-        log.info("MoMo order created successfully. Original orderId: {}, MoMo orderId: {}",
-                orderId, responseDto.getOrderId());
+        log.info("MoMo order created successfully. Original orderId: {}, MoMo orderId: {}", orderId,
+                responseDto.getOrderId());
 
         return result;
 
@@ -163,8 +155,7 @@ public class MomoServiceImpl implements MomoService {
             log.error("Invalid signature for MoMo IPN: {}", request.getOrderId());
             return false;
         }
-        Optional<MomoTransaction> momoTxnOpt = momoTransactionRepository
-                .findByMomoOrderId(request.getOrderId());
+        Optional<MomoTransaction> momoTxnOpt = momoTransactionRepository.findByMomoOrderId(request.getOrderId());
 
         if (momoTxnOpt.isEmpty()) {
             log.error("MoMo transaction not found for orderId: {}", request.getOrderId());
@@ -242,9 +233,9 @@ public class MomoServiceImpl implements MomoService {
         return result;
 
     }
+
     private Payment getOrCreatePayment(Order order) {
-        Optional<Payment> existingPaymentOpt = paymentRepository.findByOrderId(
-                order.getId());
+        Optional<Payment> existingPaymentOpt = paymentRepository.findByOrderId(order.getId());
 
         if (existingPaymentOpt.isEmpty()) {
             return createPaymentRecord(order.getId());
@@ -278,27 +269,16 @@ public class MomoServiceImpl implements MomoService {
         }
         Order order = orderOtp.get();
 
-        Payment payment = Payment.builder()
-                .amount(order.getTotalAmount())
-                .gateway(PaymentGateway.MOMO)
-                .type(PaymentType.ONLINE_PAYMENT)
-                .status(PaymentStatus.PENDING)
-                .order(order)
-                .build();
+        Payment payment = Payment.builder().amount(order.getTotalAmount()).gateway(PaymentGateway.MOMO)
+                .type(PaymentType.ONLINE_PAYMENT).status(PaymentStatus.PENDING).order(order).build();
 
         return paymentRepository.save(payment);
     }
 
-    private void createMomoTransaction(Long orderId, String paymentId, String momoOrderId,
-            String requestId, Double amount) {
-        MomoTransaction momoTxn = MomoTransaction.builder()
-                .orderId(orderId)
-                .paymentId(paymentId)
-                .momoOrderId(momoOrderId)
-                .momoRequestId(requestId)
-                .amount(amount)
-                .status(PaymentStatus.PENDING)
-                .build();
+    private void createMomoTransaction(Long orderId, String paymentId, String momoOrderId, String requestId,
+            Double amount) {
+        MomoTransaction momoTxn = MomoTransaction.builder().orderId(orderId).paymentId(paymentId)
+                .momoOrderId(momoOrderId).momoRequestId(requestId).amount(amount).status(PaymentStatus.PENDING).build();
 
         momoTransactionRepository.save(momoTxn);
     }

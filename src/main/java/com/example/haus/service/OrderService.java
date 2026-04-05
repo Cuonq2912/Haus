@@ -14,7 +14,8 @@ public interface OrderService {
 
     InvoiceResponseDto getInvoiceDetails(Long orderId, String username);
 
-    PaginationResponseDto<OrderResponseDto> getAllOrders(PaginationRequestDto paginationRequest, String status, String username);
+    PaginationResponseDto<OrderResponseDto> getAllOrders(PaginationRequestDto paginationRequest, String status,
+            String username);
 
     OrderResponseDto getOrderById(Long id, String username);
 

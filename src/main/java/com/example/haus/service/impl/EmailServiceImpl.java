@@ -1,8 +1,8 @@
 package com.example.haus.service.impl;
 
-import com.example.haus.service.EmailService;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.exception.KeycloakException;
+import com.example.haus.service.EmailService;
 import com.sendgrid.Method;
 import com.sendgrid.Request;
 import com.sendgrid.Response;
@@ -62,12 +62,8 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private String processTemplate(String template, String name, String otp) {
-        return template
-                .replace("{{NAME}}", name)
-                .replace("{{OTP_CODE}}", otp)
-                .replace("{{IMAGE_PREV}}", imagePrev)
-                .replace("{{IMAGE_NEXT}}", imageNext)
-                .replace("{{LOGO_LINK}}", logo);
+        return template.replace("{{NAME}}", name).replace("{{OTP_CODE}}", otp).replace("{{IMAGE_PREV}}", imagePrev)
+                .replace("{{IMAGE_NEXT}}", imageNext).replace("{{LOGO_LINK}}", logo);
     }
 
     @Override

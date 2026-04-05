@@ -48,10 +48,8 @@ public class FavoriteServiceImpl implements FavoriteService {
 
         Long productId = request.getProductId();
 
-        Product product = productRepository.findById(productId)
-                .filter(p -> !p.getIsDeleted())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED + ": " + productId));
+        Product product = productRepository.findById(productId).filter(p -> !p.getIsDeleted()).orElseThrow(
+                () -> new ResourceNotFoundException(ErrorMessage.Product.ERR_PRODUCT_NOT_EXISTED + ": " + productId));
 
         var existingFavorite = favoriteRepository.findByUserIdAndProductId(userId, productId);
         if (existingFavorite.isPresent()) {
@@ -91,8 +89,7 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Override
     @Transactional(readOnly = true)
-    public PaginationResponseDto<ProductResponseDto> getFavorites(
-            String userId,
+    public PaginationResponseDto<ProductResponseDto> getFavorites(String userId,
             PaginationRequestDto paginationRequest) {
 
         int pageIndex = paginationRequest.getPageNum();
@@ -100,19 +97,14 @@ public class FavoriteServiceImpl implements FavoriteService {
 
         Pageable pageable = PageRequest.of(pageIndex, pageSize);
 
-        Page<Favorite> page = favoriteRepository
-                .findByUserIdWithProductDetails(userId, pageable);
+        Page<Favorite> page = favoriteRepository.findByUserIdWithProductDetails(userId, pageable);
 
         List<ProductResponseDto> productResponseList = page.getContent().stream()
-                .map(favorite -> productMapper.productToProductResponse(favorite.getProduct()))
-                .toList();
+                .map(favorite -> productMapper.productToProductResponse(favorite.getProduct())).toList();
 
-        PaginationCustom paginationCustom = PaginationCustom.builder()
-                .pageNum(paginationRequest.getDisplayPageNum())
-                .pageSize(paginationRequest.getPageSize())
-                .totalElement(page.getTotalElements())
-                .totalPages(page.getTotalPages())
-                .build();
+        PaginationCustom paginationCustom = PaginationCustom.builder().pageNum(paginationRequest.getDisplayPageNum())
+                .pageSize(paginationRequest.getPageSize()).totalElement(page.getTotalElements())
+                .totalPages(page.getTotalPages()).build();
 
         return new PaginationResponseDto<>(paginationCustom, productResponseList);
     }
@@ -123,10 +115,8 @@ public class FavoriteServiceImpl implements FavoriteService {
 
         var favorite = favoriteRepository.findByUserIdAndProductId(userId, productId);
 
-        return CheckFavoriteResponseDto.builder()
-                .isFavorited(favorite.isPresent())
-                .favoriteId(favorite.map(Favorite::getId).orElse(null))
-                .build();
+        return CheckFavoriteResponseDto.builder().isFavorited(favorite.isPresent())
+                .favoriteId(favorite.map(Favorite::getId).orElse(null)).build();
     }
 
     @Override
@@ -140,23 +130,13 @@ public class FavoriteServiceImpl implements FavoriteService {
     private FavoriteResponseDto buildFavoriteResponse(Favorite favorite) {
         Product product = favorite.getProduct();
 
-        String imageUrl = product.getMedias().stream()
-                .findFirst()
-                .map(Media::getUrl)
-                .orElse(null);
+        String imageUrl = product.getMedias().stream().findFirst().map(Media::getUrl).orElse(null);
 
-        FavoriteResponseDto.ProductInfo productInfo = FavoriteResponseDto.ProductInfo.builder()
-                .id(product.getId())
-                .productCode(product.getProductCode())
-                .productName(product.getProductName())
-                .price(product.getPrice())
-                .imageUrl(imageUrl)
-                .build();
+        FavoriteResponseDto.ProductInfo productInfo = FavoriteResponseDto.ProductInfo.builder().id(product.getId())
+                .productCode(product.getProductCode()).productName(product.getProductName()).price(product.getPrice())
+                .imageUrl(imageUrl).build();
 
-        return FavoriteResponseDto.builder()
-                .id(favorite.getId())
-                .product(productInfo)
-                .createdAt(favorite.getCreatedAt())
-                .build();
+        return FavoriteResponseDto.builder().id(favorite.getId()).product(productInfo)
+                .createdAt(favorite.getCreatedAt()).build();
     }
 }

@@ -9,7 +9,8 @@ import org.springframework.util.MultiValueMap;
 
 public class ResponseUtil {
 
-    private ResponseUtil() {}
+    private ResponseUtil() {
+    }
 
     public static <T> ResponseEntity<ResponseData<T>> success(String message, T data) {
         return success(HttpStatus.OK, message, data);
@@ -29,7 +30,8 @@ public class ResponseUtil {
         return success(HttpStatus.OK, header, data);
     }
 
-    public static <T> ResponseEntity<ResponseData<T>> success(HttpStatus status, MultiValueMap<String, String> header, T data) {
+    public static <T> ResponseEntity<ResponseData<T>> success(HttpStatus status, MultiValueMap<String, String> header,
+            T data) {
         ResponseData<T> response = new ResponseData<>(data);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.addAll(header);
