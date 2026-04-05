@@ -2,13 +2,12 @@ package com.example.haus.util;
 
 import com.example.haus.domain.dto.response.invoice.InvoiceResponseDto;
 import com.google.zxing.BarcodeFormat;
-import com.google.zxing.common.BitMatrix;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.qrcode.WriterException;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;

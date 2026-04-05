@@ -9,7 +9,7 @@ import com.example.haus.domain.dto.response.statistic.BestSellerRow;
 import com.example.haus.domain.dto.response.statistic.RecentOrderResponseDto;
 import com.example.haus.domain.dto.response.statistic.RevenueDetailResponseDto;
 import com.example.haus.domain.entity.product.*;
-import com.example.haus.domain.mapper.*;
+import com.example.haus.domain.mapper.OrderMapper;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.repository.CategoryRepository;
 import com.example.haus.repository.OrderItemRepository;

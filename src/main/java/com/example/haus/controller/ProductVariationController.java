@@ -6,8 +6,6 @@ import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.request.product.CreateProductVariationRequestDto;
 import com.example.haus.domain.dto.request.product.UpdateProductVariationRequestDto;
-import com.example.haus.domain.dto.response.category.CategoryResponseDto;
-import com.example.haus.domain.dto.response.product.ProductResponseDto;
 import com.example.haus.domain.dto.response.product.ProductVariationResponseDto;
 import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.service.ProductVariationService;

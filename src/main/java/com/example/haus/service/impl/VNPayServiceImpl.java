@@ -1,10 +1,8 @@
 package com.example.haus.service.impl;
 
 import com.example.haus.config.VNPayConfig;
-import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.OrderStatus;
-import com.example.haus.domain.dto.request.auth.otp.PendingResetPasswordRequestDto;
 import com.example.haus.domain.entity.product.Order;
 import com.example.haus.domain.entity.product.OrderItem;
 import com.example.haus.domain.entity.product.ProductVariation;
@@ -28,9 +26,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.A;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

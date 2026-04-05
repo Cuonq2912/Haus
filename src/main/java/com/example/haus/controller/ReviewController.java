@@ -10,7 +10,6 @@ import com.example.haus.domain.dto.request.product.ReviewRequestDto;
 import com.example.haus.domain.dto.response.dashboard.TopReviewDto;
 import com.example.haus.domain.dto.response.product.RatingStatisticsDto;
 import com.example.haus.domain.dto.response.product.ReviewResponseDto;
-import com.example.haus.domain.dto.response.promotion.PromotionResponseDto;
 import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.security.CustomUserDetails;
 import com.example.haus.service.ReviewService;

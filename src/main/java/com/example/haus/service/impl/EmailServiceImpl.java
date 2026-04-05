@@ -1,8 +1,8 @@
 package com.example.haus.service.impl;
 
-import com.example.haus.service.EmailService;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.exception.KeycloakException;
+import com.example.haus.service.EmailService;
 import com.sendgrid.Method;
 import com.sendgrid.Request;
 import com.sendgrid.Response;

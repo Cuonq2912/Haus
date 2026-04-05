@@ -8,7 +8,6 @@ import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.product.ProductRequestDto;
 import com.example.haus.domain.dto.request.product.UpdateProductRequestDto;
-import com.example.haus.domain.dto.response.category.CategoryResponseDto;
 import com.example.haus.domain.dto.response.product.ProductResponseDto;
 import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.service.ProductService;

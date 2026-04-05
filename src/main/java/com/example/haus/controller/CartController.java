@@ -4,7 +4,6 @@ import com.example.haus.base.ResponseUtil;
 import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
-import com.example.haus.domain.dto.request.auth.LoginRequestDto;
 import com.example.haus.domain.dto.request.cart.CartRequest;
 import com.example.haus.domain.dto.request.cart.UpdateCartRequest;
 import com.example.haus.domain.dto.response.cart.CartResponseDto;
@@ -18,10 +17,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

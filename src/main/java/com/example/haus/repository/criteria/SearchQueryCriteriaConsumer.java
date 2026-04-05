@@ -1,13 +1,16 @@
 package com.example.haus.repository.criteria;
 
+import com.example.haus.constant.AppConstants;
 import com.example.haus.constant.PriceRange;
 import com.example.haus.constant.promotion.PromotionStatus;
 import com.example.haus.domain.entity.product.Category;
 import com.example.haus.domain.entity.product.Product;
 import com.example.haus.domain.entity.product.ProductVariation;
-import com.example.haus.constant.AppConstants;
 import jakarta.persistence.criteria.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;

@@ -7,7 +7,6 @@ import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.product.AddFavoriteRequestDto;
-import com.example.haus.domain.dto.response.category.CategoryResponseDto;
 import com.example.haus.domain.dto.response.product.CheckFavoriteResponseDto;
 import com.example.haus.domain.dto.response.product.FavoriteResponseDto;
 import com.example.haus.domain.dto.response.product.ProductResponseDto;

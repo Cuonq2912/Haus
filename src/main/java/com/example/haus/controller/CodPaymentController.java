@@ -5,7 +5,6 @@ import com.example.haus.base.RestApiV1;
 import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.request.product.CodPaymentRequestDto;
-import com.example.haus.domain.dto.response.category.CategoryResponseDto;
 import com.example.haus.domain.dto.response.product.CodPaymentResponseDto;
 import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.service.CodPaymentService;

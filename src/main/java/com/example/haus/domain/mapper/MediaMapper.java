@@ -1,8 +1,10 @@
 package com.example.haus.domain.mapper;
 
-import com.example.haus.domain.entity.product.Media;
 import com.example.haus.domain.dto.response.product.MediaResponseDto;
-import org.mapstruct.*;
+import com.example.haus.domain.entity.product.Media;
+import org.mapstruct.Mapper;
+import org.mapstruct.NullValueCheckStrategy;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring", nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface MediaMapper {

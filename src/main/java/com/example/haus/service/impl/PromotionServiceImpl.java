@@ -2,7 +2,6 @@ package com.example.haus.service.impl;
 
 import com.example.haus.constant.AppConstants;
 import com.example.haus.constant.ErrorMessage;
-import com.example.haus.constant.promotion.PromotionStatus;
 import com.example.haus.domain.dto.pagination.PaginationCustom;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
@@ -28,18 +27,13 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.annotation.Before;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

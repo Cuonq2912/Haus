@@ -1,12 +1,11 @@
 package com.example.haus.service;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.product.ProductRequestDto;
 import com.example.haus.domain.dto.request.product.UpdateProductRequestDto;
 import com.example.haus.domain.dto.response.product.ProductResponseDto;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface ProductService {
 

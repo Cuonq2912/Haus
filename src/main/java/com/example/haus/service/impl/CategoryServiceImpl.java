@@ -1,15 +1,12 @@
 package com.example.haus.service.impl;
 
-import com.example.haus.constant.AppConstants;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.domain.dto.pagination.PaginationCustom;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.category.CategoryRequestDto;
 import com.example.haus.domain.dto.response.category.CategoryResponseDto;
-import com.example.haus.domain.dto.response.product.ProductResponseDto;
 import com.example.haus.domain.entity.product.Category;
-import com.example.haus.domain.entity.product.Product;
 import com.example.haus.domain.mapper.CategoryMapper;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
@@ -22,20 +19,12 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service

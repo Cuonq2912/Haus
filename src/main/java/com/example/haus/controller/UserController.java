@@ -6,7 +6,6 @@ import com.example.haus.constant.SuccessMessage;
 import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.request.user.profile.ConfirmPasswordUpdateUserRequestDto;
 import com.example.haus.domain.dto.request.user.profile.UpdatePasswordRequestDto;
-import com.example.haus.domain.dto.response.product.ReviewResponseDto;
 import com.example.haus.domain.dto.response.user.UserResponseDto;
 import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.service.UserService;

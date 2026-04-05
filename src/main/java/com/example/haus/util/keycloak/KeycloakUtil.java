@@ -21,7 +21,6 @@ import java.util.Map;
 import static com.example.haus.constant.CommonConstant.ADMIN_REALM;
 import static com.example.haus.constant.CommonConstant.USER_END_POINT;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Component
 @Slf4j(topic = "EMAIL-KEYCLOAK")

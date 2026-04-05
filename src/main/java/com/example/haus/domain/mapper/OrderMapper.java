@@ -4,7 +4,10 @@ import com.example.haus.domain.dto.order.OrderRequestDto;
 import com.example.haus.domain.dto.response.product.OrderResponseDto;
 import com.example.haus.domain.dto.response.statistic.RecentOrderResponseDto;
 import com.example.haus.domain.entity.product.Order;
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.NullValueCheckStrategy;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring",
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,

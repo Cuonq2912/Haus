@@ -11,9 +11,7 @@ import com.example.haus.domain.dto.response.invoice.InvoiceResponseDto;
 import com.example.haus.domain.dto.response.product.CreateOrderResponseDto;
 import com.example.haus.domain.dto.response.product.OrderResponseDto;
 import com.example.haus.domain.dto.response.utils.ResponseData;
-import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.service.OrderService;
-import com.itextpdf.text.DocumentException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,18 +28,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestApiV1

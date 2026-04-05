@@ -9,6 +9,7 @@ import com.example.haus.domain.entity.user.User;
 import com.example.haus.repository.CartRepository;
 import com.example.haus.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,8 +18,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @RequiredArgsConstructor

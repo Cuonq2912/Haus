@@ -3,13 +3,13 @@ package com.example.haus.service.impl;
 import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.constant.MediaType;
+import com.example.haus.domain.dto.request.product.CreateProductVariationRequestDto;
+import com.example.haus.domain.dto.request.product.UpdateProductVariationRequestDto;
+import com.example.haus.domain.dto.response.product.ProductVariationResponseDto;
 import com.example.haus.domain.entity.product.Media;
 import com.example.haus.domain.entity.product.Product;
 import com.example.haus.domain.entity.product.ProductVariation;
 import com.example.haus.domain.mapper.ProductVariationMapper;
-import com.example.haus.domain.dto.request.product.CreateProductVariationRequestDto;
-import com.example.haus.domain.dto.request.product.UpdateProductVariationRequestDto;
-import com.example.haus.domain.dto.response.product.ProductVariationResponseDto;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.ProductRepository;
@@ -20,15 +20,13 @@ import com.example.haus.util.UploadFileUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

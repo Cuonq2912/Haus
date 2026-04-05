@@ -2,7 +2,6 @@ package com.example.haus.domain.dto.response.cart;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;

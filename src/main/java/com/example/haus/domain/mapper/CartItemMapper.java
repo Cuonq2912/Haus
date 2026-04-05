@@ -3,7 +3,9 @@ package com.example.haus.domain.mapper;
 import com.example.haus.domain.dto.response.cart.ProductInCartResponseDto;
 import com.example.haus.domain.entity.product.CartItem;
 import com.example.haus.domain.entity.product.Product;
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.NullValueCheckStrategy;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.util.List;
 import java.util.Map;

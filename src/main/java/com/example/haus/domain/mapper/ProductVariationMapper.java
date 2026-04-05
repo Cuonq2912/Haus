@@ -1,11 +1,11 @@
 package com.example.haus.domain.mapper;
 
-import com.example.haus.domain.dto.response.cart.ProductVariationInCartResponseDto;
-import com.example.haus.domain.entity.product.CartItem;
-import com.example.haus.domain.entity.product.ProductVariation;
 import com.example.haus.domain.dto.request.product.CreateProductVariationRequestDto;
 import com.example.haus.domain.dto.request.product.UpdateProductVariationRequestDto;
+import com.example.haus.domain.dto.response.cart.ProductVariationInCartResponseDto;
 import com.example.haus.domain.dto.response.product.ProductVariationResponseDto;
+import com.example.haus.domain.entity.product.CartItem;
+import com.example.haus.domain.entity.product.ProductVariation;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 

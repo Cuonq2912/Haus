@@ -7,7 +7,6 @@ import com.example.haus.constant.UrlConstant;
 import com.example.haus.domain.dto.pagination.PaginationRequestDto;
 import com.example.haus.domain.dto.pagination.PaginationResponseDto;
 import com.example.haus.domain.dto.request.promotion.PromotionRequestDto;
-import com.example.haus.domain.dto.response.category.CategoryResponseDto;
 import com.example.haus.domain.dto.response.promotion.PromotionResponseDto;
 import com.example.haus.domain.dto.response.utils.ResponseData;
 import com.example.haus.service.PromotionService;
@@ -23,8 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Date;
 
 @RestApiV1
 @Validated
