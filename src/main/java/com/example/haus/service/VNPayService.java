@@ -7,7 +7,7 @@ import java.util.Map;
 public interface VNPayService {
 
 
-    String createVNPayUrl(Long orderId, HttpServletRequest request);
+    String createVNPayUrl(Long orderId, String username, HttpServletRequest request);
 
     //Xử lý IPN từ VNPay Server(Update db)
     Map<String, String> processVNPayIPN(Map<String, String> params);

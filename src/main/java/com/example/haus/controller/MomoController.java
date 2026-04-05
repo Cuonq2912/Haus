@@ -18,6 +18,8 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,9 +41,11 @@ public class MomoController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PostMapping(UrlConstant.Payment.MOMO_CREATE_ORDER)
-    public ResponseEntity<ResponseData<Object>> createMomoOrder(@RequestParam Long orderId) throws JsonProcessingException {
+    public ResponseEntity<ResponseData<Object>> createMomoOrder(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam Long orderId) throws JsonProcessingException {
 
-        Map<String, String> result = momoService.createPaymentOrder(orderId);
+        Map<String, String> result = momoService.createPaymentOrder(orderId, userDetails.getUsername());
         String resultCode = result.get("resultCode");
         boolean success = "0".equals(resultCode);
 

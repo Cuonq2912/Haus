@@ -82,6 +82,7 @@ public class OrderController {
     )
     @GetMapping(UrlConstant.Order.GET_ALL_ORDERS)
     public ResponseEntity<ResponseData<PaginationResponseDto<OrderResponseDto>>> getAllOrders(
+                    @AuthenticationPrincipal UserDetails userDetails,
                     @RequestParam(defaultValue = "1") Integer pageNum,
                     @RequestParam(defaultValue = "10") Integer pageSize,
                     @RequestParam(required = false) String status) {
@@ -89,7 +90,7 @@ public class OrderController {
             PaginationRequestDto paginationRequest = new PaginationRequestDto(pageNum, pageSize);
             return ResponseUtil.success(
                             SuccessMessage.Order.GET_ORDER_SUCCESS,
-                            orderService.getAllOrders(paginationRequest, status));
+                            orderService.getAllOrders(paginationRequest, status, userDetails.getUsername()));
     }
 
 

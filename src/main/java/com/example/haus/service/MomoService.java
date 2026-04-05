@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface MomoService {
 
-    Map<String, String> createPaymentOrder(Long orderId) throws JsonProcessingException;
+    Map<String, String> createPaymentOrder(Long orderId, String username) throws JsonProcessingException;
 
     boolean handleIpnCallback(MomoIpnRequestDto request);
 

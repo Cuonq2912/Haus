@@ -19,6 +19,8 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,9 +41,11 @@ public class CodPaymentController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PostMapping(UrlConstant.Payment.COD_PAYMENT)
-    public ResponseEntity<ResponseData<CodPaymentResponseDto>> processCodPayment(@Valid @RequestBody CodPaymentRequestDto request) {
+    public ResponseEntity<ResponseData<CodPaymentResponseDto>> processCodPayment(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody CodPaymentRequestDto request) {
 
-        CodPaymentResponseDto response = codPaymentService.processCodPayment(request);
+        CodPaymentResponseDto response = codPaymentService.processCodPayment(request, userDetails.getUsername());
 
         return ResponseUtil.success(
                 HttpStatus.OK,

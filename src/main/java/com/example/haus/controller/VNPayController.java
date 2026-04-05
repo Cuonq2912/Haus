@@ -18,6 +18,8 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,10 +43,11 @@ public class VNPayController {
     )
     @GetMapping(UrlConstant.Payment.GET_PAYMENT_URL)
     public ResponseEntity<ResponseData<String>> getVNPayUrl(
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(value = "orderId") Long orderId,
             HttpServletRequest request
     ) {
-            String vnPayUrl = vnPayService.createVNPayUrl(orderId, request);
+            String vnPayUrl = vnPayService.createVNPayUrl(orderId, userDetails.getUsername(), request);
             return ResponseUtil.success(
                             HttpStatus.OK,
                             SuccessMessage.Payment.GET_VNPAYURL_SUCCESS,
