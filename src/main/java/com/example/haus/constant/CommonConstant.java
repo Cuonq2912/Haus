@@ -39,7 +39,7 @@ public class CommonConstant {
     public static final String CLIENT_ID = "client_id";
     public static final String MESSAGE = "Message";
     public static final String RSP_CODE = "RspCode";
-    public static final String ETC_GMT7 = "Etc/GMT+7";
+    public static final String ETC_GMT7 = "Asia/Ho_Chi_Minh";
     public static final String VNP_TXN_REF = "vnp_TxnRef";
     public static final String ORDER_ID = "orderId";
     public static final String RESULT_CODE = "resultCode";

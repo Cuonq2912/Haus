@@ -37,6 +37,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
@@ -70,11 +71,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     Map<String, PendingResetPasswordRequestDto> pendingResetPasswordMap = new ConcurrentHashMap<>();
 
+    private String serverUrl() {
+        String baseUrl = keycloakProperties.serverUrl();
+        if (baseUrl == null || baseUrl.isBlank()) {
+            throw new KeycloakException("Keycloak server URL is not configured");
+        }
+        return baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
+    }
+
     @Override
     @Transactional
     public LoginResponseDto authentication(LoginRequestDto request) {
+        final String loginIdentifier = request.getUsername();
+        final String resolvedUsername = keycloakUtil.resolveUsername(loginIdentifier);
 
-        final String url = keycloakProperties.serverUrl() + "realms/" + keycloakProperties.realm() + "/protocol/openid-connect/token";
+        final String url = serverUrl() + "realms/" + keycloakProperties.realm() + "/protocol/openid-connect/token";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -84,7 +95,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         params.add(CLIENT_ID, keycloakProperties.clientId());
         params.add(CLIENT_SECRET, keycloakProperties.clientSecret());
         params.add("scope", "openid");
-        params.add("username", request.getUsername());
+        params.add("username", resolvedUsername);
         params.add(PASSWORD, request.getPassword());
 
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(params, headers);
@@ -102,9 +113,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 List<String> realmRoles = (List<String>) claims.get("realm_access")
                         .asMap().get("roles");
 
+                ensureLocalUserExists(decodedJWT, realmRoles);
+
                 return LoginResponseDto.builder()
                         .tokenType(CommonConstant.BEARER_TOKEN)
-                        .userId(keycloakUtil.getUserId(request.getUsername()))
+                        .userId(keycloakUtil.getUserId(resolvedUsername))
                         .role(realmRoles.toString().contains("ADMIN") ? "ADMIN" : "USER")
                         .accessToken(accessToken)
                         .refreshToken((String) body.get(REFRESH_TOKEN))
@@ -113,16 +126,65 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             else {
                 log.error("Đăng nhập thất bại với username = {}", request.getUsername());
             }
+        } catch (HttpStatusCodeException ex) {
+            String responseBody = ex.getResponseBodyAsString();
+            log.error("Keycloak login failed for identifier={} resolvedUsername={} status={} body={}",
+                    loginIdentifier, resolvedUsername, ex.getStatusCode(), responseBody);
+            if (ex.getStatusCode() == HttpStatus.BAD_REQUEST || ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+                throw new InvalidDataException(ErrorMessage.Auth.ERR_USERNAME_PASSWORD_INCORRECT);
+            }
+            throw new KeycloakException(ErrorMessage.Auth.ERR_LOGIN_FAILED_IN_KEYCLOAK);
         } catch (Exception ex) {
+            log.error("Unexpected error during Keycloak login for identifier={} resolvedUsername={}",
+                    loginIdentifier, resolvedUsername, ex);
             throw new KeycloakException(ErrorMessage.Auth.ERR_LOGIN_FAILED_IN_KEYCLOAK);
         }
         throw new InvalidDataException(ErrorMessage.Auth.ERR_USERNAME_PASSWORD_INCORRECT);
     }
 
+    private void ensureLocalUserExists(DecodedJWT decodedJWT, List<String> realmRoles) {
+        String username = decodedJWT.getClaim("preferred_username").asString();
+
+        if (username == null || username.isBlank()) {
+            log.warn("Cannot provision local user because preferred_username is missing in JWT");
+            return;
+        }
+
+        if (userRepository.existsUserByUsernameAndIsDeletedFalse(username)) {
+            return;
+        }
+
+        Role role = realmRoles != null && realmRoles.contains("ADMIN") ? Role.ADMIN : Role.USER;
+        String email = decodedJWT.getClaim("email").asString();
+        String firstName = decodedJWT.getClaim("given_name").asString();
+        String lastName = decodedJWT.getClaim("family_name").asString();
+
+        User user = User.builder()
+                .username(username)
+                .password(new BCryptPasswordEncoder(10).encode(UUID.randomUUID().toString()))
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email != null && !email.isBlank() ? email : username)
+                .role(role)
+                .isActive(TRUE)
+                .isDeleted(FALSE)
+                .isLock(FALSE)
+                .build();
+
+        Cart cart = new Cart();
+        cart.setUser(user);
+        user.setCart(cart);
+
+        userRepository.save(user);
+        cartRepository.save(cart);
+
+        log.info("Provisioned missing local user {} with role {}", username, role);
+    }
+
     @Override
     public void logout(String refreshToken) {
-        String url = keycloakProperties.serverUrl()
-                + "/realms/" + keycloakProperties.realm()
+        String url = serverUrl()
+                + "realms/" + keycloakProperties.realm()
                 + "/protocol/openid-connect/logout";
 
         HttpHeaders headers = new HttpHeaders();
@@ -153,7 +215,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public RefreshTokenResponseDto refresh(String refreshToken) {
 
-        final String url = keycloakProperties.serverUrl() + "/realms/" + keycloakProperties.realm() + "/protocol/openid-connect/token";
+        final String url = serverUrl() + "realms/" + keycloakProperties.realm() + "/protocol/openid-connect/token";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -179,7 +241,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         .refreshToken((String) body.get("refresh_token"))
                         .build();
             }
+        } catch (HttpStatusCodeException ex) {
+            log.error("Keycloak refresh failed status={} body={}", ex.getStatusCode(), ex.getResponseBodyAsString());
+            if (ex.getStatusCode() == HttpStatus.BAD_REQUEST || ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+                throw new InvalidDataException(ErrorMessage.Auth.ERR_USERNAME_PASSWORD_INCORRECT);
+            }
+            throw new KeycloakException(ErrorMessage.Auth.ERR_LOGIN_FAILED_IN_KEYCLOAK);
         } catch (Exception ex) {
+            log.error("Unexpected error during Keycloak refresh", ex);
             throw new KeycloakException(ErrorMessage.Auth.ERR_LOGIN_FAILED_IN_KEYCLOAK);
         }
         throw new InvalidDataException(ErrorMessage.Auth.ERR_USERNAME_PASSWORD_INCORRECT);
@@ -187,8 +256,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void register(RegisterRequestDto request) {
+        String userId;
 
-        final String url = keycloakProperties.serverUrl() + "admin/realms/" + keycloakProperties.realm() + "/users";
+        final String url = serverUrl() + "admin/realms/" + keycloakProperties.realm() + "/users";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, CommonConstant.BEARER_TOKEN + " " + keycloakUtil.getAdminToken());
@@ -221,7 +291,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 throw new KeycloakException(ErrorMessage.Auth.ERR_CAN_NOT_CREATE_USER);
             }
 
-            String userId = keycloakUtil.getUserId(request.getUsername());
+            userId = keycloakUtil.getUserId(request.getUsername());
 
             String roleId;
 
@@ -233,17 +303,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new KeycloakException(ex.getMessage());
         }
 
-        String otp = OtpUtil.generateOtp();
+        try {
+            String otp = OtpUtil.generateOtp();
 
-        PendingRegistrationRequestDto pending = new PendingRegistrationRequestDto();
+            PendingRegistrationRequestDto pending = new PendingRegistrationRequestDto();
 
-        pending.setRequest(request);
-        pending.setOtp(otp);
-        pending.setExpireAt(LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")).plusMinutes(5));
+            pending.setRequest(request);
+            pending.setOtp(otp);
+            pending.setExpireAt(LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")).plusMinutes(5));
 
-        pendingRegisterMap.put(request.getEmail(), pending);
+            pendingRegisterMap.put(request.getEmail(), pending);
 
-        emailService.sendRegistrationOtpByEmail(request.getEmail(), request.getUsername(), otp);
+            emailService.sendRegistrationOtpByEmail(request.getEmail(), request.getUsername(), otp);
+        } catch (RuntimeException ex) {
+            pendingRegisterMap.remove(request.getEmail());
+            try {
+                keycloakUtil.deleteUser(userId);
+            } catch (RuntimeException cleanupEx) {
+                log.error("Failed to cleanup Keycloak user {} after OTP send failure", userId, cleanupEx);
+            }
+            throw ex;
+        }
     }
 
     @Override

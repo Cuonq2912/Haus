@@ -256,7 +256,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(KeycloakException.class)
-    @ResponseStatus(CONFLICT)
+    @ResponseStatus(BAD_REQUEST)
     public ErrorResponse handleKeycloakException(KeycloakException e, WebRequest webRequest) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(new Date());

@@ -6,13 +6,15 @@ import com.example.haus.domain.dto.request.product.CodPaymentRequestDto;
 import com.example.haus.domain.dto.response.product.CodPaymentResponseDto;
 import com.example.haus.domain.entity.product.Order;
 import com.example.haus.domain.entity.product.payment.Payment;
-import com.example.haus.domain.entity.product.payment.PaymentGateway;
 import com.example.haus.domain.entity.product.payment.PaymentStatus;
 import com.example.haus.domain.entity.product.payment.PaymentType;
+import com.example.haus.domain.entity.user.Role;
+import com.example.haus.domain.entity.user.User;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.OrderRepository;
 import com.example.haus.repository.PaymentRepository;
+import com.example.haus.repository.UserRepository;
 import com.example.haus.service.CodPaymentService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -31,13 +33,13 @@ public class CodPaymentServiceImpl implements CodPaymentService {
 
     OrderRepository orderRepository;
     PaymentRepository paymentRepository;
+    UserRepository userRepository;
 
     @Override
     @Transactional
-    public CodPaymentResponseDto processCodPayment(CodPaymentRequestDto request) {
+    public CodPaymentResponseDto processCodPayment(CodPaymentRequestDto request, String username) {
 
-        Order order = orderRepository.findById(request.getOrderId())
-                .orElseThrow(() ->  new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
+        Order order = getAccessibleOrder(request.getOrderId(), username);
 
         if (!order.getPayment().getType().equals(PaymentType.COD)) {
             throw new InvalidDataException("Payment type invalid");
@@ -66,6 +68,20 @@ public class CodPaymentServiceImpl implements CodPaymentService {
                 .paymentId(payment.getId())
                 .message(request.getNote())
                 .build();
+    }
+
+    private Order getAccessibleOrder(Long orderId, String username) {
+        User currentUser = userRepository.findByUsernameAndIsDeletedFalse(username)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
+
+        if (currentUser.getRole() != Role.ADMIN && !order.getUser().getId().equals(currentUser.getId())) {
+            throw new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED);
+        }
+
+        return order;
     }
 
 

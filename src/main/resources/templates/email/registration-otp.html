@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác thực tài khoản - HAUS</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f4f4f4;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f4f4f4; padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden;">
+                    <!-- Header with Logo -->
+                    <tr>
+                        <td align="center" bgcolor="#1f3c5b" style="background-color: #1f3c5b; padding: 24px; text-align: center;">
+                            <div style="display: inline-block; color: #ffffff; font-size: 28px; font-weight: 700; letter-spacing: 4px; line-height: 1;">
+                                HAUS
+                            </div>
+                            <div style="color: #d8e6f2; font-size: 12px; margin-top: 8px; letter-spacing: 2px; text-transform: uppercase;">
+                                Noi that cao cap
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Main Content -->
+                    <tr>
+                        <td style="padding: 40px 30px;">
+                            <h1 style="color: #2c3e50; font-size: 24px; margin: 0 0 20px 0; text-align: center;">Xác thực tài khoản</h1>
+                            
+                            <p style="color: #555; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+                                Xin chào <strong style="color: #2c3e50;">{{NAME}}</strong>,
+                            </p>
+                            
+                            <p style="color: #555; font-size: 16px; line-height: 1.6; margin: 0 0 30px 0;">
+                                Cảm ơn bạn đã đăng ký tài khoản tại <strong>HAUS</strong>. Vui lòng sử dụng mã OTP bên dưới để xác thực tài khoản của bạn:
+                            </p>
+                            
+                            <!-- OTP Box -->
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0 0 30px 0;">
+                                <tr>
+                                    <td align="center" bgcolor="#1d6fa5" style="background-color: #1d6fa5; border-radius: 10px; padding: 24px 16px;">
+                                        <p style="color: #ffffff; font-size: 14px; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 2px; font-weight: 700;">Ma xac thuc</p>
+                                        <div style="color: #ffffff; font-size: 36px; line-height: 1.2; margin: 0; letter-spacing: 8px; font-weight: 700;">
+                                            {{OTP_CODE}}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <p style="color: #888; font-size: 14px; line-height: 1.6; margin: 0 0 20px 0; text-align: center;">
+                                Mã OTP có hiệu lực trong <strong>5 phút</strong>. Vui lòng không chia sẻ mã này với bất kỳ ai.
+                            </p>
+                            
+                            <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+                            
+                            <p style="color: #888; font-size: 13px; line-height: 1.6; margin: 0;">
+                                Nếu bạn không yêu cầu đăng ký tài khoản, vui lòng bỏ qua email này hoặc liên hệ với chúng tôi nếu cần hỗ trợ.
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #2c3e50; padding: 25px; text-align: center;">
+                            <p style="color: #ecf0f1; font-size: 14px; margin: 0 0 10px 0;">
+                                <strong>HAUS</strong> - Nội thất cao cấp
+                            </p>
+                            <p style="color: #95a5a6; font-size: 12px; margin: 0;">
+                                © 2024 HAUS. All rights reserved.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

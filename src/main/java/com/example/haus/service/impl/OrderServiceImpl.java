@@ -93,12 +93,16 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public PaginationResponseDto<OrderResponseDto> getAllOrders(PaginationRequestDto paginationRequest, String status) {
+    public PaginationResponseDto<OrderResponseDto> getAllOrders(PaginationRequestDto paginationRequest, String status, String username) {
 
         Pageable pageable = PageRequest.of(
                 paginationRequest.getPageNum(),
                 paginationRequest.getPageSize());
 
+        User currentUser = userRepository.findByUsernameAndIsDeletedFalse(username)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+
+        boolean isAdmin = RoleConstant.ADMIN.equals(currentUser.getRole().name());
         Page<Order> orderPage;
 
         if (status != null && !status.trim().isEmpty()) {
@@ -108,9 +112,14 @@ public class OrderServiceImpl implements OrderService {
             } catch (IllegalArgumentException e) {
                 throw new InvalidDataException(ErrorMessage.Order.ERR_INVALID_ORDER_STATUS);
             }
-            orderPage = orderRepository.findByStatus(orderStatus, pageable);
+
+            orderPage = isAdmin
+                    ? orderRepository.findByStatus(orderStatus, pageable)
+                    : orderRepository.findByUserIdAndStatusWithOrderItems(currentUser.getId(), orderStatus, pageable);
         } else {
-            orderPage = orderRepository.findAllWithOrderItems(pageable);
+            orderPage = isAdmin
+                    ? orderRepository.findAllWithOrderItems(pageable)
+                    : orderRepository.findByUserIdWithOrderItems(currentUser.getId(), pageable);
         }
 
         List<OrderResponseDto> orderResponseList = orderPage.getContent().stream()

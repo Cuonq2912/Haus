@@ -12,11 +12,14 @@ import com.example.haus.domain.entity.product.payment.Payment;
 import com.example.haus.domain.entity.product.payment.PaymentGateway;
 import com.example.haus.domain.entity.product.payment.PaymentStatus;
 import com.example.haus.domain.entity.product.payment.PaymentType;
+import com.example.haus.domain.entity.user.Role;
+import com.example.haus.domain.entity.user.User;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.repository.OrderRepository;
 import com.example.haus.repository.PaymentRepository;
 import com.example.haus.repository.ProductVariationRepository;
+import com.example.haus.repository.UserRepository;
 import com.example.haus.service.VNPayService;
 import com.example.haus.util.PaymentUtil;
 import com.example.haus.util.UpdateSoldQuantityUtil;
@@ -55,6 +58,8 @@ public class VNPayServiceImpl implements VNPayService {
 
     final UpdateSoldQuantityUtil updateSoldQuantityUtil;
 
+    final UserRepository userRepository;
+
     Map<String, Boolean> checkIpnList = new ConcurrentHashMap<>();
 
     @Value("${payment.vnPay.maxTime}")
@@ -67,9 +72,8 @@ public class VNPayServiceImpl implements VNPayService {
 
     @Override
     @Transactional
-    public String createVNPayUrl(Long orderId, HttpServletRequest request) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
+    public String createVNPayUrl(Long orderId, String username, HttpServletRequest request) {
+        Order order = getAccessibleOrder(orderId, username);
 
         if (!order.getPayment().getGateway().equals(PaymentGateway.VNPAY) || !order.getPayment().getType().equals(PaymentType.ONLINE_PAYMENT)) {
             throw new InvalidDataException("Payment type invalid");
@@ -101,6 +105,20 @@ public class VNPayServiceImpl implements VNPayService {
         String vnpSecureHash = PaymentUtil.hmacSHA512(vnPayConfig.getVnPayHashSecret(), hashData);
 
         return vnPayConfig.getVnPayUrl() + "?" + hashData + "&vnp_SecureHash=" + vnpSecureHash;
+    }
+
+    private Order getAccessibleOrder(Long orderId, String username) {
+        User currentUser = userRepository.findByUsernameAndIsDeletedFalse(username)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
+
+        if (currentUser.getRole() != Role.ADMIN && !order.getUser().getId().equals(currentUser.getId())) {
+            throw new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED);
+        }
+
+        return order;
     }
 
     @NotNull
@@ -140,7 +158,7 @@ public class VNPayServiceImpl implements VNPayService {
 
         // Payment PENDING nhưng đã quá hạn
         Date currentTime = new Date();
-        if (payment.getStatus() == PaymentStatus.PENDING && currentTime.after(payment.getExpireAt())) {
+        if (payment.getStatus() == PaymentStatus.PENDING && !currentTime.before(payment.getExpireAt())) {
             Calendar newExpireTime = Calendar.getInstance(TimeZone.getTimeZone(ETC_GMT7));
             newExpireTime.add(Calendar.SECOND, maxPaymentTime);
             
@@ -152,7 +170,7 @@ public class VNPayServiceImpl implements VNPayService {
     }
 
     private Payment createPaymentRecord(Order order) {
-        Calendar expireTime = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        Calendar expireTime = Calendar.getInstance(TimeZone.getTimeZone(ETC_GMT7));
         expireTime.add(Calendar.SECOND, maxPaymentTime);
 
         Payment payment = Payment.builder()
@@ -173,16 +191,18 @@ public class VNPayServiceImpl implements VNPayService {
             throw new InvalidDataException("Expired time and current time must not be null");
         }
         
-        Calendar now = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        TimeZone vnTimeZone = TimeZone.getTimeZone(ETC_GMT7);
+        Calendar now = Calendar.getInstance(vnTimeZone);
 
         // Thời gian còn lại (giây)
         long diffInMillis = expiredTime.getTime() - currentTime.getTime();
         int remainingSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(diffInMillis);
 
         // Thời gian cho phép tối đa
-        int allowedTime = Math.min(remainingSeconds, maxPaymentTime);
+        int allowedTime = Math.max(0, Math.min(remainingSeconds, maxPaymentTime));
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        formatter.setTimeZone(vnTimeZone);
 
         // Ngày tạo giao dịch
         String vnpCreateDate = formatter.format(now.getTime());

@@ -32,8 +32,16 @@ public class KeycloakUtil {
     RestTemplate restTemplate;
     KeycloakProperties keycloakProperties;
 
+    private String serverUrl() {
+        String baseUrl = keycloakProperties.serverUrl();
+        if (baseUrl == null || baseUrl.isBlank()) {
+            throw new KeycloakException("Keycloak server URL is not configured");
+        }
+        return baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
+    }
+
     public void sendResetPasswordEmail(String userId) {
-        final String url = keycloakProperties.serverUrl()
+        final String url = serverUrl()
                 + ADMIN_REALM + keycloakProperties.realm()
                 + USER_END_POINT + userId + "/execute-actions-email";
 
@@ -57,7 +65,7 @@ public class KeycloakUtil {
 
 
     public boolean verifyEmail(String userId, boolean status) {
-        final String url = keycloakProperties.serverUrl()
+        final String url = serverUrl()
                 + ADMIN_REALM + keycloakProperties.realm() + USER_END_POINT + userId;
 
         HttpHeaders headers = new HttpHeaders();
@@ -86,7 +94,7 @@ public class KeycloakUtil {
     }
 
     public boolean resetPassword(String userId, String newPassword) {
-        final String url = keycloakProperties.serverUrl()
+        final String url = serverUrl()
                 + "admin/realms/" + keycloakProperties.realm()
                 + "/users/" + userId + "/reset-password";
 
@@ -122,12 +130,38 @@ public class KeycloakUtil {
         }
     }
 
+    public void deleteUser(String userId) {
+        final String url = serverUrl()
+                + "admin/realms/" + keycloakProperties.realm()
+                + "/users/" + userId;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.AUTHORIZATION, CommonConstant.BEARER_TOKEN + " " + getAdminToken());
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.DELETE, entity, String.class);
+            if (response.getStatusCode().is2xxSuccessful() || response.getStatusCode() == HttpStatus.NO_CONTENT) {
+                log.info("Deleted Keycloak user {}", userId);
+                return;
+            }
+
+            log.error("Failed to delete Keycloak user {}, status = {}, body = {}",
+                    userId, response.getStatusCode(), response.getBody());
+            throw new KeycloakException("Failed to delete user in Keycloak");
+        } catch (Exception ex) {
+            log.error("Error deleting Keycloak user {}", userId, ex);
+            throw new KeycloakException("Failed to delete user in Keycloak");
+        }
+    }
+
 
 
 
 
     public String getAdminToken() {
-        final String adminUrl = keycloakProperties.serverUrl() + "realms/Haus/protocol/openid-connect/token";
+        final String adminUrl = serverUrl() + "realms/" + keycloakProperties.realm() + "/protocol/openid-connect/token";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -143,13 +177,11 @@ public class KeycloakUtil {
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(params, headers);
         ResponseEntity<Map> response = restTemplate.postForEntity(adminUrl, entity, Map.class);
 
-        log.info("access_token = {}", (String) response.getBody().get("access_token"));
-
         return (String) response.getBody().get("access_token");
     }
 
     public String getUserId(String username) {
-        String url = keycloakProperties.serverUrl() + "admin/realms/" + keycloakProperties.realm() + "/users?username=" + username;
+        String url = serverUrl() + "admin/realms/" + keycloakProperties.realm() + "/users?username=" + username;
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, CommonConstant.BEARER_TOKEN + " " + getAdminToken());
@@ -162,7 +194,7 @@ public class KeycloakUtil {
             return (String) user.get("id");
         }
 
-        url = keycloakProperties.serverUrl() + "admin/realm/" + keycloakProperties.realm() + "/users?email=" + username;
+        url = serverUrl() + "admin/realms/" + keycloakProperties.realm() + "/users?email=" + username;
 
         entity = new HttpEntity<>(headers);
         response = restTemplate.exchange(url, HttpMethod.GET, entity, List.class);
@@ -175,10 +207,35 @@ public class KeycloakUtil {
         throw new RuntimeException("User not found in Keycloak with provided username or email");
     }
 
+    public String resolveUsername(String usernameOrEmail) {
+        String url = serverUrl() + "admin/realms/" + keycloakProperties.realm() + "/users?username=" + usernameOrEmail;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(AUTHORIZATION, CommonConstant.BEARER_TOKEN + " " + getAdminToken());
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<List> response = restTemplate.exchange(url, HttpMethod.GET, entity, List.class);
+
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null && !response.getBody().isEmpty()) {
+            Map<String, Object> user = (Map<String, Object>) response.getBody().get(0);
+            return (String) user.get("username");
+        }
+
+        url = serverUrl() + "admin/realms/" + keycloakProperties.realm() + "/users?email=" + usernameOrEmail;
+        response = restTemplate.exchange(url, HttpMethod.GET, entity, List.class);
+
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null && !response.getBody().isEmpty()) {
+            Map<String, Object> user = (Map<String, Object>) response.getBody().get(0);
+            return (String) user.get("username");
+        }
+
+        return usernameOrEmail;
+    }
+
     public void assignRoleToUser(String userId, String roleId) {
 
-        String url = keycloakProperties.serverUrl()
-                + "/admin/realms/" + keycloakProperties.realm()
+        String url = serverUrl()
+                + "admin/realms/" + keycloakProperties.realm()
                 + "/users/" + userId + "/role-mappings/realm";
 
         HttpHeaders headers = new HttpHeaders();
@@ -205,8 +262,8 @@ public class KeycloakUtil {
 
     public String getRoleId(String roleName) {
 
-        String url = keycloakProperties.serverUrl()
-                + "/admin/realms/" + keycloakProperties.realm()
+        String url = serverUrl()
+                + "admin/realms/" + keycloakProperties.realm()
                 + "/roles/" + roleName;
 
         HttpHeaders headers = new HttpHeaders();

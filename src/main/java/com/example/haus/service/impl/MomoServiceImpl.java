@@ -12,12 +12,15 @@ import com.example.haus.domain.entity.product.payment.PaymentGateway;
 import com.example.haus.domain.entity.product.payment.PaymentStatus;
 import com.example.haus.domain.entity.product.payment.PaymentType;
 import com.example.haus.domain.entity.product.payment.MomoTransaction;
+import com.example.haus.domain.entity.user.Role;
+import com.example.haus.domain.entity.user.User;
 import com.example.haus.exception.InvalidDataException;
 import com.example.haus.exception.ResourceNotFoundException;
 import com.example.haus.helper.MomoHelper;
 import com.example.haus.repository.OrderRepository;
 import com.example.haus.repository.PaymentRepository;
 import com.example.haus.repository.MomoTransactionRepository;
+import com.example.haus.repository.UserRepository;
 import com.example.haus.service.MomoService;
 import com.example.haus.util.PaymentUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -60,16 +63,17 @@ public class MomoServiceImpl implements MomoService {
 
     MomoTransactionRepository momoTransactionRepository;
 
+    UserRepository userRepository;
+
     RestTemplate restTemplate;
 
     ObjectMapper objectMapper;
 
     @Override
     @Transactional
-    public Map<String, String> createPaymentOrder(Long orderId) throws JsonProcessingException {
+    public Map<String, String> createPaymentOrder(Long orderId, String username) throws JsonProcessingException {
 
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
+        Order order = getAccessibleOrder(orderId, username);
 
         if (!order.getPayment().getGateway().equals(PaymentGateway.MOMO) || !order.getPayment().getType().equals(PaymentType.ONLINE_PAYMENT)) {
             throw new InvalidDataException("Payment gateway | type invalid");
@@ -135,6 +139,20 @@ public class MomoServiceImpl implements MomoService {
 
         return result;
 
+    }
+
+    private Order getAccessibleOrder(Long orderId, String username) {
+        User currentUser = userRepository.findByUsernameAndIsDeletedFalse(username)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.User.ERR_USER_NOT_EXISTED));
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED));
+
+        if (currentUser.getRole() != Role.ADMIN && !order.getUser().getId().equals(currentUser.getId())) {
+            throw new ResourceNotFoundException(ErrorMessage.Order.ERR_ORDER_NOT_EXISTED);
+        }
+
+        return order;
     }
 
     @Override
