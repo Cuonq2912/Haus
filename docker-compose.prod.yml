@@ -121,6 +121,11 @@ services:
       REDIS_PORT: 6379
       CLAMAV_HOST: clamav
       CLAMAV_PORT: 3310
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "10"
     volumes:
       - ./logs:/app/logs
 

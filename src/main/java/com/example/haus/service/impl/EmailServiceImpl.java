@@ -3,6 +3,7 @@ package com.example.haus.service.impl;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.exception.KeycloakException;
 import com.example.haus.service.EmailService;
+import com.example.haus.util.LogSanitizerUtil;
 import com.sendgrid.Method;
 import com.sendgrid.Request;
 import com.sendgrid.Response;
@@ -26,9 +27,6 @@ import java.nio.charset.StandardCharsets;
 @Slf4j(topic = "EMAIL-SERVICE")
 public class EmailServiceImpl implements EmailService {
     private final SendGrid sendGrid;
-
-    @Value("${spring.sendGrid.apiKey}")
-    private String apiKey;
 
     @Value("${spring.sendGrid.fromEmail}")
     private String from;
@@ -68,7 +66,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendRegistrationOtpByEmail(String to, String name, String otp) {
-        log.info("Send email verification for username = {}", name);
+        log.info("Send registration OTP email to identifier={}", LogSanitizerUtil.maskIdentifier(to));
 
         Email fromEmail = new Email(from, "HAUS");
         Email toEmail = new Email(to);
@@ -84,9 +82,8 @@ public class EmailServiceImpl implements EmailService {
             request.setBody(mail.build());
             request.setEndpoint("mail/send");
             Response response = sendGrid.api(request);
-            log.info("SendGrid API Key (first 20 chars): {}", apiKey.substring(0, Math.min(20, apiKey.length())));
             log.info("SendGrid Response Code: {}", response.getStatusCode());
-            log.info("SendGrid Response Body: {}", response.getBody());
+            log.info("SendGrid Response Body: {}", LogSanitizerUtil.sanitizeSensitiveText(response.getBody()));
             log.info("SendGrid Response Headers: {}", response.getHeaders());
             if (response.getStatusCode() == 202) {
                 log.info("Sending email verification successfully");
@@ -105,7 +102,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendForgotPasswordOtpByEmail(String to, String name, String otp) {
-        log.info("Sending email forgot password by email = {}", to);
+        log.info("Send forgot password OTP email to identifier={}", LogSanitizerUtil.maskIdentifier(to));
 
         Email fromEmail = new Email(from, "HAUS");
         Email toEmail = new Email(to);
@@ -122,7 +119,7 @@ public class EmailServiceImpl implements EmailService {
             request.setEndpoint("mail/send");
             Response response = sendGrid.api(request);
             log.info("SendGrid Response Code: {}", response.getStatusCode());
-            log.info("SendGrid Response Body: {}", response.getBody());
+            log.info("SendGrid Response Body: {}", LogSanitizerUtil.sanitizeSensitiveText(response.getBody()));
             if (response.getStatusCode() == 202) {
                 log.info("Sending email forgot password successfully");
             } else {

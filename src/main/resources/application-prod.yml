@@ -1,7 +1,26 @@
+application:
+  repository:
+    query-limit-warning-ms: ${QUERY_LIMIT_WARNING_MS:300}
+
 spring:
   config:
     activate:
       on-profile: prod
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI}
+
+  sendGrid:
+    apiKey: ${SENDGRID_API_KEY}
+    fromEmail: ${SENDGRID_FROM_EMAIL}
+    templateRegistrationId: d-edda5c8267604fdfb5fe08227332ed6c
+    templateForgotId: d-fe449caceb8545679f70b7f1f3fabae9
+    imagePrev: https://res.cloudinary.com/dgwnoquie/image/upload/v1755789933/image-43_f3kmgh.jpg
+    imageNext: https://res.cloudinary.com/dgwnoquie/image/upload/v1755790009/KHACH-BEP-15_bj8u43.jpg
+    logo: https://res.cloudinary.com/dgwnoquie/image/upload/v1755791051/HAUS-logo_byhum7.jpg
 
   redis:
     host: ${REDIS_HOST:localhost}
@@ -9,6 +28,10 @@ spring:
     password: ${REDIS_PASSWORD:}
 
 security:
+  public-endpoints: /oauth2/**, /auth/**, /api/v1/auth/**, /api/v1/payment/**
+  user-endpoints: /api/v1/user/**
+  admin-endpoints: /api/v1/admin/**, /api/v1/promotion/**, /api/v1/category/**, /api/v1/product/**
+  swagger-endpoints: /swagger-ui/**, /v3/api-docs/**, /swagger-ui.html
   cookie:
     name: refresh_token
     max-age-seconds: 604800
@@ -24,9 +47,74 @@ springdoc:
 openapi:
   service:
     api-docs: api-service
-    server: http://localhost:${server.port}
+    server: ${OPENAPI_SERVER_URL:http://localhost:${server.port}}
     title: API DOCUMENT
     version: v1.0.0
+
+jwt:
+  expiryHour: ${JWT_EXPIRY_HOUR:2}
+  expiryDay: ${JWT_EXPIRY_DAY:30}
+  accessKey: ${JWT_SECRET_KEY}
+  refreshKey: ${JWT_REFRESH_KEY}
+
+cloudinary:
+  cloud_name: ${CLOUDINARY_NAME}
+  api_key: ${CLOUDINARY_API_KEY}
+  secret_key: ${CLOUDINARY_SECRET_KEY}
+
+payment:
+  vnPay:
+    url: ${VNPAY_URL}
+    returnUrl: ${VNPAY_RETURN_URL}
+    tmnCode: ${VNPAY_TMN_CODE}
+    hashSecret: ${VNPAY_HASH_SECRET}
+    apiUrl: ${VNPAY_API_URL}
+    version: ${VNPAY_VERSION}
+    command: ${VNPAY_COMMAND:pay}
+    maxTime: ${VNPAY_MAXTIME}
+    orderType: ${VNPAY_ORDER_TYPE:other}
+    currCode: ${VNPAY_CURRCODE:VND}
+    locale: ${VNPAY_LOCALE:vn}
+
+  momo:
+    partner-code: ${MOMO_PARTNER_CODE}
+    access-key: ${MOMO_ACCESS_KEY}
+    secret-key: ${MOMO_SECRET_KEY}
+    end-point: ${MOMO_END_POINT:https://test-payment.momo.vn/v2/gateway/api/create}
+    redirect-url: ${MOMO_REDIRECT_URL}
+    ipn-url: ${MOMO_IPN_URL}
+    request-type: ${MOMO_REQUEST_TYPE:captureWallet}
+
+keycloak:
+  serverUrl: ${KEYCLOAK_SERVERURL}
+  realm: ${KEYCLOAK_REALM}
+  clientId: ${KEYCLOAK_CLIENTID}
+  clientSecret: ${KEYCLOAK_CLIENTSECRET}
+  adminUser: ${KEYCLOAK_ADMINUSER}
+  adminPassword: ${KEYCLOAK_ADMINPASSWORD}
+
+logging:
+  level:
+    root: ${LOGGING_LEVEL_ROOT:INFO}
+    com.example.haus: ${LOGGING_LEVEL_COM_EXAMPLE_HAUS:INFO}
+    org.springframework: ${LOGGING_LEVEL_ORG_SPRINGFRAMEWORK:WARN}
+    org.hibernate: ${LOGGING_LEVEL_ORG_HIBERNATE:WARN}
+  structured:
+    service: ${LOGGING_STRUCTURED_SERVICE:haus-backend}
+    env: ${LOGGING_STRUCTURED_ENV:prod}
+    version: ${LOGGING_STRUCTURED_VERSION:unknown}
+  file:
+    name: ${LOGGING_FILE_NAME:/app/logs/haus-backend.log}
+  pattern:
+    console: ${LOGGING_PATTERN_CONSOLE:%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n}
+    file: ${LOGGING_PATTERN_FILE:%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n}
+  logback:
+    rollingpolicy:
+      file-name-pattern: ${LOGGING_ROLLING_FILE_NAME_PATTERN:/app/logs/haus-backend.%d{yyyy-MM-dd}.%i.log.gz}
+      max-file-size: ${LOGGING_ROLLING_MAX_FILE_SIZE:20MB}
+      max-history: ${LOGGING_ROLLING_MAX_HISTORY:14}
+      total-size-cap: ${LOGGING_ROLLING_TOTAL_SIZE_CAP:2GB}
+      clean-history-on-start: ${LOGGING_ROLLING_CLEAN_HISTORY_ON_START:true}
 
 rate-limit:
   enabled: true

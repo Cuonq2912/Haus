@@ -27,6 +27,7 @@ import com.example.haus.repository.CartRepository;
 import com.example.haus.repository.UserRepository;
 import com.example.haus.service.AuthenticationService;
 import com.example.haus.service.EmailService;
+import com.example.haus.util.LogSanitizerUtil;
 import com.example.haus.util.OtpUtil;
 import com.example.haus.util.keycloak.KeycloakUtil;
 import jakarta.transaction.Transactional;
@@ -122,22 +123,26 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
                 return LoginResponseDto.builder().tokenType(CommonConstant.BEARER_TOKEN)
                         .userId(keycloakUtil.getUserId(resolvedUsername))
-                        .role(realmRoles.toString().contains("ADMIN") ? "ADMIN" : "USER").accessToken(accessToken)
-                        .refreshToken((String) body.get(REFRESH_TOKEN)).build();
-            } else {
-                log.error("Đăng nhập thất bại với username = {}", request.getUsername());
+                        .role(realmRoles.toString().contains("ADMIN") ? "ADMIN" : "USER")
+                        .accessToken(accessToken)
+                        .refreshToken((String) body.get(REFRESH_TOKEN))
+                        .build();
+            }
+            else {
+                log.error("Keycloak login failed with non-success response status={}", response.getStatusCode());
             }
         } catch (HttpStatusCodeException ex) {
             String responseBody = ex.getResponseBodyAsString();
-            log.error("Keycloak login failed for identifier={} resolvedUsername={} status={} body={}", loginIdentifier,
-                    resolvedUsername, ex.getStatusCode(), responseBody);
+            log.error("Keycloak login failed status={} identifier={} body={}",
+                    ex.getStatusCode(), LogSanitizerUtil.maskIdentifier(loginIdentifier),
+                    LogSanitizerUtil.sanitizeSensitiveText(responseBody));
             if (ex.getStatusCode() == HttpStatus.BAD_REQUEST || ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
                 throw new InvalidDataException(ErrorMessage.Auth.ERR_USERNAME_PASSWORD_INCORRECT);
             }
             throw new KeycloakException(ErrorMessage.Auth.ERR_LOGIN_FAILED_IN_KEYCLOAK);
         } catch (Exception ex) {
-            log.error("Unexpected error during Keycloak login for identifier={} resolvedUsername={}", loginIdentifier,
-                    resolvedUsername, ex);
+            log.error("Unexpected error during Keycloak login for identifier={}",
+                    LogSanitizerUtil.maskIdentifier(loginIdentifier), ex);
             throw new KeycloakException(ErrorMessage.Auth.ERR_LOGIN_FAILED_IN_KEYCLOAK);
         }
         throw new InvalidDataException(ErrorMessage.Auth.ERR_USERNAME_PASSWORD_INCORRECT);
@@ -172,7 +177,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userRepository.save(user);
         cartRepository.save(cart);
 
-        log.info("Provisioned missing local user {} with role {}", username, role);
+        log.info("Provisioned missing local user {} with role {}", LogSanitizerUtil.maskIdentifier(username), role);
     }
 
     @Override
@@ -193,7 +198,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
 
             if (!response.getStatusCode().is2xxSuccessful()) {
-                log.error("Logout failed: {}", response.getBody());
+                log.error("Logout failed status={} body={}", response.getStatusCode(),
+                        LogSanitizerUtil.sanitizeSensitiveText(response.getBody()));
                 throw new KeycloakException("Failed to logout");
             }
 
@@ -231,7 +237,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         .refreshToken((String) body.get("refresh_token")).build();
             }
         } catch (HttpStatusCodeException ex) {
-            log.error("Keycloak refresh failed status={} body={}", ex.getStatusCode(), ex.getResponseBodyAsString());
+            log.error("Keycloak refresh failed status={} body={}",
+                    ex.getStatusCode(), LogSanitizerUtil.sanitizeSensitiveText(ex.getResponseBodyAsString()));
             if (ex.getStatusCode() == HttpStatus.BAD_REQUEST || ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
                 throw new InvalidDataException(ErrorMessage.Auth.ERR_USERNAME_PASSWORD_INCORRECT);
             }
@@ -352,7 +359,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void forgotPassword(ForgotPasswordRequestDto request) {
-        log.info(request.getEmail());
+        log.info("Forgot password flow started for identifier={}",
+                LogSanitizerUtil.maskIdentifier(request.getEmail()));
 
         if (!userRepository.existsUserByEmailAndIsDeletedFalse(request.getEmail()))
             throw new ResourceNotFoundException(ErrorMessage.User.ERR_EMAIL_NOT_EXISTED);

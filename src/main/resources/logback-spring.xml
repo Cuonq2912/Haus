@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+
+    <springProperty scope="context" name="LOG_FILE" source="logging.file.name"
+        defaultValue="/app/logs/haus-backend.log" />
+    <springProperty scope="context" name="LOG_MAX_SIZE" source="logging.logback.rollingpolicy.max-file-size"
+        defaultValue="20MB" />
+    <springProperty scope="context" name="LOG_MAX_HISTORY" source="logging.logback.rollingpolicy.max-history"
+        defaultValue="14" />
+    <springProperty scope="context" name="LOG_TOTAL_SIZE_CAP"
+        source="logging.logback.rollingpolicy.total-size-cap" defaultValue="2GB" />
+    <springProperty scope="context" name="LOG_FILE_PATTERN"
+        source="logging.logback.rollingpolicy.file-name-pattern"
+        defaultValue="/app/logs/haus-backend.%d{yyyy-MM-dd}.%i.log.gz" />
+    <springProperty scope="context" name="LOG_CLEAN_HISTORY_ON_START"
+        source="logging.logback.rollingpolicy.clean-history-on-start"
+        defaultValue="true" />
+    <springProperty scope="context" name="STRUCTURED_SERVICE" source="logging.structured.service"
+        defaultValue="haus-backend" />
+    <springProperty scope="context" name="STRUCTURED_ENV" source="logging.structured.env"
+        defaultValue="prod" />
+    <springProperty scope="context" name="STRUCTURED_VERSION" source="logging.structured.version"
+        defaultValue="unknown" />
+    <springProperty scope="context" name="CONSOLE_PATTERN" source="logging.pattern.console"
+        defaultValue="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n" />
+
+    <appender name="STDOUT_PATTERN" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <springProfile name="prod">
+        <appender name="FILE_JSON" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_FILE}</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_FILE_PATTERN}</fileNamePattern>
+                <maxFileSize>${LOG_MAX_SIZE}</maxFileSize>
+                <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
+                <totalSizeCap>${LOG_TOTAL_SIZE_CAP}</totalSizeCap>
+                <cleanHistoryOnStart>${LOG_CLEAN_HISTORY_ON_START}</cleanHistoryOnStart>
+            </rollingPolicy>
+
+            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                <providers>
+                    <timestamp>
+                        <fieldName>timestamp</fieldName>
+                        <pattern>yyyy-MM-dd'T'HH:mm:ss.SSSXXX</pattern>
+                    </timestamp>
+                    <logLevel>
+                        <fieldName>level</fieldName>
+                    </logLevel>
+                    <threadName>
+                        <fieldName>thread</fieldName>
+                    </threadName>
+                    <loggerName>
+                        <fieldName>logger</fieldName>
+                    </loggerName>
+                    <message>
+                        <fieldName>message</fieldName>
+                    </message>
+                    <mdc>
+                        <includeMdcKeyName>requestId</includeMdcKeyName>
+                        <includeMdcKeyName>path</includeMdcKeyName>
+                        <includeMdcKeyName>method</includeMdcKeyName>
+                        <includeMdcKeyName>status</includeMdcKeyName>
+                        <includeMdcKeyName>durationMs</includeMdcKeyName>
+                        <includeMdcKeyName>clientIp</includeMdcKeyName>
+                        <includeMdcKeyName>userId</includeMdcKeyName>
+                        <includeMdcKeyName>traceId</includeMdcKeyName>
+                        <includeMdcKeyName>spanId</includeMdcKeyName>
+                    </mdc>
+                    <stackTrace />
+                    <globalCustomFields>
+                        <customFields>{"service":"${STRUCTURED_SERVICE}","env":"${STRUCTURED_ENV}","version":"${STRUCTURED_VERSION}"}</customFields>
+                    </globalCustomFields>
+                </providers>
+            </encoder>
+        </appender>
+
+        <appender name="CONSOLE_JSON" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <customFields>{"service":"${STRUCTURED_SERVICE}","env":"${STRUCTURED_ENV}","version":"${STRUCTURED_VERSION}"}</customFields>
+            </encoder>
+        </appender>
+
+        <root level="${LOGGING_LEVEL_ROOT:-INFO}">
+            <appender-ref ref="FILE_JSON" />
+            <appender-ref ref="CONSOLE_JSON" />
+        </root>
+    </springProfile>
+
+    <springProfile name="!prod">
+        <root level="${LOGGING_LEVEL_ROOT:-INFO}">
+            <appender-ref ref="STDOUT_PATTERN" />
+        </root>
+    </springProfile>
+</configuration>

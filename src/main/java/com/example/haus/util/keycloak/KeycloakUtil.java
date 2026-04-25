@@ -4,6 +4,7 @@ import com.example.haus.config.keycloak.KeycloakProperties;
 import com.example.haus.constant.CommonConstant;
 import com.example.haus.constant.ErrorMessage;
 import com.example.haus.exception.KeycloakException;
+import com.example.haus.util.LogSanitizerUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -56,7 +57,7 @@ public class KeycloakUtil {
             log.info("Reset password email sent successfully to userId = {}", userId);
         } else {
             log.error("Reset password email sent failed to userId = {}, status = {}, body = {}", userId,
-                    response.getStatusCode(), response.getBody());
+                    response.getStatusCode(), LogSanitizerUtil.sanitizeSensitiveText(response.getBody()));
             throw new KeycloakException(ErrorMessage.Auth.ERR_CAN_NOT_SEND_RESET_PASSWORD_EMAIL);
         }
     }
@@ -80,7 +81,7 @@ public class KeycloakUtil {
                 return true;
             } else {
                 log.error("Verification email in Keycloak failed by userId = {}, status = {}, body = {}", userId,
-                        response.getStatusCode(), response.getBody());
+                        response.getStatusCode(), LogSanitizerUtil.sanitizeSensitiveText(response.getBody()));
                 return false;
             }
         } catch (Exception ex) {
@@ -115,7 +116,7 @@ public class KeycloakUtil {
                 return true;
             } else {
                 log.error("Reset password failed in Keycloak for userId = {}, status = {}, body = {}", userId,
-                        response.getStatusCode(), response.getBody());
+                        response.getStatusCode(), LogSanitizerUtil.sanitizeSensitiveText(response.getBody()));
                 return false;
             }
         } catch (Exception ex) {
@@ -140,7 +141,7 @@ public class KeycloakUtil {
             }
 
             log.error("Failed to delete Keycloak user {}, status = {}, body = {}", userId, response.getStatusCode(),
-                    response.getBody());
+                    LogSanitizerUtil.sanitizeSensitiveText(response.getBody()));
             throw new KeycloakException("Failed to delete user in Keycloak");
         } catch (Exception ex) {
             log.error("Error deleting Keycloak user {}", userId, ex);

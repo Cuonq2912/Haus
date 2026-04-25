@@ -8,6 +8,7 @@ import com.example.haus.domain.entity.user.Role;
 import com.example.haus.domain.entity.user.User;
 import com.example.haus.repository.CartRepository;
 import com.example.haus.repository.UserRepository;
+import com.example.haus.util.LogSanitizerUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.CommandLineRunner;
@@ -61,8 +62,8 @@ public class HausApplication {
 
                 cartRepository.save(cart);
 
-                log.info("admin created successful with name: {} and password = {}", admin.getUsername(),
-                        admin.getPassword());
+                log.info("Admin bootstrap account created for identifier={}",
+                        LogSanitizerUtil.maskIdentifier(admin.getUsername()));
             }
         };
     }
